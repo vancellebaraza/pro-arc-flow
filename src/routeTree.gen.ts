@@ -16,6 +16,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedEngineerIndexRouteImport } from './routes/_authenticated/engineer/index'
 import { Route as AuthenticatedClientIndexRouteImport } from './routes/_authenticated/client/index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as AuthenticatedEngineerProjectIdRouteImport } from './routes/_authenticated/engineer/$projectId'
 import { Route as AuthenticatedClientNewRouteImport } from './routes/_authenticated/client/new'
 import { Route as AuthenticatedClientProjectIdRouteImport } from './routes/_authenticated/client/$projectId'
 
@@ -55,6 +56,12 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/admin/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedEngineerProjectIdRoute =
+  AuthenticatedEngineerProjectIdRouteImport.update({
+    id: '/engineer/$projectId',
+    path: '/engineer/$projectId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedClientNewRoute = AuthenticatedClientNewRouteImport.update({
   id: '/client/new',
   path: '/client/new',
@@ -73,6 +80,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/client/$projectId': typeof AuthenticatedClientProjectIdRoute
   '/client/new': typeof AuthenticatedClientNewRoute
+  '/engineer/$projectId': typeof AuthenticatedEngineerProjectIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/client/': typeof AuthenticatedClientIndexRoute
   '/engineer/': typeof AuthenticatedEngineerIndexRoute
@@ -83,6 +91,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/client/$projectId': typeof AuthenticatedClientProjectIdRoute
   '/client/new': typeof AuthenticatedClientNewRoute
+  '/engineer/$projectId': typeof AuthenticatedEngineerProjectIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/client': typeof AuthenticatedClientIndexRoute
   '/engineer': typeof AuthenticatedEngineerIndexRoute
@@ -95,6 +104,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/client/$projectId': typeof AuthenticatedClientProjectIdRoute
   '/_authenticated/client/new': typeof AuthenticatedClientNewRoute
+  '/_authenticated/engineer/$projectId': typeof AuthenticatedEngineerProjectIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/client/': typeof AuthenticatedClientIndexRoute
   '/_authenticated/engineer/': typeof AuthenticatedEngineerIndexRoute
@@ -107,6 +117,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/client/$projectId'
     | '/client/new'
+    | '/engineer/$projectId'
     | '/admin/'
     | '/client/'
     | '/engineer/'
@@ -117,6 +128,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/client/$projectId'
     | '/client/new'
+    | '/engineer/$projectId'
     | '/admin'
     | '/client'
     | '/engineer'
@@ -128,6 +140,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/client/$projectId'
     | '/_authenticated/client/new'
+    | '/_authenticated/engineer/$projectId'
     | '/_authenticated/admin/'
     | '/_authenticated/client/'
     | '/_authenticated/engineer/'
@@ -190,6 +203,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/engineer/$projectId': {
+      id: '/_authenticated/engineer/$projectId'
+      path: '/engineer/$projectId'
+      fullPath: '/engineer/$projectId'
+      preLoaderRoute: typeof AuthenticatedEngineerProjectIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/client/new': {
       id: '/_authenticated/client/new'
       path: '/client/new'
@@ -211,6 +231,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedClientProjectIdRoute: typeof AuthenticatedClientProjectIdRoute
   AuthenticatedClientNewRoute: typeof AuthenticatedClientNewRoute
+  AuthenticatedEngineerProjectIdRoute: typeof AuthenticatedEngineerProjectIdRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedClientIndexRoute: typeof AuthenticatedClientIndexRoute
   AuthenticatedEngineerIndexRoute: typeof AuthenticatedEngineerIndexRoute
@@ -220,6 +241,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedClientProjectIdRoute: AuthenticatedClientProjectIdRoute,
   AuthenticatedClientNewRoute: AuthenticatedClientNewRoute,
+  AuthenticatedEngineerProjectIdRoute: AuthenticatedEngineerProjectIdRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   AuthenticatedClientIndexRoute: AuthenticatedClientIndexRoute,
   AuthenticatedEngineerIndexRoute: AuthenticatedEngineerIndexRoute,
