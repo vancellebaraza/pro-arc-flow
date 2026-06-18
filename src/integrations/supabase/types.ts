@@ -22,8 +22,11 @@ export type Database = {
           flagged: boolean
           id: string
           image_urls: string[]
+          meta: Json
+          photo_evidence: Json
           project_id: string
           remarks: string | null
+          signatures: Json
           stage: string
         }
         Insert: {
@@ -33,8 +36,11 @@ export type Database = {
           flagged?: boolean
           id?: string
           image_urls?: string[]
+          meta?: Json
+          photo_evidence?: Json
           project_id: string
           remarks?: string | null
+          signatures?: Json
           stage?: string
         }
         Update: {
@@ -44,8 +50,11 @@ export type Database = {
           flagged?: boolean
           id?: string
           image_urls?: string[]
+          meta?: Json
+          photo_evidence?: Json
           project_id?: string
           remarks?: string | null
+          signatures?: Json
           stage?: string
         }
         Relationships: [
@@ -86,6 +95,47 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "messages_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          link: string | null
+          project_id: string | null
+          read_at: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          project_id?: string | null
+          read_at?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          project_id?: string | null
+          read_at?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
@@ -174,6 +224,7 @@ export type Database = {
           qty: number
           quotation_id: string
           sort_order: number
+          unit: string | null
           unit_cost: number
         }
         Insert: {
@@ -184,6 +235,7 @@ export type Database = {
           qty?: number
           quotation_id: string
           sort_order?: number
+          unit?: string | null
           unit_cost?: number
         }
         Update: {
@@ -194,6 +246,7 @@ export type Database = {
           qty?: number
           quotation_id?: string
           sort_order?: number
+          unit?: string | null
           unit_cost?: number
         }
         Relationships: [
@@ -212,8 +265,11 @@ export type Database = {
           engineer_id: string
           grand_total: number
           id: string
+          labour: number
+          meta: Json
           notes: string | null
           project_id: string
+          quote_no: string | null
           status: Database["public"]["Enums"]["quotation_status"]
           subtotal: number
           updated_at: string
@@ -225,8 +281,11 @@ export type Database = {
           engineer_id: string
           grand_total?: number
           id?: string
+          labour?: number
+          meta?: Json
           notes?: string | null
           project_id: string
+          quote_no?: string | null
           status?: Database["public"]["Enums"]["quotation_status"]
           subtotal?: number
           updated_at?: string
@@ -238,8 +297,11 @@ export type Database = {
           engineer_id?: string
           grand_total?: number
           id?: string
+          labour?: number
+          meta?: Json
           notes?: string | null
           project_id?: string
+          quote_no?: string | null
           status?: Database["public"]["Enums"]["quotation_status"]
           subtotal?: number
           updated_at?: string
@@ -276,6 +338,41 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      whatsapp_logs: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          project_id: string | null
+          recipient: string | null
+          sender_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          project_id?: string | null
+          recipient?: string | null
+          sender_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          project_id?: string | null
+          recipient?: string | null
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_logs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       work_tasks: {
         Row: {
@@ -314,6 +411,71 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "work_tasks_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      worksheets: {
+        Row: {
+          client_name: string | null
+          created_at: string
+          engineer_id: string
+          id: string
+          images_before: Json
+          job_date: string | null
+          job_description: string | null
+          job_location: string | null
+          job_no: string | null
+          job_type: string | null
+          observations: Json
+          person_in_charge: string | null
+          project_id: string
+          signatures: Json
+          technician: string | null
+          updated_at: string
+        }
+        Insert: {
+          client_name?: string | null
+          created_at?: string
+          engineer_id: string
+          id?: string
+          images_before?: Json
+          job_date?: string | null
+          job_description?: string | null
+          job_location?: string | null
+          job_no?: string | null
+          job_type?: string | null
+          observations?: Json
+          person_in_charge?: string | null
+          project_id: string
+          signatures?: Json
+          technician?: string | null
+          updated_at?: string
+        }
+        Update: {
+          client_name?: string | null
+          created_at?: string
+          engineer_id?: string
+          id?: string
+          images_before?: Json
+          job_date?: string | null
+          job_description?: string | null
+          job_location?: string | null
+          job_no?: string | null
+          job_type?: string | null
+          observations?: Json
+          person_in_charge?: string | null
+          project_id?: string
+          signatures?: Json
+          technician?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "worksheets_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"

@@ -56,17 +56,30 @@ function Landing() {
               <p className="mt-2 text-muted-foreground">End-to-end coverage across property operations.</p>
             </div>
           </div>
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {SERVICES.map((s) => (
-              <div key={s.key} className="group rounded-xl border bg-card p-6 transition hover:border-foreground/30 hover:-translate-y-0.5">
-                <div className="flex items-center gap-3">
-                  <div className="grid h-10 w-10 place-items-center rounded-md bg-foreground/5">
-                    <s.icon className="h-5 w-5" />
+              <article key={s.key} className="group overflow-hidden rounded-xl border bg-card transition hover:border-foreground/30 hover:-translate-y-0.5 hover:shadow-md">
+                <div className="relative aspect-[16/10] overflow-hidden">
+                  <img
+                    src={s.image}
+                    alt={s.label}
+                    width={1024}
+                    height={640}
+                    loading="lazy"
+                    className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  <div className="absolute bottom-3 left-3 flex items-center gap-2 text-background">
+                    <div className="grid h-8 w-8 place-items-center rounded-md bg-background/15 backdrop-blur">
+                      <s.icon className="h-4 w-4" />
+                    </div>
+                    <h3 className="font-medium drop-shadow">{s.label}</h3>
                   </div>
-                  <h3 className="font-medium">{s.label}</h3>
                 </div>
-                <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
-              </div>
+                <div className="p-5">
+                  <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
+                </div>
+              </article>
             ))}
           </div>
         </div>
@@ -76,7 +89,7 @@ function Landing() {
         <div className="mx-auto max-w-6xl px-6 py-20 grid md:grid-cols-3 gap-10">
           <div className="md:col-span-1">
             <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">About</h2>
-            <p className="mt-3 text-muted-foreground">Built for RealArc Estates' multi-trade operations team.</p>
+            <p className="mt-3 text-muted-foreground">Built for RealArc Estates&apos; multi-trade operations team.</p>
           </div>
           <div className="md:col-span-2 grid sm:grid-cols-3 gap-6">
             {[
