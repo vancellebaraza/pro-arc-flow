@@ -19,6 +19,11 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedEngineerProjectIdRouteImport } from './routes/_authenticated/engineer/$projectId'
 import { Route as AuthenticatedClientNewRouteImport } from './routes/_authenticated/client/new'
 import { Route as AuthenticatedClientProjectIdRouteImport } from './routes/_authenticated/client/$projectId'
+import { Route as AuthenticatedEngineerProjectIdWorksheetRouteImport } from './routes/_authenticated/engineer/$projectId.worksheet'
+import { Route as AuthenticatedEngineerProjectIdQuotationRouteImport } from './routes/_authenticated/engineer/$projectId.quotation'
+import { Route as AuthenticatedEngineerProjectIdMessagesRouteImport } from './routes/_authenticated/engineer/$projectId.messages'
+import { Route as AuthenticatedEngineerProjectIdInspectionRouteImport } from './routes/_authenticated/engineer/$projectId.inspection'
+import { Route as AuthenticatedEngineerProjectIdCompareRouteImport } from './routes/_authenticated/engineer/$projectId.compare'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -73,6 +78,36 @@ const AuthenticatedClientProjectIdRoute =
     path: '/client/$projectId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedEngineerProjectIdWorksheetRoute =
+  AuthenticatedEngineerProjectIdWorksheetRouteImport.update({
+    id: '/worksheet',
+    path: '/worksheet',
+    getParentRoute: () => AuthenticatedEngineerProjectIdRoute,
+  } as any)
+const AuthenticatedEngineerProjectIdQuotationRoute =
+  AuthenticatedEngineerProjectIdQuotationRouteImport.update({
+    id: '/quotation',
+    path: '/quotation',
+    getParentRoute: () => AuthenticatedEngineerProjectIdRoute,
+  } as any)
+const AuthenticatedEngineerProjectIdMessagesRoute =
+  AuthenticatedEngineerProjectIdMessagesRouteImport.update({
+    id: '/messages',
+    path: '/messages',
+    getParentRoute: () => AuthenticatedEngineerProjectIdRoute,
+  } as any)
+const AuthenticatedEngineerProjectIdInspectionRoute =
+  AuthenticatedEngineerProjectIdInspectionRouteImport.update({
+    id: '/inspection',
+    path: '/inspection',
+    getParentRoute: () => AuthenticatedEngineerProjectIdRoute,
+  } as any)
+const AuthenticatedEngineerProjectIdCompareRoute =
+  AuthenticatedEngineerProjectIdCompareRouteImport.update({
+    id: '/compare',
+    path: '/compare',
+    getParentRoute: () => AuthenticatedEngineerProjectIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -80,10 +115,15 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/client/$projectId': typeof AuthenticatedClientProjectIdRoute
   '/client/new': typeof AuthenticatedClientNewRoute
-  '/engineer/$projectId': typeof AuthenticatedEngineerProjectIdRoute
+  '/engineer/$projectId': typeof AuthenticatedEngineerProjectIdRouteWithChildren
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/client/': typeof AuthenticatedClientIndexRoute
   '/engineer/': typeof AuthenticatedEngineerIndexRoute
+  '/engineer/$projectId/compare': typeof AuthenticatedEngineerProjectIdCompareRoute
+  '/engineer/$projectId/inspection': typeof AuthenticatedEngineerProjectIdInspectionRoute
+  '/engineer/$projectId/messages': typeof AuthenticatedEngineerProjectIdMessagesRoute
+  '/engineer/$projectId/quotation': typeof AuthenticatedEngineerProjectIdQuotationRoute
+  '/engineer/$projectId/worksheet': typeof AuthenticatedEngineerProjectIdWorksheetRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -91,10 +131,15 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/client/$projectId': typeof AuthenticatedClientProjectIdRoute
   '/client/new': typeof AuthenticatedClientNewRoute
-  '/engineer/$projectId': typeof AuthenticatedEngineerProjectIdRoute
+  '/engineer/$projectId': typeof AuthenticatedEngineerProjectIdRouteWithChildren
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/client': typeof AuthenticatedClientIndexRoute
   '/engineer': typeof AuthenticatedEngineerIndexRoute
+  '/engineer/$projectId/compare': typeof AuthenticatedEngineerProjectIdCompareRoute
+  '/engineer/$projectId/inspection': typeof AuthenticatedEngineerProjectIdInspectionRoute
+  '/engineer/$projectId/messages': typeof AuthenticatedEngineerProjectIdMessagesRoute
+  '/engineer/$projectId/quotation': typeof AuthenticatedEngineerProjectIdQuotationRoute
+  '/engineer/$projectId/worksheet': typeof AuthenticatedEngineerProjectIdWorksheetRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -104,10 +149,15 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/client/$projectId': typeof AuthenticatedClientProjectIdRoute
   '/_authenticated/client/new': typeof AuthenticatedClientNewRoute
-  '/_authenticated/engineer/$projectId': typeof AuthenticatedEngineerProjectIdRoute
+  '/_authenticated/engineer/$projectId': typeof AuthenticatedEngineerProjectIdRouteWithChildren
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/client/': typeof AuthenticatedClientIndexRoute
   '/_authenticated/engineer/': typeof AuthenticatedEngineerIndexRoute
+  '/_authenticated/engineer/$projectId/compare': typeof AuthenticatedEngineerProjectIdCompareRoute
+  '/_authenticated/engineer/$projectId/inspection': typeof AuthenticatedEngineerProjectIdInspectionRoute
+  '/_authenticated/engineer/$projectId/messages': typeof AuthenticatedEngineerProjectIdMessagesRoute
+  '/_authenticated/engineer/$projectId/quotation': typeof AuthenticatedEngineerProjectIdQuotationRoute
+  '/_authenticated/engineer/$projectId/worksheet': typeof AuthenticatedEngineerProjectIdWorksheetRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -121,6 +171,11 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/client/'
     | '/engineer/'
+    | '/engineer/$projectId/compare'
+    | '/engineer/$projectId/inspection'
+    | '/engineer/$projectId/messages'
+    | '/engineer/$projectId/quotation'
+    | '/engineer/$projectId/worksheet'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -132,6 +187,11 @@ export interface FileRouteTypes {
     | '/admin'
     | '/client'
     | '/engineer'
+    | '/engineer/$projectId/compare'
+    | '/engineer/$projectId/inspection'
+    | '/engineer/$projectId/messages'
+    | '/engineer/$projectId/quotation'
+    | '/engineer/$projectId/worksheet'
   id:
     | '__root__'
     | '/'
@@ -144,6 +204,11 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/'
     | '/_authenticated/client/'
     | '/_authenticated/engineer/'
+    | '/_authenticated/engineer/$projectId/compare'
+    | '/_authenticated/engineer/$projectId/inspection'
+    | '/_authenticated/engineer/$projectId/messages'
+    | '/_authenticated/engineer/$projectId/quotation'
+    | '/_authenticated/engineer/$projectId/worksheet'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -224,14 +289,76 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedClientProjectIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/engineer/$projectId/worksheet': {
+      id: '/_authenticated/engineer/$projectId/worksheet'
+      path: '/worksheet'
+      fullPath: '/engineer/$projectId/worksheet'
+      preLoaderRoute: typeof AuthenticatedEngineerProjectIdWorksheetRouteImport
+      parentRoute: typeof AuthenticatedEngineerProjectIdRoute
+    }
+    '/_authenticated/engineer/$projectId/quotation': {
+      id: '/_authenticated/engineer/$projectId/quotation'
+      path: '/quotation'
+      fullPath: '/engineer/$projectId/quotation'
+      preLoaderRoute: typeof AuthenticatedEngineerProjectIdQuotationRouteImport
+      parentRoute: typeof AuthenticatedEngineerProjectIdRoute
+    }
+    '/_authenticated/engineer/$projectId/messages': {
+      id: '/_authenticated/engineer/$projectId/messages'
+      path: '/messages'
+      fullPath: '/engineer/$projectId/messages'
+      preLoaderRoute: typeof AuthenticatedEngineerProjectIdMessagesRouteImport
+      parentRoute: typeof AuthenticatedEngineerProjectIdRoute
+    }
+    '/_authenticated/engineer/$projectId/inspection': {
+      id: '/_authenticated/engineer/$projectId/inspection'
+      path: '/inspection'
+      fullPath: '/engineer/$projectId/inspection'
+      preLoaderRoute: typeof AuthenticatedEngineerProjectIdInspectionRouteImport
+      parentRoute: typeof AuthenticatedEngineerProjectIdRoute
+    }
+    '/_authenticated/engineer/$projectId/compare': {
+      id: '/_authenticated/engineer/$projectId/compare'
+      path: '/compare'
+      fullPath: '/engineer/$projectId/compare'
+      preLoaderRoute: typeof AuthenticatedEngineerProjectIdCompareRouteImport
+      parentRoute: typeof AuthenticatedEngineerProjectIdRoute
+    }
   }
 }
+
+interface AuthenticatedEngineerProjectIdRouteChildren {
+  AuthenticatedEngineerProjectIdCompareRoute: typeof AuthenticatedEngineerProjectIdCompareRoute
+  AuthenticatedEngineerProjectIdInspectionRoute: typeof AuthenticatedEngineerProjectIdInspectionRoute
+  AuthenticatedEngineerProjectIdMessagesRoute: typeof AuthenticatedEngineerProjectIdMessagesRoute
+  AuthenticatedEngineerProjectIdQuotationRoute: typeof AuthenticatedEngineerProjectIdQuotationRoute
+  AuthenticatedEngineerProjectIdWorksheetRoute: typeof AuthenticatedEngineerProjectIdWorksheetRoute
+}
+
+const AuthenticatedEngineerProjectIdRouteChildren: AuthenticatedEngineerProjectIdRouteChildren =
+  {
+    AuthenticatedEngineerProjectIdCompareRoute:
+      AuthenticatedEngineerProjectIdCompareRoute,
+    AuthenticatedEngineerProjectIdInspectionRoute:
+      AuthenticatedEngineerProjectIdInspectionRoute,
+    AuthenticatedEngineerProjectIdMessagesRoute:
+      AuthenticatedEngineerProjectIdMessagesRoute,
+    AuthenticatedEngineerProjectIdQuotationRoute:
+      AuthenticatedEngineerProjectIdQuotationRoute,
+    AuthenticatedEngineerProjectIdWorksheetRoute:
+      AuthenticatedEngineerProjectIdWorksheetRoute,
+  }
+
+const AuthenticatedEngineerProjectIdRouteWithChildren =
+  AuthenticatedEngineerProjectIdRoute._addFileChildren(
+    AuthenticatedEngineerProjectIdRouteChildren,
+  )
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedClientProjectIdRoute: typeof AuthenticatedClientProjectIdRoute
   AuthenticatedClientNewRoute: typeof AuthenticatedClientNewRoute
-  AuthenticatedEngineerProjectIdRoute: typeof AuthenticatedEngineerProjectIdRoute
+  AuthenticatedEngineerProjectIdRoute: typeof AuthenticatedEngineerProjectIdRouteWithChildren
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedClientIndexRoute: typeof AuthenticatedClientIndexRoute
   AuthenticatedEngineerIndexRoute: typeof AuthenticatedEngineerIndexRoute
@@ -241,7 +368,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedClientProjectIdRoute: AuthenticatedClientProjectIdRoute,
   AuthenticatedClientNewRoute: AuthenticatedClientNewRoute,
-  AuthenticatedEngineerProjectIdRoute: AuthenticatedEngineerProjectIdRoute,
+  AuthenticatedEngineerProjectIdRoute:
+    AuthenticatedEngineerProjectIdRouteWithChildren,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   AuthenticatedClientIndexRoute: AuthenticatedClientIndexRoute,
   AuthenticatedEngineerIndexRoute: AuthenticatedEngineerIndexRoute,
