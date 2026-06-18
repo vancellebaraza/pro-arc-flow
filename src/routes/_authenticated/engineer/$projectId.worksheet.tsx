@@ -91,9 +91,9 @@ function WorksheetPage() {
         technician,
         person_in_charge: personInCharge,
         job_description: jobDescription,
-        observations,
-        images_before: imagesBefore,
-        signatures: { technician_name: sigTech, supervisor_name: sigSup, client_name: sigClient },
+        observations: observations as never,
+        images_before: imagesBefore as never,
+        signatures: { technician_name: sigTech, supervisor_name: sigSup, client_name: sigClient } as never,
       };
       if (worksheetId) {
         const { error } = await supabase.from("worksheets").update(payload).eq("id", worksheetId);

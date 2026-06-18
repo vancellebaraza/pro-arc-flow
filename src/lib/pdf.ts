@@ -96,7 +96,7 @@ export function generateQuotationPdf(q: QuotePdfInput) {
   doc.setTextColor(20);
 
   fy += 12;
-  doc.setFillColor(245);
+  doc.setFillColor(245, 245, 245);
   doc.rect(14, fy, 186, 36, "F");
   doc.setFontSize(10);
   doc.text("Payment — Bank Details", 18, fy + 6);

@@ -93,11 +93,11 @@ function InspectionPage() {
         project_id: projectId,
         engineer_id: u.user.id,
         stage,
-        checklist: checklistJson,
+        checklist: checklistJson as never,
         remarks,
-        meta,
-        photo_evidence: photos,
-        signatures,
+        meta: meta as never,
+        photo_evidence: photos as never,
+        signatures: signatures as never,
         image_urls: photos.flatMap((p) => [p.before, p.during, p.after].filter(Boolean)),
       });
       if (error) throw error;

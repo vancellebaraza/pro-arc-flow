@@ -53,13 +53,19 @@ function ProjectDetail() {
 
   function downloadPdf() {
     if (!quote || !project) return;
+    const labour = items.reduce((sum, it) => sum + Number(it.amount), 0);
     generateQuotationPdf({
       projectTitle: project.title,
       service: SERVICES.find((s) => s.key === project.service)?.label ?? project.service,
       location: project.location,
-      quoteId: quote.id,
+      quoteNo: quote.id.slice(0, 8).toUpperCase(),
+      billTo: project.title,
       date: new Date(quote.created_at).toLocaleDateString(),
-      items, vatRate: quote.vat_rate, subtotal: quote.subtotal, vatAmount: quote.vat_amount, grandTotal: quote.grand_total, notes: quote.notes,
+      items,
+      labour,
+      subtotal: Number(quote.subtotal),
+      grandTotal: Number(quote.grand_total),
+      notes: quote.notes,
     });
   }
 
