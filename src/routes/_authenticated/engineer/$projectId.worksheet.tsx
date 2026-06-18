@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -91,9 +92,9 @@ function WorksheetPage() {
         technician,
         person_in_charge: personInCharge,
         job_description: jobDescription,
-        observations: observations as never,
-        images_before: imagesBefore as never,
-        signatures: { technician_name: sigTech, supervisor_name: sigSup, client_name: sigClient } as never,
+        observations: observations as Json,
+        images_before: imagesBefore as Json,
+        signatures: { technician_name: sigTech, supervisor_name: sigSup, client_name: sigClient } as Json,
       };
       if (worksheetId) {
         const { error } = await supabase.from("worksheets").update(payload).eq("id", worksheetId);

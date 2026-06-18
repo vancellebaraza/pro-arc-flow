@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { SERVICES, STATUS_LABEL } from "@/lib/services";
@@ -139,6 +139,9 @@ function EngineerProjectHub() {
           </li>
         ))}
       </ul>
+      <div className="mt-8">
+        <Outlet />
+      </div>
     </div>
   );
 }

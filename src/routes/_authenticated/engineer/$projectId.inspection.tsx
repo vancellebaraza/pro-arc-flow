@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -93,11 +94,11 @@ function InspectionPage() {
         project_id: projectId,
         engineer_id: u.user.id,
         stage,
-        checklist: checklistJson as never,
+        checklist: checklistJson as Json,
         remarks,
-        meta: meta as never,
-        photo_evidence: photos as never,
-        signatures: signatures as never,
+        meta: meta as Json,
+        photo_evidence: photos as Json,
+        signatures: signatures as Json,
         image_urls: photos.flatMap((p) => [p.before, p.during, p.after].filter(Boolean)),
       });
       if (error) throw error;
