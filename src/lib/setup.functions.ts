@@ -22,7 +22,7 @@ export const ensureFixedAccounts = createServerFn({ method: "POST" }).handler(as
 
   for (const acc of FIXED_ACCOUNTS) {
     const found = list.users.find((u) => u.email?.toLowerCase() === acc.email.toLowerCase());
-    
+
     if (!found) {
       // Create the user
       const { data: newUser, error } = await supabaseAdmin.auth.admin.createUser({
@@ -31,9 +31,9 @@ export const ensureFixedAccounts = createServerFn({ method: "POST" }).handler(as
         email_confirm: true,
         user_metadata: { full_name: acc.full_name },
       });
-      
+
       if (error && !String(error.message).toLowerCase().includes("already")) throw error;
-      
+
       // Assign role if user was created successfully
       if (newUser?.user?.id) {
         await supabaseAdmin
@@ -51,10 +51,7 @@ export const ensureFixedAccounts = createServerFn({ method: "POST" }).handler(as
 
       if (!existingRoles || existingRoles.length === 0) {
         // Delete any existing roles and insert the correct one
-        await supabaseAdmin
-          .from("user_roles")
-          .delete()
-          .eq("user_id", found.id);
+        await supabaseAdmin.from("user_roles").delete().eq("user_id", found.id);
 
         await supabaseAdmin
           .from("user_roles")

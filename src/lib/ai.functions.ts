@@ -1,7 +1,7 @@
- import { createServerFn } from "@tanstack/react-start";
- import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
- import { z } from "zod";
- import { GoogleGenerativeAI } from "@google/generative-ai";
+import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { z } from "zod";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const ChatInput = z.object({
   message: z.string().min(1).max(2000),
@@ -17,7 +17,10 @@ export const chatWithAssistant = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
-    const { data: roleRows } = await supabase.from("user_roles").select("role").eq("user_id", userId);
+    const { data: roleRows } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId);
     const roles = (roleRows ?? []).map((r: { role: string }) => r.role);
     const role: "admin" | "engineer" | "client" = roles.includes("admin")
       ? "admin"
@@ -88,7 +91,10 @@ ${dbContext}
 === END DATA ===`;
 
     const apiKey = process.env.GOOGLE_GEMINI_API_KEY;
-    if (!apiKey) throw new Error("AI is not configured. Please set GOOGLE_GEMINI_API_KEY environment variable.");
+    if (!apiKey)
+      throw new Error(
+        "AI is not configured. Please set GOOGLE_GEMINI_API_KEY environment variable.",
+      );
 
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
@@ -127,7 +133,7 @@ ${dbContext}
             const model = genAI.getGenerativeModel({ model: candidate });
             const chat = model.startChat({ history: geminiMessages.slice(0, -1) });
             const result = await chat.sendMessage(
-              geminiMessages[geminiMessages.length - 1]?.parts[0]?.text || data.message
+              geminiMessages[geminiMessages.length - 1]?.parts[0]?.text || data.message,
             );
             const reply = result.response.text();
             return { reply, role };
@@ -163,12 +169,14 @@ ${dbContext}
 
       const le = lastError instanceof Error ? lastError.message : String(lastError);
       throw new Error(
-        `AI model not available or busy. Tried models: ${candidates.join(", ")}. Last error: ${le}`
+        `AI model not available or busy. Tried models: ${candidates.join(", ")}. Last error: ${le}`,
       );
     } catch (error) {
       if (error instanceof Error) {
-        if (error.message.includes("429")) throw new Error("AI rate limit reached. Try again in a moment.");
-        if (error.message.includes("402")) throw new Error("AI usage limit reached. Please add credits.");
+        if (error.message.includes("429"))
+          throw new Error("AI rate limit reached. Try again in a moment.");
+        if (error.message.includes("402"))
+          throw new Error("AI usage limit reached. Please add credits.");
         throw new Error(`AI error: ${error.message}`);
       }
       throw new Error("Failed to get AI response");

@@ -73,20 +73,27 @@ function AuthPage() {
   return (
     <div className="min-h-screen grid md:grid-cols-2 bg-background">
       <div className="hidden md:flex flex-col justify-between p-10 surface border-r">
-        <Link to="/"><Logo className="h-10 w-auto" /></Link>
+        <Link to="/">
+          <Logo className="h-10 w-auto" />
+        </Link>
         <div>
           <h1 className="text-3xl font-semibold tracking-tight max-w-md leading-tight">
             RealArc Estates property operations, unified.
           </h1>
           <p className="mt-3 text-muted-foreground max-w-md">
-            Submit requests, run inspections, build quotations, and track every project from one place.
+            Submit requests, run inspections, build quotations, and track every project from one
+            place.
           </p>
         </div>
-        <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} RealArc Estates</p>
+        <p className="text-xs text-muted-foreground">
+          © {new Date().getFullYear()} RealArc Estates
+        </p>
       </div>
       <div className="flex items-center justify-center p-6">
         <div className="w-full max-w-sm">
-          <div className="md:hidden mb-6"><Logo className="h-8 w-auto" /></div>
+          <div className="md:hidden mb-6">
+            <Logo className="h-8 w-auto" />
+          </div>
           <Tabs defaultValue="signin">
             <TabsList className="grid grid-cols-2 w-full">
               <TabsTrigger value="signin">Sign in</TabsTrigger>
@@ -94,8 +101,14 @@ function AuthPage() {
             </TabsList>
             <TabsContent value="signin">
               <form onSubmit={signIn} className="space-y-4 mt-4">
-                <div><Label htmlFor="email">Email</Label><Input id="email" name="email" type="email" required /></div>
-                <div><Label htmlFor="password">Password</Label><Input id="password" name="password" type="password" required minLength={6} /></div>
+                <div>
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" name="email" type="email" required />
+                </div>
+                <div>
+                  <Label htmlFor="password">Password</Label>
+                  <Input id="password" name="password" type="password" required minLength={6} />
+                </div>
                 <Button type="submit" disabled={loading} className="w-full">
                   {loading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}Sign in
                 </Button>
@@ -103,21 +116,37 @@ function AuthPage() {
             </TabsContent>
             <TabsContent value="signup">
               <p className="mt-4 text-xs text-muted-foreground leading-relaxed">
-                New accounts are automatically set up as <strong>client portals</strong>. Engineer and admin access is reserved.
+                New accounts are automatically set up as <strong>client portals</strong>. Engineer
+                and admin access is reserved.
               </p>
               <form onSubmit={signUp} className="space-y-4 mt-4">
-                <div><Label htmlFor="full_name">Full name</Label><Input id="full_name" name="full_name" required /></div>
-                <div><Label htmlFor="phone">Phone</Label><Input id="phone" name="phone" /></div>
-                <div><Label htmlFor="email2">Email</Label><Input id="email2" name="email" type="email" required /></div>
-                <div><Label htmlFor="password2">Password</Label><Input id="password2" name="password" type="password" required minLength={6} /></div>
+                <div>
+                  <Label htmlFor="full_name">Full name</Label>
+                  <Input id="full_name" name="full_name" required />
+                </div>
+                <div>
+                  <Label htmlFor="phone">Phone</Label>
+                  <Input id="phone" name="phone" />
+                </div>
+                <div>
+                  <Label htmlFor="email2">Email</Label>
+                  <Input id="email2" name="email" type="email" required />
+                </div>
+                <div>
+                  <Label htmlFor="password2">Password</Label>
+                  <Input id="password2" name="password" type="password" required minLength={6} />
+                </div>
                 <Button type="submit" disabled={loading} className="w-full">
-                  {loading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}Create client account
+                  {loading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}Create client
+                  account
                 </Button>
               </form>
             </TabsContent>
           </Tabs>
           <p className="mt-6 text-xs text-muted-foreground text-center">
-            <Link to="/" className="hover:underline">← Back to home</Link>
+            <Link to="/" className="hover:underline">
+              ← Back to home
+            </Link>
           </p>
         </div>
       </div>

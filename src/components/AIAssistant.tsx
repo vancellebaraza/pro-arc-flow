@@ -27,7 +27,10 @@ export function AIAssistant() {
       const { reply } = await chat({ data: { message: msg, history: messages.slice(-10) } });
       setMessages((m) => [...m, { role: "assistant", content: reply || "(no response)" }]);
     } catch (e) {
-      setMessages((m) => [...m, { role: "assistant", content: "⚠️ " + (e instanceof Error ? e.message : "Failed") }]);
+      setMessages((m) => [
+        ...m,
+        { role: "assistant", content: "⚠️ " + (e instanceof Error ? e.message : "Failed") },
+      ]);
     } finally {
       setLoading(false);
     }

@@ -9,29 +9,25 @@ export type TemplateKey =
 export const templates: Record<Exclude<TemplateKey, "custom">, { title: string; body: string }> = {
   request_correction: {
     title: "Request correction",
-    body:
-      "Hi {{clientName}}, this is {{engineerName}}. Please correct the following for {{projectTitle}} (status: {{status}}): {{errorMessage}}",
+    body: "Hi {{clientName}}, this is {{engineerName}}. Please correct the following for {{projectTitle}} (status: {{status}}): {{errorMessage}}",
   },
   quotation_approved: {
     title: "Quotation approved",
-    body:
-      "Hi {{clientName}}, the quotation for {{projectTitle}} has been approved by {{engineerName}}. Status: {{status}}.",
+    body: "Hi {{clientName}}, the quotation for {{projectTitle}} has been approved by {{engineerName}}. Status: {{status}}.",
   },
   work_completed: {
     title: "Work completed",
-    body:
-      "Hi {{clientName}}, work for {{projectTitle}} has been completed by {{engineerName}}. Status: {{status}}. Please confirm receipt.",
+    body: "Hi {{clientName}}, work for {{projectTitle}} has been completed by {{engineerName}}. Status: {{status}}. Please confirm receipt.",
   },
   inspection_failed: {
     title: "Inspection failed",
-    body:
-      "Hi {{clientName}}, inspection for {{projectTitle}} returned issues: {{errorMessage}}. Contact {{engineerName}} for details. Status: {{status}}.",
+    body: "Hi {{clientName}}, inspection for {{projectTitle}} returned issues: {{errorMessage}}. Contact {{engineerName}} for details. Status: {{status}}.",
   },
 };
 
 export function renderTemplate(
   templateStr: string,
-  ctx: Record<string, string | undefined | null>
+  ctx: Record<string, string | undefined | null>,
 ): string {
   return templateStr.replace(/{{\s*([^}]+)\s*}}/g, (_, key) => {
     const k = key.trim();
@@ -43,7 +39,7 @@ export function renderTemplate(
 export function buildMessageForKey(
   key: TemplateKey,
   ctx: Record<string, string | undefined | null>,
-  customMessage?: string
+  customMessage?: string,
 ): string {
   if (key === "custom") {
     return customMessage ? String(customMessage) : "";

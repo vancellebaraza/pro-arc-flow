@@ -34,7 +34,7 @@ export function formatPhoneForWhatsApp(phone?: string | null): string | null {
  */
 export async function getProjectContacts(
   supabase: SupabaseClientLike,
-  projectId: string
+  projectId: string,
 ): Promise<ProjectContacts> {
   const { data: projectData, error: projectError } = await supabase
     .from("projects")
@@ -67,15 +67,17 @@ export async function getProjectContacts(
       .select("id, full_name, phone")
       .in("id", ids);
 
-    (profiles ?? []).forEach((p: any) => {
-      if (p.id === clientId) {
-        clientName = p.full_name ?? undefined;
-        clientPhone = p.phone ?? null;
-      } else if (p.id === engineerId) {
-        engineerName = p.full_name ?? undefined;
-        engineerPhone = p.phone ?? null;
-      }
-    });
+    (profiles ?? []).forEach(
+      (p: { id: string; full_name: string | null; phone: string | null }) => {
+        if (p.id === clientId) {
+          clientName = p.full_name ?? undefined;
+          clientPhone = p.phone ?? null;
+        } else if (p.id === engineerId) {
+          engineerName = p.full_name ?? undefined;
+          engineerPhone = p.phone ?? null;
+        }
+      },
+    );
   }
 
   return {
@@ -104,8 +106,8 @@ export async function logWhatsAppAction(
     project_id?: string | null;
     message_type?: string | null;
     body?: string | null;
-    meta?: Record<string, any> | null;
-  }
+    meta?: Record<string, string | number | boolean | null> | null;
+  },
 ): Promise<void> {
   // The DB table `whatsapp_logs` has columns: sender_id, project_id, recipient, body, created_at
   // We'll map payload.recipient_phone -> recipient and include message_type/meta into body prefix if present

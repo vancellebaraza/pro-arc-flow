@@ -41,8 +41,11 @@ export function useMyRoles() {
         setRolesLoading(false);
       });
   }, [user, loading]);
-  const primaryRole: AppRole =
-    roles.includes("admin") ? "admin" : roles.includes("engineer") ? "engineer" : "client";
+  const primaryRole: AppRole = roles.includes("admin")
+    ? "admin"
+    : roles.includes("engineer")
+      ? "engineer"
+      : "client";
   return { roles, primaryRole, loading: loading || rolesLoading, user };
 }
 

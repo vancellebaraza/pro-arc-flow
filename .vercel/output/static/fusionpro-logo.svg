@@ -1,0 +1,7 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" fill="#1a1a1a"/>
+  <circle cx="100" cy="100" r="85" fill="none" stroke="#06b6d4" stroke-width="3"/>
+  <path d="M 70 100 L 100 70 L 130 100 L 100 130 Z" fill="#06b6d4"/>
+  <circle cx="100" cy="100" r="30" fill="#1a1a1a" stroke="#06b6d4" stroke-width="2"/>
+  <text x="100" y="170" font-size="18" font-weight="bold" text-anchor="middle" fill="#06b6d4" font-family="system-ui, -apple-system, sans-serif">FusionPro</text>
+</svg>

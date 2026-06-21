@@ -56,7 +56,7 @@ export function generateQuotationPdf(q: QuotePdfInput) {
   const doc = new jsPDF();
   header(doc, "QUOTATION", `No: ${q.quoteNo || "DRAFT"}  •  ${q.date}`);
 
-  let y = 34;
+  const y = 34;
   doc.setFontSize(10);
   doc.setTextColor(20);
   doc.text(`Bill To: ${q.billTo || "—"}`, 14, y);
@@ -141,7 +141,7 @@ export interface InspectionPdfInput {
 export function generateInspectionPdf(input: InspectionPdfInput) {
   const doc = new jsPDF();
   header(doc, "INSPECTION REPORT", input.inspectionDate);
-  let y = 34;
+  const y = 34;
   doc.setFontSize(10);
   doc.setTextColor(20);
   const left = [
@@ -186,7 +186,10 @@ export function generateInspectionPdf(input: InspectionPdfInput) {
     fy = getY(doc) + 6;
   }
 
-  if (fy > 240) { doc.addPage(); fy = 20; }
+  if (fy > 240) {
+    doc.addPage();
+    fy = 20;
+  }
   doc.setFontSize(11);
   doc.text("Sign-off", 14, fy);
   fy += 6;
@@ -262,7 +265,10 @@ export function generateWorksheetPdf(w: WorksheetPdfInput) {
     doc.text(`Images Before: ${w.imagesBefore.length} attached`, 14, fy);
     fy += 6;
   }
-  if (fy > 240) { doc.addPage(); fy = 20; }
+  if (fy > 240) {
+    doc.addPage();
+    fy = 20;
+  }
   doc.setFontSize(11);
   doc.text("Signatures", 14, fy);
   fy += 6;
@@ -289,7 +295,9 @@ export function downloadCsv(filename: string, rows: Array<Record<string, unknown
     const s = v == null ? "" : String(v);
     return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
   };
-  const csv = [headers.join(","), ...rows.map((r) => headers.map((h) => esc(r[h])).join(","))].join("\n");
+  const csv = [headers.join(","), ...rows.map((r) => headers.map((h) => esc(r[h])).join(","))].join(
+    "\n",
+  );
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");

@@ -51,10 +51,7 @@ export default function WhatsAppButton(props: WhatsAppButtonProps) {
   const [loading, setLoading] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [editableMessage, setEditableMessage] = useState<string | null>(null);
-  const phoneDigits = useMemo(
-    () => normalizePhoneForClient(initialPhone ?? null),
-    [initialPhone]
-  );
+  const phoneDigits = useMemo(() => normalizePhoneForClient(initialPhone ?? null), [initialPhone]);
 
   const disabled = explicitDisabled || loading;
 
@@ -77,24 +74,32 @@ export default function WhatsAppButton(props: WhatsAppButtonProps) {
     try {
       // Fetch up-to-date contacts & normalized phone from the server.
       const contactsRes = await getProjectContacts({ data: { projectId } });
-      const phone = recipientRole === "client" ? contactsRes.clientPhoneNorm : contactsRes.engineerPhoneNorm;
+      const phone =
+        recipientRole === "client" ? contactsRes.clientPhoneNorm : contactsRes.engineerPhoneNorm;
       if (!phone) {
         toast.error(
           recipientRole === "client"
             ? "Unable to find the client phone. Please verify the client contact on this project."
-            : "Unable to find the engineer phone. Please verify the engineer contact on this project."
+            : "Unable to find the engineer phone. Please verify the engineer contact on this project.",
         );
         setLoading(false);
         return;
       }
 
-      const bodyText = messageType === "custom" ? String(customMessage ?? "") : buildMessageForKey(messageType as TemplateKey | "custom", {
-        clientName: contactsRes.clientName ?? "",
-        projectTitle: contactsRes.projectTitle ?? "",
-        status: contactsRes.status ?? "",
-        engineerName: contactsRes.engineerName ?? "",
-        errorMessage: "",
-      }, customMessage);
+      const bodyText =
+        messageType === "custom"
+          ? String(customMessage ?? "")
+          : buildMessageForKey(
+              messageType as TemplateKey | "custom",
+              {
+                clientName: contactsRes.clientName ?? "",
+                projectTitle: contactsRes.projectTitle ?? "",
+                status: contactsRes.status ?? "",
+                engineerName: contactsRes.engineerName ?? "",
+                errorMessage: "",
+              },
+              customMessage,
+            );
 
       // Show preview modal and allow optional edits before sending
       setEditableMessage(bodyText);
@@ -113,12 +118,13 @@ export default function WhatsAppButton(props: WhatsAppButtonProps) {
     setLoading(true);
     try {
       const contactsRes = await getProjectContacts({ data: { projectId } });
-      const phone = recipientRole === "client" ? contactsRes.clientPhoneNorm : contactsRes.engineerPhoneNorm;
+      const phone =
+        recipientRole === "client" ? contactsRes.clientPhoneNorm : contactsRes.engineerPhoneNorm;
       if (!phone) {
         toast.error(
           recipientRole === "client"
             ? "Unable to find the client phone. Please verify the client contact on this project."
-            : "Unable to find the engineer phone. Please verify the engineer contact on this project."
+            : "Unable to find the engineer phone. Please verify the engineer contact on this project.",
         );
         return;
       }
@@ -153,42 +159,53 @@ export default function WhatsAppButton(props: WhatsAppButtonProps) {
 
   return (
     <>
-    <button
-      type="button"
-      onClick={handleClick}
-      className={className}
-      disabled={disabled || loading}
-      aria-label="WhatsApp"
-      title={previewMessage || "WhatsApp"}
-      style={{
-        display: "inline-flex",
-        gap: 8,
-        alignItems: "center",
-        background: "#25D366",
-        color: "#fff",
-        border: "none",
-        padding: "8px 10px",
-        borderRadius: 6,
-        cursor: disabled ? "not-allowed" : "pointer",
-        opacity: disabled ? 0.6 : 1,
-      }}
-    >
-      <WhatsAppIcon />
-      <span style={{ fontWeight: 600 }}>WhatsApp</span>
-    </button>
-    {previewOpen && (
-      <div role="dialog" aria-modal className="fixed inset-0 z-50 grid place-items-center">
-        <div className="absolute inset-0 bg-black/40" onClick={() => setPreviewOpen(false)} />
-        <div className="relative w-full max-w-lg p-4 bg-white rounded shadow">
-          <h3 className="font-semibold mb-2">Preview WhatsApp message</h3>
-          <textarea value={editableMessage ?? ""} onChange={(e) => setEditableMessage(e.target.value)} className="w-full h-40 p-2 border rounded" />
-          <div className="mt-3 flex justify-end gap-2">
-            <button onClick={() => setPreviewOpen(false)} className="px-3 py-2 rounded border">Cancel</button>
-            <button onClick={confirmAndSend} className="px-3 py-2 rounded bg-green-600 text-white">Open WhatsApp</button>
+      <button
+        type="button"
+        onClick={handleClick}
+        className={className}
+        disabled={disabled || loading}
+        aria-label="WhatsApp"
+        title={previewMessage || "WhatsApp"}
+        style={{
+          display: "inline-flex",
+          gap: 8,
+          alignItems: "center",
+          background: "#25D366",
+          color: "#fff",
+          border: "none",
+          padding: "8px 10px",
+          borderRadius: 6,
+          cursor: disabled ? "not-allowed" : "pointer",
+          opacity: disabled ? 0.6 : 1,
+        }}
+      >
+        <WhatsAppIcon />
+        <span style={{ fontWeight: 600 }}>WhatsApp</span>
+      </button>
+      {previewOpen && (
+        <div role="dialog" aria-modal className="fixed inset-0 z-50 grid place-items-center">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setPreviewOpen(false)} />
+          <div className="relative w-full max-w-lg p-4 bg-white rounded shadow">
+            <h3 className="font-semibold mb-2">Preview WhatsApp message</h3>
+            <textarea
+              value={editableMessage ?? ""}
+              onChange={(e) => setEditableMessage(e.target.value)}
+              className="w-full h-40 p-2 border rounded"
+            />
+            <div className="mt-3 flex justify-end gap-2">
+              <button onClick={() => setPreviewOpen(false)} className="px-3 py-2 rounded border">
+                Cancel
+              </button>
+              <button
+                onClick={confirmAndSend}
+                className="px-3 py-2 rounded bg-green-600 text-white"
+              >
+                Open WhatsApp
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-    )}
+      )}
     </>
   );
 }

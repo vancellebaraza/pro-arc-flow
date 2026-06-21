@@ -44,14 +44,14 @@
 
 :root {
   --radius: 0.5rem;
-  --background: oklch(0.99 0.002 80);          /* soft white */
-  --foreground: oklch(0.18 0.005 260);         /* near black */
-  --surface: oklch(0.97 0.003 80);             /* light grey UI surface */
+  --background: oklch(0.99 0.002 80); /* soft white */
+  --foreground: oklch(0.18 0.005 260); /* near black */
+  --surface: oklch(0.97 0.003 80); /* light grey UI surface */
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.18 0.005 260);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.18 0.005 260);
-  --primary: oklch(0.22 0.005 260);            /* black-ish */
+  --primary: oklch(0.22 0.005 260); /* black-ish */
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.96 0.003 80);
   --secondary-foreground: oklch(0.22 0.005 260);
@@ -59,7 +59,7 @@
   --muted-foreground: oklch(0.5 0.01 260);
   --accent: oklch(0.95 0.005 80);
   --accent-foreground: oklch(0.22 0.005 260);
-  --brand: oklch(0.56 0.21 27);                /* FusionPro red */
+  --brand: oklch(0.56 0.21 27); /* FusionPro red */
   --brand-foreground: oklch(0.99 0 0);
   --destructive: oklch(0.56 0.21 27);
   --destructive-foreground: oklch(0.985 0 0);
@@ -112,22 +112,35 @@
 }
 
 @layer base {
-  * { border-color: var(--color-border); }
-  html, body { font-family: var(--font-sans); }
+  * {
+    border-color: var(--color-border);
+  }
+  html,
+  body {
+    font-family: var(--font-sans);
+  }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     -webkit-font-smoothing: antialiased;
   }
-  /* Hide Lovable badge globally as requested */
-  #lovable-badge { display: none !important; }
 }
 
 @layer components {
-  .surface { background-color: var(--color-surface); }
-  .fade-in { animation: fadeIn .4s ease both; }
+  .surface {
+    background-color: var(--color-surface);
+  }
+  .fade-in {
+    animation: fadeIn 0.4s ease both;
+  }
   @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(4px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }

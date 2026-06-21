@@ -15,8 +15,16 @@ export const Route = createFileRoute("/_authenticated/engineer/$projectId/inspec
   component: InspectionPage,
 });
 
-interface ChecklistRow { item: string; remark: string; pass: boolean }
-interface PhotoRow { before: string; during: string; after: string }
+interface ChecklistRow {
+  item: string;
+  remark: string;
+  pass: boolean;
+}
+interface PhotoRow {
+  before: string;
+  during: string;
+  after: string;
+}
 
 function InspectionPage() {
   const { projectId } = Route.useParams();
@@ -44,7 +52,11 @@ function InspectionPage() {
   const [saving, setSaving] = useState(false);
 
   const load = useCallback(async () => {
-    const { data: p } = await supabase.from("projects").select("title,location,service").eq("id", projectId).maybeSingle();
+    const { data: p } = await supabase
+      .from("projects")
+      .select("title,location,service")
+      .eq("id", projectId)
+      .maybeSingle();
     if (p) {
       setProjectTitle(p.title);
       setProjectLocation(p.location ?? "");
@@ -52,7 +64,9 @@ function InspectionPage() {
       setWorkCategory(p.service);
     }
   }, [projectId]);
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load();
+  }, [load]);
 
   async function uploadImage(file: File): Promise<string> {
     const { data: u } = await supabase.auth.getUser();
@@ -60,7 +74,9 @@ function InspectionPage() {
     const path = `${u.user.id}/insp/${projectId}/${Date.now()}-${file.name}`;
     const { error } = await supabase.storage.from("project-images").upload(path, file);
     if (error) throw error;
-    const { data: signed } = await supabase.storage.from("project-images").createSignedUrl(path, 60 * 60 * 24 * 365);
+    const { data: signed } = await supabase.storage
+      .from("project-images")
+      .createSignedUrl(path, 60 * 60 * 24 * 365);
     return signed?.signedUrl ?? "";
   }
 
@@ -87,9 +103,23 @@ function InspectionPage() {
     try {
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) throw new Error("Not signed in");
-      const checklistJson = checklist.map((c) => ({ item: c.item, pass: c.pass, remark: c.remark }));
-      const meta = { work_category: workCategory, client_name: clientName, inspection_date: inspectionDate, inspector_name: inspectorName, technician };
-      const signatures = { client_name: sigClient, inspector_name: sigInspector, technician_name: sigTechnician };
+      const checklistJson = checklist.map((c) => ({
+        item: c.item,
+        pass: c.pass,
+        remark: c.remark,
+      }));
+      const meta = {
+        work_category: workCategory,
+        client_name: clientName,
+        inspection_date: inspectionDate,
+        inspector_name: inspectorName,
+        technician,
+      };
+      const signatures = {
+        client_name: sigClient,
+        inspector_name: sigInspector,
+        technician_name: sigTechnician,
+      };
       const { error } = await supabase.from("inspections").insert({
         project_id: projectId,
         engineer_id: u.user.id,
@@ -102,7 +132,10 @@ function InspectionPage() {
         image_urls: photos.flatMap((p) => [p.before, p.during, p.after].filter(Boolean)),
       });
       if (error) throw error;
-      await supabase.from("projects").update({ status: "inspected" as const }).eq("id", projectId);
+      await supabase
+        .from("projects")
+        .update({ status: "inspected" as const })
+        .eq("id", projectId);
       toast.success("Inspection saved");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Save failed");
@@ -122,35 +155,86 @@ function InspectionPage() {
       technician,
       checklist: checklist.map((c) => ({ item: c.item, remark: c.remark, pass: c.pass })),
       photoEvidence: photos,
-      signatures: { client_name: sigClient, inspector_name: sigInspector, technician_name: sigTechnician },
+      signatures: {
+        client_name: sigClient,
+        inspector_name: sigInspector,
+        technician_name: sigTechnician,
+      },
     });
   }
 
   return (
     <div className="p-4 md:p-8 fade-in max-w-5xl mx-auto pb-24">
-      <Link to="/engineer/$projectId" params={{ projectId }} className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground">
-        <ArrowLeft className="h-4 w-4 mr-1" />Back to project
+      <Link
+        to="/engineer/$projectId"
+        params={{ projectId }}
+        className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
+      >
+        <ArrowLeft className="h-4 w-4 mr-1" />
+        Back to project
       </Link>
       <h1 className="mt-3 text-2xl md:text-3xl font-semibold tracking-tight">Inspection Report</h1>
-      <p className="text-muted-foreground mt-1">Complete the checklist, photo evidence and sign-off.</p>
+      <p className="text-muted-foreground mt-1">
+        Complete the checklist, photo evidence and sign-off.
+      </p>
 
       <section className="mt-8 grid md:grid-cols-2 gap-4">
         <div>
           <Label>Work Category</Label>
-          <select value={workCategory} onChange={(e) => setWorkCategory(e.target.value)} className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-            {SERVICES.map((s) => <option key={s.key} value={s.key}>{s.label}</option>)}
+          <select
+            value={workCategory}
+            onChange={(e) => setWorkCategory(e.target.value)}
+            className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+          >
+            {SERVICES.map((s) => (
+              <option key={s.key} value={s.key}>
+                {s.label}
+              </option>
+            ))}
           </select>
         </div>
-        <div><Label>Project Name</Label><Input value={projectTitle} readOnly /></div>
-        <div><Label>Client Name</Label><Input value={clientName} onChange={(e) => setClientName(e.target.value)} placeholder="Client full name" /></div>
-        <div><Label>Site Location</Label><Input value={projectLocation} onChange={(e) => setProjectLocation(e.target.value)} /></div>
-        <div><Label>Inspection Date</Label><Input type="date" value={inspectionDate} onChange={(e) => setInspectionDate(e.target.value)} /></div>
-        <div><Label>Inspector Name</Label><Input value={inspectorName} onChange={(e) => setInspectorName(e.target.value)} /></div>
-        <div><Label>Technician</Label><Input value={technician} onChange={(e) => setTechnician(e.target.value)} /></div>
+        <div>
+          <Label>Project Name</Label>
+          <Input value={projectTitle} readOnly />
+        </div>
+        <div>
+          <Label>Client Name</Label>
+          <Input
+            value={clientName}
+            onChange={(e) => setClientName(e.target.value)}
+            placeholder="Client full name"
+          />
+        </div>
+        <div>
+          <Label>Site Location</Label>
+          <Input value={projectLocation} onChange={(e) => setProjectLocation(e.target.value)} />
+        </div>
+        <div>
+          <Label>Inspection Date</Label>
+          <Input
+            type="date"
+            value={inspectionDate}
+            onChange={(e) => setInspectionDate(e.target.value)}
+          />
+        </div>
+        <div>
+          <Label>Inspector Name</Label>
+          <Input value={inspectorName} onChange={(e) => setInspectorName(e.target.value)} />
+        </div>
+        <div>
+          <Label>Technician</Label>
+          <Input value={technician} onChange={(e) => setTechnician(e.target.value)} />
+        </div>
         <div>
           <Label>Stage</Label>
-          <select value={stage} onChange={(e) => setStage(e.target.value)} className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-            <option value="initial">Initial</option><option value="during">During work</option><option value="final">Final</option>
+          <select
+            value={stage}
+            onChange={(e) => setStage(e.target.value)}
+            className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+          >
+            <option value="initial">Initial</option>
+            <option value="during">During work</option>
+            <option value="final">Final</option>
           </select>
         </div>
       </section>
@@ -158,24 +242,71 @@ function InspectionPage() {
       <section className="mt-10">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold tracking-tight">Inspection Checklist</h2>
-          <Button variant="outline" size="sm" onClick={() => setChecklist((a) => [...a, { item: "", remark: "", pass: true }])}><Plus className="h-4 w-4 mr-1" />Add row</Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setChecklist((a) => [...a, { item: "", remark: "", pass: true }])}
+          >
+            <Plus className="h-4 w-4 mr-1" />
+            Add row
+          </Button>
         </div>
         <div className="mt-3 overflow-x-auto rounded-lg border">
           <table className="w-full text-sm">
             <thead className="bg-surface text-left">
-              <tr><th className="p-2 w-1/3">Work Item</th><th className="p-2">Remarks</th><th className="p-2 w-32 text-center">Status</th><th className="w-10"></th></tr>
+              <tr>
+                <th className="p-2 w-1/3">Work Item</th>
+                <th className="p-2">Remarks</th>
+                <th className="p-2 w-32 text-center">Status</th>
+                <th className="w-10"></th>
+              </tr>
             </thead>
             <tbody>
               {checklist.map((c, i) => (
                 <tr key={i} className="border-t align-top">
-                  <td className="p-1"><Input value={c.item} onChange={(e) => setChecklist((a) => a.map((x, j) => j === i ? { ...x, item: e.target.value } : x))} /></td>
-                  <td className="p-1"><Input value={c.remark} onChange={(e) => setChecklist((a) => a.map((x, j) => j === i ? { ...x, remark: e.target.value } : x))} /></td>
+                  <td className="p-1">
+                    <Input
+                      value={c.item}
+                      onChange={(e) =>
+                        setChecklist((a) =>
+                          a.map((x, j) => (j === i ? { ...x, item: e.target.value } : x)),
+                        )
+                      }
+                    />
+                  </td>
+                  <td className="p-1">
+                    <Input
+                      value={c.remark}
+                      onChange={(e) =>
+                        setChecklist((a) =>
+                          a.map((x, j) => (j === i ? { ...x, remark: e.target.value } : x)),
+                        )
+                      }
+                    />
+                  </td>
                   <td className="p-1 text-center">
-                    <button type="button" onClick={() => setChecklist((a) => a.map((x, j) => j === i ? { ...x, pass: !x.pass } : x))} className={`rounded px-3 py-1 text-xs font-medium ${c.pass ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setChecklist((a) =>
+                          a.map((x, j) => (j === i ? { ...x, pass: !x.pass } : x)),
+                        )
+                      }
+                      className={`rounded px-3 py-1 text-xs font-medium ${c.pass ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}
+                    >
                       {c.pass ? "PASS" : "FAIL"}
                     </button>
                   </td>
-                  <td className="p-1"><Button type="button" variant="ghost" size="icon" onClick={() => setChecklist((a) => a.filter((_, j) => j !== i))}><Trash2 className="h-4 w-4" /></Button></td>
+                  <td className="p-1">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setChecklist((a) => a.filter((_, j) => j !== i))}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -186,26 +317,57 @@ function InspectionPage() {
       <section className="mt-10">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold tracking-tight">Photo Evidence</h2>
-          <Button variant="outline" size="sm" onClick={() => setPhotos((a) => [...a, { before: "", during: "", after: "" }])}><Plus className="h-4 w-4 mr-1" />Add row</Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPhotos((a) => [...a, { before: "", during: "", after: "" }])}
+          >
+            <Plus className="h-4 w-4 mr-1" />
+            Add row
+          </Button>
         </div>
         <div className="mt-3 space-y-2">
           {photos.map((p, i) => (
-            <div key={i} className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-2 rounded-lg border p-2 bg-card">
+            <div
+              key={i}
+              className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-2 rounded-lg border p-2 bg-card"
+            >
               {(["before", "during", "after"] as const).map((field) => (
                 <div key={field} className="space-y-1">
-                  <Label className="text-xs uppercase tracking-wider text-muted-foreground">{field}</Label>
+                  <Label className="text-xs uppercase tracking-wider text-muted-foreground">
+                    {field}
+                  </Label>
                   {p[field] ? (
                     <a href={p[field]} target="_blank" rel="noreferrer">
-                      <img src={p[field]} alt={field} className="rounded border h-24 w-full object-cover" />
+                      <img
+                        src={p[field]}
+                        alt={field}
+                        className="rounded border h-24 w-full object-cover"
+                      />
                     </a>
                   ) : (
-                    <button type="button" onClick={() => pickFile(field, i)} className="w-full h-24 rounded border border-dashed grid place-items-center text-xs text-muted-foreground hover:bg-accent">
-                      <span className="flex items-center gap-1"><UploadCloud className="h-3 w-3" />Upload</span>
+                    <button
+                      type="button"
+                      onClick={() => pickFile(field, i)}
+                      className="w-full h-24 rounded border border-dashed grid place-items-center text-xs text-muted-foreground hover:bg-accent"
+                    >
+                      <span className="flex items-center gap-1">
+                        <UploadCloud className="h-3 w-3" />
+                        Upload
+                      </span>
                     </button>
                   )}
                 </div>
               ))}
-              <Button type="button" variant="ghost" size="icon" className="self-center" onClick={() => setPhotos((a) => a.filter((_, j) => j !== i))}><Trash2 className="h-4 w-4" /></Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="self-center"
+                onClick={() => setPhotos((a) => a.filter((_, j) => j !== i))}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
             </div>
           ))}
         </div>
@@ -215,16 +377,25 @@ function InspectionPage() {
         <h2 className="text-lg font-semibold tracking-tight">Sign-off</h2>
         <div className="mt-3 grid md:grid-cols-3 gap-4">
           <div className="rounded-lg border p-4 bg-card">
-            <Label>Client Name</Label><Input value={sigClient} onChange={(e) => setSigClient(e.target.value)} />
-            <div className="mt-3 text-xs text-muted-foreground">Client signature collected on site.</div>
+            <Label>Client Name</Label>
+            <Input value={sigClient} onChange={(e) => setSigClient(e.target.value)} />
+            <div className="mt-3 text-xs text-muted-foreground">
+              Client signature collected on site.
+            </div>
           </div>
           <div className="rounded-lg border p-4 bg-card">
-            <Label>Inspector Name</Label><Input value={sigInspector} onChange={(e) => setSigInspector(e.target.value)} />
-            <div className="mt-3 text-xs text-muted-foreground">Inspector signature collected on site.</div>
+            <Label>Inspector Name</Label>
+            <Input value={sigInspector} onChange={(e) => setSigInspector(e.target.value)} />
+            <div className="mt-3 text-xs text-muted-foreground">
+              Inspector signature collected on site.
+            </div>
           </div>
           <div className="rounded-lg border p-4 bg-card">
-            <Label>Technician Name</Label><Input value={sigTechnician} onChange={(e) => setSigTechnician(e.target.value)} />
-            <div className="mt-3 text-xs text-muted-foreground">Technician signature collected on site.</div>
+            <Label>Technician Name</Label>
+            <Input value={sigTechnician} onChange={(e) => setSigTechnician(e.target.value)} />
+            <div className="mt-3 text-xs text-muted-foreground">
+              Technician signature collected on site.
+            </div>
           </div>
         </div>
       </section>
@@ -235,8 +406,14 @@ function InspectionPage() {
       </section>
 
       <div className="mt-8 flex flex-wrap justify-end gap-2">
-        <Button variant="outline" onClick={exportPdf}><FileDown className="h-4 w-4 mr-1" />Export PDF</Button>
-        <Button onClick={save} disabled={saving}><Save className="h-4 w-4 mr-1" />Save inspection</Button>
+        <Button variant="outline" onClick={exportPdf}>
+          <FileDown className="h-4 w-4 mr-1" />
+          Export PDF
+        </Button>
+        <Button onClick={save} disabled={saving}>
+          <Save className="h-4 w-4 mr-1" />
+          Save inspection
+        </Button>
       </div>
     </div>
   );

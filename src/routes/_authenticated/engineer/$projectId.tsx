@@ -44,7 +44,9 @@ function EngineerProjectHub() {
     setProject(data as Project | null);
     setLoading(false);
   }, [projectId]);
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load();
+  }, [load]);
 
   async function claim() {
     const { data: u } = await supabase.auth.getUser();
@@ -71,22 +73,56 @@ function EngineerProjectHub() {
   }
 
   const tools: Array<{
-    to: "/engineer/$projectId/inspection" | "/engineer/$projectId/quotation" | "/engineer/$projectId/worksheet" | "/engineer/$projectId/compare" | "/engineer/$projectId/messages";
+    to:
+      | "/engineer/$projectId/inspection"
+      | "/engineer/$projectId/quotation"
+      | "/engineer/$projectId/worksheet"
+      | "/engineer/$projectId/compare"
+      | "/engineer/$projectId/messages";
     title: string;
     desc: string;
     icon: typeof FileText;
   }> = [
-    { to: "/engineer/$projectId/inspection", title: "Inspection report", desc: "Checklist, photos, sign-off.", icon: ClipboardCheck },
-    { to: "/engineer/$projectId/quotation", title: "Quotation", desc: "Bill-to, line items, totals & bank details.", icon: FileText },
-    { to: "/engineer/$projectId/worksheet", title: "Job worksheet", desc: "Document 2 — site observations & sign-off.", icon: ClipboardList },
-    { to: "/engineer/$projectId/compare", title: "Quoted vs Actual", desc: "Compare estimated vs actual costs.", icon: GitCompare },
-    { to: "/engineer/$projectId/messages", title: "Communication", desc: "Internal messages & WhatsApp log.", icon: MessageSquare },
+    {
+      to: "/engineer/$projectId/inspection",
+      title: "Inspection report",
+      desc: "Checklist, photos, sign-off.",
+      icon: ClipboardCheck,
+    },
+    {
+      to: "/engineer/$projectId/quotation",
+      title: "Quotation",
+      desc: "Bill-to, line items, totals & bank details.",
+      icon: FileText,
+    },
+    {
+      to: "/engineer/$projectId/worksheet",
+      title: "Job worksheet",
+      desc: "Document 2 — site observations & sign-off.",
+      icon: ClipboardList,
+    },
+    {
+      to: "/engineer/$projectId/compare",
+      title: "Quoted vs Actual",
+      desc: "Compare estimated vs actual costs.",
+      icon: GitCompare,
+    },
+    {
+      to: "/engineer/$projectId/messages",
+      title: "Communication",
+      desc: "Internal messages & WhatsApp log.",
+      icon: MessageSquare,
+    },
   ];
 
   return (
     <div className="p-4 md:p-8 fade-in max-w-5xl mx-auto">
-      <Link to="/engineer" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground">
-        <ArrowLeft className="h-4 w-4 mr-1" />Back to projects
+      <Link
+        to="/engineer"
+        className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
+      >
+        <ArrowLeft className="h-4 w-4 mr-1" />
+        Back to projects
       </Link>
 
       <div className="mt-4 flex items-start justify-between gap-4 flex-wrap">
@@ -94,11 +130,17 @@ function EngineerProjectHub() {
           <div className="text-xs uppercase tracking-wider text-muted-foreground">
             {svc?.label} · {STATUS_LABEL[project.status] ?? project.status}
           </div>
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight mt-1 truncate">{project.title}</h1>
+          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight mt-1 truncate">
+            {project.title}
+          </h1>
           <p className="text-muted-foreground mt-1">{project.location ?? "—"}</p>
         </div>
         <div className="flex gap-2 flex-wrap">
-          {!project.engineer_id && <Button size="sm" onClick={claim}>Assign to me</Button>}
+          {!project.engineer_id && (
+            <Button size="sm" onClick={claim}>
+              Assign to me
+            </Button>
+          )}
           <WhatsAppButton
             projectId={project.id}
             recipientRole="client"
@@ -115,14 +157,20 @@ function EngineerProjectHub() {
         <div className="mt-5 grid grid-cols-2 md:grid-cols-4 gap-2">
           {project.image_urls.map((u, i) => (
             <a key={i} href={u} target="_blank" rel="noreferrer">
-              <img src={u} className="rounded border h-28 w-full object-cover" alt={`Attachment ${i + 1}`} />
+              <img
+                src={u}
+                className="rounded border h-28 w-full object-cover"
+                alt={`Attachment ${i + 1}`}
+              />
             </a>
           ))}
         </div>
       )}
 
       <h2 className="mt-10 text-lg font-semibold tracking-tight">Forms & tools</h2>
-      <p className="text-sm text-muted-foreground">Each form opens in its own page so you have room to work.</p>
+      <p className="text-sm text-muted-foreground">
+        Each form opens in its own page so you have room to work.
+      </p>
 
       <ul className="mt-4 grid gap-3 sm:grid-cols-2">
         {tools.map((t) => (
