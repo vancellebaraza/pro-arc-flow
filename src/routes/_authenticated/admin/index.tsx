@@ -324,6 +324,9 @@ function AdminHome() {
           <Button variant="outline" asChild>
             <Link to="/admin/vendors">Vendor management</Link>
           </Button>
+          <Button variant="outline" asChild>
+            <Link to="/admin/todos">Staff To Do List</Link>
+          </Button>
           <Button variant="outline" onClick={exportSheet}>
             <FileDown className="h-4 w-4 mr-1" />
             Export Work Data Sheet (CSV)

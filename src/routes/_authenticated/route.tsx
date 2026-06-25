@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMyRoles, signOutClean } from "@/lib/auth";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
-import { LogOut, LayoutDashboard, ClipboardPlus, Wrench, ShieldCheck, Menu, Briefcase } from "lucide-react";
+import { LogOut, LayoutDashboard, ClipboardPlus, Wrench, ShieldCheck, Menu, Briefcase, Calendar } from "lucide-react";
 import { useState } from "react";
 import { AIAssistant } from "@/components/AIAssistant";
 
@@ -35,6 +35,7 @@ function AuthedLayout() {
       ? [
           { to: "/admin", label: "Admin", icon: ShieldCheck },
           { to: "/admin/vendors", label: "Vendor Management", icon: Briefcase },
+          { to: "/admin/todos", label: "Staff To Do", icon: Calendar },
           { to: "/engineer", label: "Engineer view", icon: Wrench },
           { to: "/client", label: "Client view", icon: ClipboardPlus },
         ]
