@@ -1,8 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { STATUS_LABEL, SERVICES } from "@/lib/services";
 import { downloadCsv } from "@/lib/pdf";
 import { toast } from "sonner";
@@ -24,6 +25,14 @@ interface Row {
   created_at: string;
 }
 
+interface PendingVendorAssignmentRow {
+  id: string;
+  project_id: string;
+  project: { title: string };
+  vendor: { name: string; category: string };
+  created_at: string;
+}
+
 function AdminHome() {
   const [rows, setRows] = useState<Row[]>([]);
   const [pendingQuotes, setPendingQuotes] = useState<
@@ -35,6 +44,7 @@ function AdminHome() {
       project: { title: string };
     }>
   >([]);
+  const [pendingVendorAssignments, setPendingVendorAssignments] = useState<PendingVendorAssignmentRow[]>([]);
   const [filter, setFilter] = useState("");
 
   const load = useCallback(async () => {
@@ -43,6 +53,7 @@ function AdminHome() {
       .select("*")
       .order("created_at", { ascending: false });
     setRows((data ?? []) as Row[]);
+
     const { data: q } = await supabase
       .from("quotations")
       .select("id,project_id,grand_total,status, project:projects(title)")
@@ -56,6 +67,18 @@ function AdminHome() {
         project: { title: string };
       }>,
     );
+
+    const { data: assignments, error: assignmentsError } = await supabase
+      .from("project_vendor_assignments")
+      .select("id,project_id,status,created_at, project:projects(title), vendor:vendors(name, category)")
+      .eq("status", "pending_approval")
+      .order("created_at", { ascending: false });
+
+    if (assignmentsError) {
+      toast.error(assignmentsError.message);
+    } else {
+      setPendingVendorAssignments((assignments ?? []) as PendingVendorAssignmentRow[]);
+    }
   }, []);
   useEffect(() => {
     load();
@@ -76,6 +99,21 @@ function AdminHome() {
       .update({ scheduled_date: date, status: "scheduled" })
       .eq("id", p.id);
     toast.success("Scheduled");
+    load();
+  }
+
+  async function updateVendorAssignmentStatus(id: string, status: "approved" | "rejected") {
+    const { error } = await supabase
+      .from("project_vendor_assignments")
+      .update({ status })
+      .eq("id", id);
+
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+
+    toast.success(`Vendor assignment ${status}`);
     load();
   }
 
@@ -105,13 +143,18 @@ function AdminHome() {
         <div>
           <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Admin overview</h1>
           <p className="text-muted-foreground mt-1">
-            Approve quotations, schedule work, export reports.
+            Approve quotations, manage vendors, schedule work, export reports.
           </p>
         </div>
-        <Button variant="outline" onClick={exportSheet}>
-          <FileDown className="h-4 w-4 mr-1" />
-          Export Work Data Sheet (CSV)
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" asChild>
+            <Link to="/admin/vendors">Vendor management</Link>
+          </Button>
+          <Button variant="outline" onClick={exportSheet}>
+            <FileDown className="h-4 w-4 mr-1" />
+            Export Work Data Sheet (CSV)
+          </Button>
+        </div>
       </div>
 
       <div className="mt-6 grid md:grid-cols-3 gap-4">
@@ -150,6 +193,60 @@ function AdminHome() {
               </li>
             ))}
           </ul>
+        </section>
+      )}
+
+      {pendingVendorAssignments.length > 0 && (
+        <section className="mt-8">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <h2 className="text-lg font-semibold tracking-tight">Vendor assignments pending approval</h2>
+              <p className="text-sm text-muted-foreground mt-1">
+                Review vendor requests submitted by engineers.
+              </p>
+            </div>
+            <Link to="/admin/vendors" className="text-sm text-primary underline hover:text-primary/80">
+              Manage vendors
+            </Link>
+          </div>
+          <div className="mt-4 overflow-x-auto rounded-xl border bg-card">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Project</TableHead>
+                  <TableHead>Vendor</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Requested</TableHead>
+                  <TableHead className="text-right">Action</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {pendingVendorAssignments.map((assignment) => (
+                  <TableRow key={assignment.id}>
+                    <TableCell>{assignment.project?.title ?? "—"}</TableCell>
+                    <TableCell>{assignment.vendor?.name ?? "—"}</TableCell>
+                    <TableCell>{assignment.vendor?.category ?? "—"}</TableCell>
+                    <TableCell>{new Date(assignment.created_at).toLocaleString()}</TableCell>
+                    <TableCell className="text-right gap-2 flex justify-end">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => updateVendorAssignmentStatus(assignment.id, "rejected")}
+                      >
+                        Reject
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() => updateVendorAssignmentStatus(assignment.id, "approved")}
+                      >
+                        Approve
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </section>
       )}
 

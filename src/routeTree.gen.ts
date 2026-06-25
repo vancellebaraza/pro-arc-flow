@@ -19,6 +19,7 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedEngineerProjectIdRouteImport } from './routes/_authenticated/engineer/$projectId'
 import { Route as AuthenticatedClientNewRouteImport } from './routes/_authenticated/client/new'
 import { Route as AuthenticatedClientProjectIdRouteImport } from './routes/_authenticated/client/$projectId'
+import { Route as AuthenticatedAdminVendorsRouteImport } from './routes/_authenticated/admin/vendors'
 import { Route as AuthenticatedEngineerProjectIdWorksheetRouteImport } from './routes/_authenticated/engineer/$projectId.worksheet'
 import { Route as AuthenticatedEngineerProjectIdQuotationRouteImport } from './routes/_authenticated/engineer/$projectId.quotation'
 import { Route as AuthenticatedEngineerProjectIdMessagesRouteImport } from './routes/_authenticated/engineer/$projectId.messages'
@@ -78,6 +79,12 @@ const AuthenticatedClientProjectIdRoute =
     path: '/client/$projectId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminVendorsRoute =
+  AuthenticatedAdminVendorsRouteImport.update({
+    id: '/admin/vendors',
+    path: '/admin/vendors',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedEngineerProjectIdWorksheetRoute =
   AuthenticatedEngineerProjectIdWorksheetRouteImport.update({
     id: '/worksheet',
@@ -113,6 +120,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/admin/vendors': typeof AuthenticatedAdminVendorsRoute
   '/client/$projectId': typeof AuthenticatedClientProjectIdRoute
   '/client/new': typeof AuthenticatedClientNewRoute
   '/engineer/$projectId': typeof AuthenticatedEngineerProjectIdRouteWithChildren
@@ -129,6 +137,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/admin/vendors': typeof AuthenticatedAdminVendorsRoute
   '/client/$projectId': typeof AuthenticatedClientProjectIdRoute
   '/client/new': typeof AuthenticatedClientNewRoute
   '/engineer/$projectId': typeof AuthenticatedEngineerProjectIdRouteWithChildren
@@ -147,6 +156,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/admin/vendors': typeof AuthenticatedAdminVendorsRoute
   '/_authenticated/client/$projectId': typeof AuthenticatedClientProjectIdRoute
   '/_authenticated/client/new': typeof AuthenticatedClientNewRoute
   '/_authenticated/engineer/$projectId': typeof AuthenticatedEngineerProjectIdRouteWithChildren
@@ -165,6 +175,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/dashboard'
+    | '/admin/vendors'
     | '/client/$projectId'
     | '/client/new'
     | '/engineer/$projectId'
@@ -181,6 +192,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/dashboard'
+    | '/admin/vendors'
     | '/client/$projectId'
     | '/client/new'
     | '/engineer/$projectId'
@@ -198,6 +210,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/dashboard'
+    | '/_authenticated/admin/vendors'
     | '/_authenticated/client/$projectId'
     | '/_authenticated/client/new'
     | '/_authenticated/engineer/$projectId'
@@ -289,6 +302,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedClientProjectIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/vendors': {
+      id: '/_authenticated/admin/vendors'
+      path: '/admin/vendors'
+      fullPath: '/admin/vendors'
+      preLoaderRoute: typeof AuthenticatedAdminVendorsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/engineer/$projectId/worksheet': {
       id: '/_authenticated/engineer/$projectId/worksheet'
       path: '/worksheet'
@@ -356,6 +376,7 @@ const AuthenticatedEngineerProjectIdRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedAdminVendorsRoute: typeof AuthenticatedAdminVendorsRoute
   AuthenticatedClientProjectIdRoute: typeof AuthenticatedClientProjectIdRoute
   AuthenticatedClientNewRoute: typeof AuthenticatedClientNewRoute
   AuthenticatedEngineerProjectIdRoute: typeof AuthenticatedEngineerProjectIdRouteWithChildren
@@ -366,6 +387,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedAdminVendorsRoute: AuthenticatedAdminVendorsRoute,
   AuthenticatedClientProjectIdRoute: AuthenticatedClientProjectIdRoute,
   AuthenticatedClientNewRoute: AuthenticatedClientNewRoute,
   AuthenticatedEngineerProjectIdRoute:

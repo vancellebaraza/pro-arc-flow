@@ -6,9 +6,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import { generateWorksheetPdf } from "@/lib/pdf";
 import { toast } from "sonner";
-import { ArrowLeft, Plus, Trash2, Save, FileDown, UploadCloud } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Save, FileDown, UploadCloud, BrandWhatsapp } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/engineer/$projectId/worksheet")({
   component: WorksheetPage,
@@ -17,6 +24,14 @@ export const Route = createFileRoute("/_authenticated/engineer/$projectId/worksh
 interface Observation {
   observation: string;
   action: string;
+}
+
+interface VendorOption {
+  id: string;
+  name: string;
+  category: string;
+  whatsapp_phone: string | null;
+  phone: string;
 }
 
 function WorksheetPage() {
@@ -38,6 +53,11 @@ function WorksheetPage() {
   const [sigSup, setSigSup] = useState("");
   const [sigClient, setSigClient] = useState("");
   const [saving, setSaving] = useState(false);
+  const [vendors, setVendors] = useState<VendorOption[]>([]);
+  const [vendorSearch, setVendorSearch] = useState("");
+  const [vendorCategoryFilter, setVendorCategoryFilter] = useState("");
+  const [selectedVendorId, setSelectedVendorId] = useState("");
+  const [assignmentLoading, setAssignmentLoading] = useState(false);
 
   const load = useCallback(async () => {
     const { data: p } = await supabase
@@ -79,11 +99,59 @@ function WorksheetPage() {
       setSigSup(s.supervisor_name ?? "");
       setSigClient(s.client_name ?? "");
     }
+
+    const { data: vendorRows, error: vendorError } = await supabase
+      .from("vendors")
+      .select("id,name,category,whatsapp_phone,phone")
+      .order("name", { ascending: true });
+
+    if (vendorError) {
+      toast.error(vendorError.message);
+    } else {
+      setVendors((vendorRows ?? []) as VendorOption[]);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId]);
   useEffect(() => {
     load();
   }, [load]);
+
+  function filteredVendors() {
+    return vendors.filter((vendor) => {
+      const matchesSearch =
+        !vendorSearch ||
+        vendor.name.toLowerCase().includes(vendorSearch.toLowerCase()) ||
+        vendor.category.toLowerCase().includes(vendorSearch.toLowerCase());
+      const matchesCategory =
+        !vendorCategoryFilter || vendor.category === vendorCategoryFilter;
+      return matchesSearch && matchesCategory;
+    });
+  }
+
+  async function assignVendor() {
+    if (!selectedVendorId) {
+      toast.error("Please choose a vendor to assign.");
+      return;
+    }
+    setAssignmentLoading(true);
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData?.data.user) throw new Error("Not signed in");
+      const { error } = await supabase.from("project_vendor_assignments").insert({
+        project_id: projectId,
+        vendor_id: selectedVendorId,
+        assigned_by: userData.data.user.id,
+        status: "pending_approval",
+      });
+      if (error) throw error;
+      toast.success("Vendor assignment requested");
+      setSelectedVendorId("");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Unable to assign vendor");
+    } finally {
+      setAssignmentLoading(false);
+    }
+  }
 
   async function uploadImages(files: FileList | null) {
     if (!files) return;
@@ -216,6 +284,104 @@ function WorksheetPage() {
           value={jobDescription}
           onChange={(e) => setJobDescription(e.target.value)}
         />
+      </section>
+
+      <section className="mt-8 rounded-xl border bg-card p-5">
+        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div>
+            <h2 className="text-lg font-semibold tracking-tight">Assign Vendor</h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              Search vendors and request approval from admin for this project.
+            </p>
+          </div>
+          <Button
+            onClick={assignVendor}
+            disabled={!selectedVendorId || assignmentLoading}
+          >
+            Assign vendor
+          </Button>
+        </div>
+
+        <div className="mt-5 grid gap-4 md:grid-cols-[1fr_auto]">
+          <div>
+            <Label>Search vendors</Label>
+            <Input
+              value={vendorSearch}
+              onChange={(e) => setVendorSearch(e.target.value)}
+              placeholder="Search by name or category"
+            />
+          </div>
+          <div>
+            <Label>Category filter</Label>
+            <Select
+              value={vendorCategoryFilter}
+              onValueChange={setVendorCategoryFilter}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="All categories" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All categories</SelectItem>
+                {Array.from(new Set(vendors.map((vendor) => vendor.category))).map((category) => (
+                  <SelectItem key={category} value={category}>
+                    {category}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="mt-5">
+          <Label>Choose vendor</Label>
+          <Select value={selectedVendorId} onValueChange={setSelectedVendorId}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select a vendor" />
+            </SelectTrigger>
+            <SelectContent>
+              {filteredVendors().map((vendor) => (
+                <SelectItem key={vendor.id} value={vendor.id}>
+                  {vendor.name} — {vendor.category}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {selectedVendorId ? (
+          <div className="mt-4 rounded-lg border bg-surface p-4">
+            {(() => {
+              const vendor = vendors.find((item) => item.id === selectedVendorId);
+              if (!vendor) return <div className="text-sm text-muted-foreground">Selected vendor not available.</div>;
+              return (
+                <div className="grid gap-2 md:grid-cols-2">
+                  <div>
+                    <div className="text-sm font-medium">{vendor.name}</div>
+                    <div className="text-sm text-muted-foreground">{vendor.category}</div>
+                  </div>
+                  <div className="space-y-1 text-sm text-muted-foreground">
+                    <div>Phone: {vendor.phone}</div>
+                    <div>
+                      WhatsApp: {vendor.whatsapp_phone ? (
+                        <a
+                          href={`https://wa.me/${vendor.whatsapp_phone.replace(/\D/g, "")}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 text-emerald-600 hover:text-emerald-800"
+                        >
+                          <BrandWhatsapp className="h-4 w-4" />
+                          Open chat
+                        </a>
+                      ) : (
+                        "—"
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        ) : null}
       </section>
 
       <section className="mt-8">
