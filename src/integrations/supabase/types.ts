@@ -1,625 +1,625 @@
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[]
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
-  }
+    PostgrestVersion: "14.5";
+  };
   graphql_public: {
     Tables: {
-      [_ in never]: never
-    }
+      [_ in never]: never;
+    };
     Views: {
-      [_ in never]: never
-    }
+      [_ in never]: never;
+    };
     Functions: {
       graphql: {
         Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
+          extensions?: Json;
+          operationName?: string;
+          query?: string;
+          variables?: Json;
+        };
+        Returns: Json;
+      };
+    };
     Enums: {
-      [_ in never]: never
-    }
+      [_ in never]: never;
+    };
     CompositeTypes: {
-      [_ in never]: never
-    }
-  }
+      [_ in never]: never;
+    };
+  };
   public: {
     Tables: {
       inspections: {
         Row: {
-          checklist: Json
-          created_at: string
-          engineer_id: string
-          flagged: boolean
-          id: string
-          image_urls: string[]
-          meta: Json
-          photo_evidence: Json
-          project_id: string
-          remarks: string | null
-          signatures: Json
-          stage: string
-        }
+          checklist: Json;
+          created_at: string;
+          engineer_id: string;
+          flagged: boolean;
+          id: string;
+          image_urls: string[];
+          meta: Json;
+          photo_evidence: Json;
+          project_id: string;
+          remarks: string | null;
+          signatures: Json;
+          stage: string;
+        };
         Insert: {
-          checklist?: Json
-          created_at?: string
-          engineer_id: string
-          flagged?: boolean
-          id?: string
-          image_urls?: string[]
-          meta?: Json
-          photo_evidence?: Json
-          project_id: string
-          remarks?: string | null
-          signatures?: Json
-          stage?: string
-        }
+          checklist?: Json;
+          created_at?: string;
+          engineer_id: string;
+          flagged?: boolean;
+          id?: string;
+          image_urls?: string[];
+          meta?: Json;
+          photo_evidence?: Json;
+          project_id: string;
+          remarks?: string | null;
+          signatures?: Json;
+          stage?: string;
+        };
         Update: {
-          checklist?: Json
-          created_at?: string
-          engineer_id?: string
-          flagged?: boolean
-          id?: string
-          image_urls?: string[]
-          meta?: Json
-          photo_evidence?: Json
-          project_id?: string
-          remarks?: string | null
-          signatures?: Json
-          stage?: string
-        }
+          checklist?: Json;
+          created_at?: string;
+          engineer_id?: string;
+          flagged?: boolean;
+          id?: string;
+          image_urls?: string[];
+          meta?: Json;
+          photo_evidence?: Json;
+          project_id?: string;
+          remarks?: string | null;
+          signatures?: Json;
+          stage?: string;
+        };
         Relationships: [
           {
-            foreignKeyName: "inspections_project_id_fkey"
-            columns: ["project_id"]
-            isOneToOne: false
-            referencedRelation: "projects"
-            referencedColumns: ["id"]
+            foreignKeyName: "inspections_project_id_fkey";
+            columns: ["project_id"];
+            isOneToOne: false;
+            referencedRelation: "projects";
+            referencedColumns: ["id"];
           },
-        ]
-      }
+        ];
+      };
       messages: {
         Row: {
-          body: string
-          channel: string
-          created_at: string
-          id: string
-          project_id: string
-          sender_id: string
-        }
+          body: string;
+          channel: string;
+          created_at: string;
+          id: string;
+          project_id: string;
+          sender_id: string;
+        };
         Insert: {
-          body: string
-          channel?: string
-          created_at?: string
-          id?: string
-          project_id: string
-          sender_id: string
-        }
+          body: string;
+          channel?: string;
+          created_at?: string;
+          id?: string;
+          project_id: string;
+          sender_id: string;
+        };
         Update: {
-          body?: string
-          channel?: string
-          created_at?: string
-          id?: string
-          project_id?: string
-          sender_id?: string
-        }
+          body?: string;
+          channel?: string;
+          created_at?: string;
+          id?: string;
+          project_id?: string;
+          sender_id?: string;
+        };
         Relationships: [
           {
-            foreignKeyName: "messages_project_id_fkey"
-            columns: ["project_id"]
-            isOneToOne: false
-            referencedRelation: "projects"
-            referencedColumns: ["id"]
+            foreignKeyName: "messages_project_id_fkey";
+            columns: ["project_id"];
+            isOneToOne: false;
+            referencedRelation: "projects";
+            referencedColumns: ["id"];
           },
-        ]
-      }
+        ];
+      };
       notifications: {
         Row: {
-          body: string | null
-          created_at: string
-          id: string
-          link: string | null
-          project_id: string | null
-          read_at: string | null
-          title: string
-          user_id: string
-        }
+          body: string | null;
+          created_at: string;
+          id: string;
+          link: string | null;
+          project_id: string | null;
+          read_at: string | null;
+          title: string;
+          user_id: string;
+        };
         Insert: {
-          body?: string | null
-          created_at?: string
-          id?: string
-          link?: string | null
-          project_id?: string | null
-          read_at?: string | null
-          title: string
-          user_id: string
-        }
+          body?: string | null;
+          created_at?: string;
+          id?: string;
+          link?: string | null;
+          project_id?: string | null;
+          read_at?: string | null;
+          title: string;
+          user_id: string;
+        };
         Update: {
-          body?: string | null
-          created_at?: string
-          id?: string
-          link?: string | null
-          project_id?: string | null
-          read_at?: string | null
-          title?: string
-          user_id?: string
-        }
+          body?: string | null;
+          created_at?: string;
+          id?: string;
+          link?: string | null;
+          project_id?: string | null;
+          read_at?: string | null;
+          title?: string;
+          user_id?: string;
+        };
         Relationships: [
           {
-            foreignKeyName: "notifications_project_id_fkey"
-            columns: ["project_id"]
-            isOneToOne: false
-            referencedRelation: "projects"
-            referencedColumns: ["id"]
+            foreignKeyName: "notifications_project_id_fkey";
+            columns: ["project_id"];
+            isOneToOne: false;
+            referencedRelation: "projects";
+            referencedColumns: ["id"];
           },
-        ]
-      }
+        ];
+      };
       profiles: {
         Row: {
-          company: string | null
-          created_at: string
-          full_name: string | null
-          id: string
-          phone: string | null
-          updated_at: string
-        }
+          company: string | null;
+          created_at: string;
+          full_name: string | null;
+          id: string;
+          phone: string | null;
+          updated_at: string;
+        };
         Insert: {
-          company?: string | null
-          created_at?: string
-          full_name?: string | null
-          id: string
-          phone?: string | null
-          updated_at?: string
-        }
+          company?: string | null;
+          created_at?: string;
+          full_name?: string | null;
+          id: string;
+          phone?: string | null;
+          updated_at?: string;
+        };
         Update: {
-          company?: string | null
-          created_at?: string
-          full_name?: string | null
-          id?: string
-          phone?: string | null
-          updated_at?: string
-        }
-        Relationships: []
-      }
+          company?: string | null;
+          created_at?: string;
+          full_name?: string | null;
+          id?: string;
+          phone?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       project_vendor_assignments: {
         Row: {
-          assigned_by: string
-          created_at: string
-          id: string
-          project_id: string
-          status: string
-          vendor_id: string
-        }
+          assigned_by: string;
+          created_at: string;
+          id: string;
+          project_id: string;
+          status: string;
+          vendor_id: string;
+        };
         Insert: {
-          assigned_by: string
-          created_at?: string
-          id?: string
-          project_id: string
-          status?: string
-          vendor_id: string
-        }
+          assigned_by: string;
+          created_at?: string;
+          id?: string;
+          project_id: string;
+          status?: string;
+          vendor_id: string;
+        };
         Update: {
-          assigned_by?: string
-          created_at?: string
-          id?: string
-          project_id?: string
-          status?: string
-          vendor_id?: string
-        }
+          assigned_by?: string;
+          created_at?: string;
+          id?: string;
+          project_id?: string;
+          status?: string;
+          vendor_id?: string;
+        };
         Relationships: [
           {
-            foreignKeyName: "project_vendor_assignments_project_id_fkey"
-            columns: ["project_id"]
-            isOneToOne: false
-            referencedRelation: "projects"
-            referencedColumns: ["id"]
+            foreignKeyName: "project_vendor_assignments_project_id_fkey";
+            columns: ["project_id"];
+            isOneToOne: false;
+            referencedRelation: "projects";
+            referencedColumns: ["id"];
           },
           {
-            foreignKeyName: "project_vendor_assignments_vendor_id_fkey"
-            columns: ["vendor_id"]
-            isOneToOne: false
-            referencedRelation: "vendors"
-            referencedColumns: ["id"]
+            foreignKeyName: "project_vendor_assignments_vendor_id_fkey";
+            columns: ["vendor_id"];
+            isOneToOne: false;
+            referencedRelation: "vendors";
+            referencedColumns: ["id"];
           },
-        ]
-      }
+        ];
+      };
       projects: {
         Row: {
-          client_id: string
-          created_at: string
-          description: string | null
-          engineer_id: string | null
-          id: string
-          image_urls: string[]
-          location: string | null
-          scheduled_date: string | null
-          service: Database["public"]["Enums"]["service_type"]
-          status: Database["public"]["Enums"]["project_status"]
-          title: string
-          updated_at: string
-        }
+          client_id: string;
+          created_at: string;
+          description: string | null;
+          engineer_id: string | null;
+          id: string;
+          image_urls: string[];
+          job_number: string;
+          location: string | null;
+          scheduled_date: string | null;
+          service: Database["public"]["Enums"]["service_type"];
+          status: Database["public"]["Enums"]["project_status"];
+          title: string;
+          updated_at: string;
+        };
         Insert: {
-          client_id: string
-          created_at?: string
-          description?: string | null
-          engineer_id?: string | null
-          id?: string
-          image_urls?: string[]
-          location?: string | null
-          scheduled_date?: string | null
-          service: Database["public"]["Enums"]["service_type"]
-          status?: Database["public"]["Enums"]["project_status"]
-          title: string
-          updated_at?: string
-        }
+          client_id: string;
+          created_at?: string;
+          description?: string | null;
+          engineer_id?: string | null;
+          id?: string;
+          image_urls?: string[];
+          job_number?: string;
+          location?: string | null;
+          scheduled_date?: string | null;
+          service: Database["public"]["Enums"]["service_type"];
+          status?: Database["public"]["Enums"]["project_status"];
+          title: string;
+          updated_at?: string;
+        };
         Update: {
-          client_id?: string
-          created_at?: string
-          description?: string | null
-          engineer_id?: string | null
-          id?: string
-          image_urls?: string[]
-          location?: string | null
-          scheduled_date?: string | null
-          service?: Database["public"]["Enums"]["service_type"]
-          status?: Database["public"]["Enums"]["project_status"]
-          title?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
+          client_id?: string;
+          created_at?: string;
+          description?: string | null;
+          engineer_id?: string | null;
+          id?: string;
+          image_urls?: string[];
+          job_number?: string;
+          location?: string | null;
+          scheduled_date?: string | null;
+          service?: Database["public"]["Enums"]["service_type"];
+          status?: Database["public"]["Enums"]["project_status"];
+          title?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       quotation_items: {
         Row: {
-          actual_cost: number | null
-          amount: number
-          description: string
-          id: string
-          qty: number
-          quotation_id: string
-          sort_order: number
-          unit: string | null
-          unit_cost: number
-        }
+          actual_cost: number | null;
+          amount: number;
+          description: string;
+          id: string;
+          qty: number;
+          quotation_id: string;
+          sort_order: number;
+          unit: string | null;
+          unit_cost: number;
+        };
         Insert: {
-          actual_cost?: number | null
-          amount?: number
-          description: string
-          id?: string
-          qty?: number
-          quotation_id: string
-          sort_order?: number
-          unit?: string | null
-          unit_cost?: number
-        }
+          actual_cost?: number | null;
+          amount?: number;
+          description: string;
+          id?: string;
+          qty?: number;
+          quotation_id: string;
+          sort_order?: number;
+          unit?: string | null;
+          unit_cost?: number;
+        };
         Update: {
-          actual_cost?: number | null
-          amount?: number
-          description?: string
-          id?: string
-          qty?: number
-          quotation_id?: string
-          sort_order?: number
-          unit?: string | null
-          unit_cost?: number
-        }
+          actual_cost?: number | null;
+          amount?: number;
+          description?: string;
+          id?: string;
+          qty?: number;
+          quotation_id?: string;
+          sort_order?: number;
+          unit?: string | null;
+          unit_cost?: number;
+        };
         Relationships: [
           {
-            foreignKeyName: "quotation_items_quotation_id_fkey"
-            columns: ["quotation_id"]
-            isOneToOne: false
-            referencedRelation: "quotations"
-            referencedColumns: ["id"]
+            foreignKeyName: "quotation_items_quotation_id_fkey";
+            columns: ["quotation_id"];
+            isOneToOne: false;
+            referencedRelation: "quotations";
+            referencedColumns: ["id"];
           },
-        ]
-      }
+        ];
+      };
       quotations: {
         Row: {
-          created_at: string
-          engineer_id: string
-          grand_total: number
-          id: string
-          labour: number
-          meta: Json
-          notes: string | null
-          project_id: string
-          quote_no: string | null
-          status: Database["public"]["Enums"]["quotation_status"]
-          subtotal: number
-          updated_at: string
-          vat_amount: number
-          vat_rate: number
-        }
+          created_at: string;
+          engineer_id: string;
+          grand_total: number;
+          id: string;
+          labour: number;
+          meta: Json;
+          notes: string | null;
+          payment_status: string;
+          project_id: string;
+          quote_no: string | null;
+          status: Database["public"]["Enums"]["quotation_status"];
+          subtotal: number;
+          updated_at: string;
+          vat_amount: number;
+          vat_rate: number;
+        };
         Insert: {
-          created_at?: string
-          engineer_id: string
-          grand_total?: number
-          id?: string
-          labour?: number
-          meta?: Json
-          notes?: string | null
-          project_id: string
-          quote_no?: string | null
-          status?: Database["public"]["Enums"]["quotation_status"]
-          subtotal?: number
-          updated_at?: string
-          vat_amount?: number
-          vat_rate?: number
-        }
+          created_at?: string;
+          engineer_id: string;
+          grand_total?: number;
+          id?: string;
+          labour?: number;
+          meta?: Json;
+          notes?: string | null;
+          payment_status?: string;
+          project_id: string;
+          quote_no?: string | null;
+          status?: Database["public"]["Enums"]["quotation_status"];
+          subtotal?: number;
+          updated_at?: string;
+          vat_amount?: number;
+          vat_rate?: number;
+        };
         Update: {
-          created_at?: string
-          engineer_id?: string
-          grand_total?: number
-          id?: string
-          labour?: number
-          meta?: Json
-          notes?: string | null
-          project_id?: string
-          quote_no?: string | null
-          status?: Database["public"]["Enums"]["quotation_status"]
-          subtotal?: number
-          updated_at?: string
-          vat_amount?: number
-          vat_rate?: number
-        }
+          created_at?: string;
+          engineer_id?: string;
+          grand_total?: number;
+          id?: string;
+          labour?: number;
+          meta?: Json;
+          notes?: string | null;
+          payment_status?: string;
+          project_id?: string;
+          quote_no?: string | null;
+          status?: Database["public"]["Enums"]["quotation_status"];
+          subtotal?: number;
+          updated_at?: string;
+          vat_amount?: number;
+          vat_rate?: number;
+        };
         Relationships: [
           {
-            foreignKeyName: "quotations_project_id_fkey"
-            columns: ["project_id"]
-            isOneToOne: false
-            referencedRelation: "projects"
-            referencedColumns: ["id"]
+            foreignKeyName: "quotations_project_id_fkey";
+            columns: ["project_id"];
+            isOneToOne: false;
+            referencedRelation: "projects";
+            referencedColumns: ["id"];
           },
-        ]
-      }
+        ];
+      };
       user_roles: {
         Row: {
-          created_at: string
-          id: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
-        }
+          created_at: string;
+          id: string;
+          role: Database["public"]["Enums"]["app_role"];
+          user_id: string;
+        };
         Insert: {
-          created_at?: string
-          id?: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
-        }
+          created_at?: string;
+          id?: string;
+          role: Database["public"]["Enums"]["app_role"];
+          user_id: string;
+        };
         Update: {
-          created_at?: string
-          id?: string
-          role?: Database["public"]["Enums"]["app_role"]
-          user_id?: string
-        }
-        Relationships: []
-      }
+          created_at?: string;
+          id?: string;
+          role?: Database["public"]["Enums"]["app_role"];
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       vendors: {
         Row: {
-          category: string
-          contact_person: string
-          created_at: string
-          created_by: string | null
-          email: string | null
-          id: string
-          name: string
-          payment_history: string | null
-          phone: string
-          services_offered: string | null
-          whatsapp_phone: string | null
-        }
+          category: string;
+          contact_person: string;
+          created_at: string;
+          created_by: string | null;
+          email: string | null;
+          id: string;
+          name: string;
+          payment_history: string | null;
+          phone: string;
+          services_offered: string | null;
+          whatsapp_phone: string | null;
+        };
         Insert: {
-          category: string
-          contact_person: string
-          created_at?: string
-          created_by?: string | null
-          email?: string | null
-          id?: string
-          name: string
-          payment_history?: string | null
-          phone: string
-          services_offered?: string | null
-          whatsapp_phone?: string | null
-        }
+          category: string;
+          contact_person: string;
+          created_at?: string;
+          created_by?: string | null;
+          email?: string | null;
+          id?: string;
+          name: string;
+          payment_history?: string | null;
+          phone: string;
+          services_offered?: string | null;
+          whatsapp_phone?: string | null;
+        };
         Update: {
-          category?: string
-          contact_person?: string
-          created_at?: string
-          created_by?: string | null
-          email?: string | null
-          id?: string
-          name?: string
-          payment_history?: string | null
-          phone?: string
-          services_offered?: string | null
-          whatsapp_phone?: string | null
-        }
-        Relationships: []
-      }
+          category?: string;
+          contact_person?: string;
+          created_at?: string;
+          created_by?: string | null;
+          email?: string | null;
+          id?: string;
+          name?: string;
+          payment_history?: string | null;
+          phone?: string;
+          services_offered?: string | null;
+          whatsapp_phone?: string | null;
+        };
+        Relationships: [];
+      };
       whatsapp_logs: {
         Row: {
-          body: string
-          created_at: string
-          id: string
-          message_type: string | null
-          meta: Json | null
-          project_id: string | null
-          recipient: string | null
-          recipient_phone: string | null
-          sender_id: string
-        }
+          body: string;
+          created_at: string;
+          id: string;
+          message_type: string | null;
+          meta: Json | null;
+          project_id: string | null;
+          recipient: string | null;
+          recipient_phone: string | null;
+          sender_id: string;
+        };
         Insert: {
-          body: string
-          created_at?: string
-          id?: string
-          message_type?: string | null
-          meta?: Json | null
-          project_id?: string | null
-          recipient?: string | null
-          recipient_phone?: string | null
-          sender_id: string
-        }
+          body: string;
+          created_at?: string;
+          id?: string;
+          message_type?: string | null;
+          meta?: Json | null;
+          project_id?: string | null;
+          recipient?: string | null;
+          recipient_phone?: string | null;
+          sender_id: string;
+        };
         Update: {
-          body?: string
-          created_at?: string
-          id?: string
-          message_type?: string | null
-          meta?: Json | null
-          project_id?: string | null
-          recipient?: string | null
-          recipient_phone?: string | null
-          sender_id?: string
-        }
+          body?: string;
+          created_at?: string;
+          id?: string;
+          message_type?: string | null;
+          meta?: Json | null;
+          project_id?: string | null;
+          recipient?: string | null;
+          recipient_phone?: string | null;
+          sender_id?: string;
+        };
         Relationships: [
           {
-            foreignKeyName: "whatsapp_logs_project_id_fkey"
-            columns: ["project_id"]
-            isOneToOne: false
-            referencedRelation: "projects"
-            referencedColumns: ["id"]
+            foreignKeyName: "whatsapp_logs_project_id_fkey";
+            columns: ["project_id"];
+            isOneToOne: false;
+            referencedRelation: "projects";
+            referencedColumns: ["id"];
           },
-        ]
-      }
+        ];
+      };
       work_tasks: {
         Row: {
-          assignee: string | null
-          created_at: string
-          end_date: string | null
-          id: string
-          notes: string | null
-          project_id: string
-          start_date: string | null
-          status: Database["public"]["Enums"]["task_status"]
-          title: string
-        }
+          assignee: string | null;
+          created_at: string;
+          end_date: string | null;
+          id: string;
+          notes: string | null;
+          project_id: string;
+          start_date: string | null;
+          status: Database["public"]["Enums"]["task_status"];
+          title: string;
+        };
         Insert: {
-          assignee?: string | null
-          created_at?: string
-          end_date?: string | null
-          id?: string
-          notes?: string | null
-          project_id: string
-          start_date?: string | null
-          status?: Database["public"]["Enums"]["task_status"]
-          title: string
-        }
+          assignee?: string | null;
+          created_at?: string;
+          end_date?: string | null;
+          id?: string;
+          notes?: string | null;
+          project_id: string;
+          start_date?: string | null;
+          status?: Database["public"]["Enums"]["task_status"];
+          title: string;
+        };
         Update: {
-          assignee?: string | null
-          created_at?: string
-          end_date?: string | null
-          id?: string
-          notes?: string | null
-          project_id?: string
-          start_date?: string | null
-          status?: Database["public"]["Enums"]["task_status"]
-          title?: string
-        }
+          assignee?: string | null;
+          created_at?: string;
+          end_date?: string | null;
+          id?: string;
+          notes?: string | null;
+          project_id?: string;
+          start_date?: string | null;
+          status?: Database["public"]["Enums"]["task_status"];
+          title?: string;
+        };
         Relationships: [
           {
-            foreignKeyName: "work_tasks_project_id_fkey"
-            columns: ["project_id"]
-            isOneToOne: false
-            referencedRelation: "projects"
-            referencedColumns: ["id"]
+            foreignKeyName: "work_tasks_project_id_fkey";
+            columns: ["project_id"];
+            isOneToOne: false;
+            referencedRelation: "projects";
+            referencedColumns: ["id"];
           },
-        ]
-      }
+        ];
+      };
       worksheets: {
         Row: {
-          client_name: string | null
-          created_at: string
-          engineer_id: string
-          id: string
-          images_before: Json
-          job_date: string | null
-          job_description: string | null
-          job_location: string | null
-          job_no: string | null
-          job_type: string | null
-          observations: Json
-          person_in_charge: string | null
-          project_id: string
-          signatures: Json
-          technician: string | null
-          updated_at: string
-        }
+          client_name: string | null;
+          created_at: string;
+          engineer_id: string;
+          id: string;
+          images_before: Json;
+          job_date: string | null;
+          job_description: string | null;
+          job_location: string | null;
+          job_no: string | null;
+          job_type: string | null;
+          observations: Json;
+          person_in_charge: string | null;
+          project_id: string;
+          signatures: Json;
+          technician: string | null;
+          updated_at: string;
+        };
         Insert: {
-          client_name?: string | null
-          created_at?: string
-          engineer_id: string
-          id?: string
-          images_before?: Json
-          job_date?: string | null
-          job_description?: string | null
-          job_location?: string | null
-          job_no?: string | null
-          job_type?: string | null
-          observations?: Json
-          person_in_charge?: string | null
-          project_id: string
-          signatures?: Json
-          technician?: string | null
-          updated_at?: string
-        }
+          client_name?: string | null;
+          created_at?: string;
+          engineer_id: string;
+          id?: string;
+          images_before?: Json;
+          job_date?: string | null;
+          job_description?: string | null;
+          job_location?: string | null;
+          job_no?: string | null;
+          job_type?: string | null;
+          observations?: Json;
+          person_in_charge?: string | null;
+          project_id: string;
+          signatures?: Json;
+          technician?: string | null;
+          updated_at?: string;
+        };
         Update: {
-          client_name?: string | null
-          created_at?: string
-          engineer_id?: string
-          id?: string
-          images_before?: Json
-          job_date?: string | null
-          job_description?: string | null
-          job_location?: string | null
-          job_no?: string | null
-          job_type?: string | null
-          observations?: Json
-          person_in_charge?: string | null
-          project_id?: string
-          signatures?: Json
-          technician?: string | null
-          updated_at?: string
-        }
+          client_name?: string | null;
+          created_at?: string;
+          engineer_id?: string;
+          id?: string;
+          images_before?: Json;
+          job_date?: string | null;
+          job_description?: string | null;
+          job_location?: string | null;
+          job_no?: string | null;
+          job_type?: string | null;
+          observations?: Json;
+          person_in_charge?: string | null;
+          project_id?: string;
+          signatures?: Json;
+          technician?: string | null;
+          updated_at?: string;
+        };
         Relationships: [
           {
-            foreignKeyName: "worksheets_project_id_fkey"
-            columns: ["project_id"]
-            isOneToOne: false
-            referencedRelation: "projects"
-            referencedColumns: ["id"]
+            foreignKeyName: "worksheets_project_id_fkey";
+            columns: ["project_id"];
+            isOneToOne: false;
+            referencedRelation: "projects";
+            referencedColumns: ["id"];
           },
-        ]
-      }
-    }
+        ];
+      };
+    };
     Views: {
-      [_ in never]: never
-    }
+      [_ in never]: never;
+    };
     Functions: {
       get_my_roles: {
-        Args: never
-        Returns: Database["public"]["Enums"]["app_role"][]
-      }
+        Args: never;
+        Returns: Database["public"]["Enums"]["app_role"][];
+      };
       has_role: {
         Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _user_id: string
-        }
-        Returns: boolean
-      }
-    }
+          _role: Database["public"]["Enums"]["app_role"];
+          _user_id: string;
+        };
+        Returns: boolean;
+      };
+    };
     Enums: {
-      app_role: "client" | "engineer" | "admin"
+      app_role: "client" | "engineer" | "admin";
       project_status:
         | "requested"
         | "inspected"
@@ -628,139 +628,137 @@ export type Database = {
         | "scheduled"
         | "in_progress"
         | "completed"
-        | "rejected"
-      quotation_status: "draft" | "sent" | "approved" | "rejected"
+        | "rejected";
+      quotation_status: "draft" | "sent" | "approved" | "rejected";
       service_type:
         | "electrical"
         | "plumbing"
         | "landscaping"
         | "painting"
         | "property_management"
-        | "tank_cleaning"
-      task_status: "pending" | "in_progress" | "done" | "blocked"
-    }
+        | "tank_cleaning";
+      task_status: "pending" | "in_progress" | "done" | "blocked";
+    };
     CompositeTypes: {
-      [_ in never]: never
-    }
-  }
-}
+      [_ in never]: never;
+    };
+  };
+};
 
-type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">;
 
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">];
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
   ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
       DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
-      Row: infer R
+      Row: infer R;
     }
     ? R
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])
-    ? (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
-        Row: infer R
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] & DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R;
       }
       ? R
       : never
-    : never
+    : never;
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Insert: infer I
+      Insert: infer I;
     }
     ? I
     : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
     ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Insert: infer I
+        Insert: infer I;
       }
       ? I
       : never
-    : never
+    : never;
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Update: infer U
+      Update: infer U;
     }
     ? U
     : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
     ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Update: infer U
+        Update: infer U;
       }
       ? U
       : never
-    : never
+    : never;
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
 > = DefaultSchemaEnumNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
   ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
-    : never
+    : never;
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
 > = PublicCompositeTypeNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
   ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-    : never
+    : never;
 
 export const Constants = {
   graphql_public: {
@@ -791,4 +789,4 @@ export const Constants = {
       task_status: ["pending", "in_progress", "done", "blocked"],
     },
   },
-} as const
+} as const;
