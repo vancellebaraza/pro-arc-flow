@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { ArrowLeft, FileDown, MessageCircle, Check, X } from "lucide-react";
 import { generateQuotationPdf } from "@/lib/pdf";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import ProjectProgress from "@/components/ProjectProgress";
 
 export const Route = createFileRoute("/_authenticated/client/$projectId")({
   component: ProjectDetail,
@@ -155,6 +156,8 @@ function ProjectDetail() {
           customMessage={waText}
         />
       </div>
+
+      <ProjectProgress status={project.status} className="mt-6" />
 
       {project.description && <p className="mt-6 text-sm leading-relaxed">{project.description}</p>}
 
