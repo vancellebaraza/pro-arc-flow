@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { toast } from "sonner";
-import { BrandWhatsapp, Pencil, Save, Plus } from "lucide-react";
+import { MessageCircle, Pencil, Save, Plus } from "lucide-react";
 
 const CATEGORY_OPTIONS = [
   "Electrical",
@@ -85,7 +85,7 @@ function VendorManagementPage() {
       const { data: userData } = await supabase.auth.getUser();
       const payload = {
         ...form,
-        created_by: userData?.data.user?.id ?? null,
+        created_by: userData?.user?.id ?? null,
       };
 
       if (editingVendorId) {
@@ -279,7 +279,7 @@ function VendorManagementPage() {
                           rel="noreferrer"
                           className="inline-flex items-center gap-1 text-emerald-600 hover:text-emerald-800"
                         >
-                          <BrandWhatsapp className="h-4 w-4" />
+                          <MessageCircle className="h-4 w-4" />
                           WhatsApp
                         </a>
                       ) : (
@@ -309,13 +309,7 @@ function VendorManagementPage() {
       </section>
     </div>
   );
-}
-import { createFileRoute } from '@tanstack/react-router'
-
-export const Route = createFileRoute('/_authenticated/admin/vendors')({
-  component: RouteComponent,
-})
 
 function RouteComponent() {
   return <div>Hello "/_authenticated/admin/vendors"!</div>
-}
+}}
