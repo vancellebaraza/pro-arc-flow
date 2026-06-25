@@ -20,6 +20,7 @@ import { Route as AuthenticatedEngineerProjectIdRouteImport } from './routes/_au
 import { Route as AuthenticatedClientNewRouteImport } from './routes/_authenticated/client/new'
 import { Route as AuthenticatedClientProjectIdRouteImport } from './routes/_authenticated/client/$projectId'
 import { Route as AuthenticatedAdminVendorsRouteImport } from './routes/_authenticated/admin/vendors'
+import { Route as AuthenticatedAdminTodosRouteImport } from './routes/_authenticated/admin/todos'
 import { Route as AuthenticatedEngineerProjectIdWorksheetRouteImport } from './routes/_authenticated/engineer/$projectId.worksheet'
 import { Route as AuthenticatedEngineerProjectIdQuotationRouteImport } from './routes/_authenticated/engineer/$projectId.quotation'
 import { Route as AuthenticatedEngineerProjectIdMessagesRouteImport } from './routes/_authenticated/engineer/$projectId.messages'
@@ -85,6 +86,11 @@ const AuthenticatedAdminVendorsRoute =
     path: '/admin/vendors',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminTodosRoute = AuthenticatedAdminTodosRouteImport.update({
+  id: '/admin/todos',
+  path: '/admin/todos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedEngineerProjectIdWorksheetRoute =
   AuthenticatedEngineerProjectIdWorksheetRouteImport.update({
     id: '/worksheet',
@@ -120,6 +126,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/admin/todos': typeof AuthenticatedAdminTodosRoute
   '/admin/vendors': typeof AuthenticatedAdminVendorsRoute
   '/client/$projectId': typeof AuthenticatedClientProjectIdRoute
   '/client/new': typeof AuthenticatedClientNewRoute
@@ -137,6 +144,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/admin/todos': typeof AuthenticatedAdminTodosRoute
   '/admin/vendors': typeof AuthenticatedAdminVendorsRoute
   '/client/$projectId': typeof AuthenticatedClientProjectIdRoute
   '/client/new': typeof AuthenticatedClientNewRoute
@@ -156,6 +164,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/admin/todos': typeof AuthenticatedAdminTodosRoute
   '/_authenticated/admin/vendors': typeof AuthenticatedAdminVendorsRoute
   '/_authenticated/client/$projectId': typeof AuthenticatedClientProjectIdRoute
   '/_authenticated/client/new': typeof AuthenticatedClientNewRoute
@@ -175,6 +184,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/dashboard'
+    | '/admin/todos'
     | '/admin/vendors'
     | '/client/$projectId'
     | '/client/new'
@@ -192,6 +202,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/dashboard'
+    | '/admin/todos'
     | '/admin/vendors'
     | '/client/$projectId'
     | '/client/new'
@@ -210,6 +221,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/dashboard'
+    | '/_authenticated/admin/todos'
     | '/_authenticated/admin/vendors'
     | '/_authenticated/client/$projectId'
     | '/_authenticated/client/new'
@@ -309,6 +321,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminVendorsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/todos': {
+      id: '/_authenticated/admin/todos'
+      path: '/admin/todos'
+      fullPath: '/admin/todos'
+      preLoaderRoute: typeof AuthenticatedAdminTodosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/engineer/$projectId/worksheet': {
       id: '/_authenticated/engineer/$projectId/worksheet'
       path: '/worksheet'
@@ -376,6 +395,7 @@ const AuthenticatedEngineerProjectIdRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedAdminTodosRoute: typeof AuthenticatedAdminTodosRoute
   AuthenticatedAdminVendorsRoute: typeof AuthenticatedAdminVendorsRoute
   AuthenticatedClientProjectIdRoute: typeof AuthenticatedClientProjectIdRoute
   AuthenticatedClientNewRoute: typeof AuthenticatedClientNewRoute
@@ -387,6 +407,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedAdminTodosRoute: AuthenticatedAdminTodosRoute,
   AuthenticatedAdminVendorsRoute: AuthenticatedAdminVendorsRoute,
   AuthenticatedClientProjectIdRoute: AuthenticatedClientProjectIdRoute,
   AuthenticatedClientNewRoute: AuthenticatedClientNewRoute,
