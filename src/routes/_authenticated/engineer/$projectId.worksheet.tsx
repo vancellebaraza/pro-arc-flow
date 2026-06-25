@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/select";
 import { generateWorksheetPdf } from "@/lib/pdf";
 import { toast } from "sonner";
-import { ArrowLeft, Plus, Trash2, Save, FileDown, UploadCloud, BrandWhatsapp } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Save, FileDown, UploadCloud, MessageCircle } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/engineer/$projectId/worksheet")({
   component: WorksheetPage,
@@ -136,11 +136,11 @@ function WorksheetPage() {
     setAssignmentLoading(true);
     try {
       const { data: userData } = await supabase.auth.getUser();
-      if (!userData?.data.user) throw new Error("Not signed in");
+      if (!userData?.user) throw new Error("Not signed in");
       const { error } = await supabase.from("project_vendor_assignments").insert({
         project_id: projectId,
         vendor_id: selectedVendorId,
-        assigned_by: userData.data.user.id,
+        assigned_by: userData.user.id,
         status: "pending_approval",
       });
       if (error) throw error;
@@ -369,7 +369,7 @@ function WorksheetPage() {
                           rel="noreferrer"
                           className="inline-flex items-center gap-1 text-emerald-600 hover:text-emerald-800"
                         >
-                          <BrandWhatsapp className="h-4 w-4" />
+                          <MessageCircle className="h-4 w-4" />
                           Open chat
                         </a>
                       ) : (
