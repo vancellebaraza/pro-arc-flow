@@ -59,7 +59,7 @@ function AuthedLayout() {
               <Link
                 key={l.to}
                 to={l.to}
-                className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition ${active ? "bg-foreground text-background" : "hover:bg-accent text-foreground"}`}
+                className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition ${active ? "bg-primary text-primary-foreground" : "hover:bg-accent text-foreground"}`}
               >
                 <l.icon className="h-4 w-4" /> {l.label}
               </Link>
