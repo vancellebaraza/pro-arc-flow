@@ -32,7 +32,7 @@ function Landing() {
             </a>
             <Link
               to="/auth"
-              className="inline-flex items-center gap-1 rounded-md bg-foreground text-background px-4 py-2 text-sm font-medium hover:opacity-90 transition"
+              className="inline-flex items-center gap-1 rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:opacity-90 transition"
             >
               Sign in <ArrowRight className="h-4 w-4" />
             </Link>
@@ -54,7 +54,7 @@ function Landing() {
         <div className="mt-10 flex flex-wrap gap-3">
           <Link
             to="/auth"
-            className="inline-flex items-center gap-2 rounded-md bg-foreground text-background px-5 py-3 text-sm font-medium hover:opacity-90 transition"
+            className="inline-flex items-center gap-2 rounded-md bg-primary text-primary-foreground px-5 py-3 text-sm font-medium hover:opacity-90 transition"
           >
             Get started <ArrowRight className="h-4 w-4" />
           </Link>

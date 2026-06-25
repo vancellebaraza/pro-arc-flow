@@ -41,7 +41,7 @@ export function AIAssistant() {
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="fixed bottom-5 right-5 z-50 h-12 w-12 rounded-full bg-foreground text-background shadow-lg grid place-items-center hover:scale-105 transition"
+          className="fixed bottom-5 right-5 z-50 h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg grid place-items-center hover:scale-105 transition"
           aria-label="Open FusionPro AI"
         >
           <Bot className="h-5 w-5" />
@@ -49,7 +49,7 @@ export function AIAssistant() {
       )}
       {open && (
         <div className="fixed bottom-5 right-5 z-50 w-[min(380px,calc(100vw-2rem))] h-[min(580px,calc(100vh-2rem))] rounded-xl border bg-card shadow-2xl flex flex-col overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-3 border-b bg-foreground text-background">
+          <div className="flex items-center justify-between px-4 py-3 border-b bg-primary text-primary-foreground">
             <div className="flex items-center gap-2">
               <Bot className="h-4 w-4" />
               <span className="font-medium text-sm">FusionPro AI</span>
@@ -103,7 +103,7 @@ export function AIAssistant() {
             <button
               type="submit"
               disabled={loading || !input.trim()}
-              className="rounded-md bg-foreground text-background px-3 disabled:opacity-50"
+              className="rounded-md bg-primary text-primary-foreground px-3 disabled:opacity-50"
             >
               <Send className="h-4 w-4" />
             </button>
