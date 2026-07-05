@@ -3,14 +3,109 @@ import autoTable from "jspdf-autotable";
 import { BANK_DETAILS } from "./services";
 
 const BRAND = [218, 31, 38] as const;
+const whatsappLogoUrl = new URL("/WhatsApp Image 2026-07-04 at 09.55.16 (1).jpeg", import.meta.url).href;
 
-function header(doc: jsPDF, title: string, subtitle?: string) {
-  doc.setFontSize(20);
-  doc.setTextColor(BRAND[0], BRAND[1], BRAND[2]);
-  doc.text("FUSIONPRO", 14, 18);
-  doc.setFontSize(9);
-  doc.setTextColor(110);
-  doc.text("RealArc Estates · Operations", 14, 23);
+function getImageTypeFromDataUrl(dataUrl: string) {
+  const match = /^data:image\/(png|jpeg|jpg|webp|bmp)(?:;[^,]*)?,/.exec(dataUrl);
+  if (!match) return "JPEG";
+  const type = match[1].toUpperCase();
+  return type === "JPG" ? "JPEG" : type;
+}
+
+function blobToDataUrl(blob: Blob) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(blob);
+  });
+}
+
+function convertBlobToPngDataUrl(blob: Blob) {
+  return new Promise<string>((resolve, reject) => {
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        URL.revokeObjectURL(url);
+        reject(new Error("Cannot create canvas context"));
+        return;
+      }
+      ctx.drawImage(img, 0, 0);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL("image/png"));
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("Failed to load image for conversion"));
+    };
+    img.src = url;
+  });
+}
+
+async function urlToDataUrl(url?: string) {
+  if (!url) return "";
+  if (url.startsWith("data:image/")) return url;
+
+  try {
+    const resolvedUrl = typeof window !== "undefined" ? new URL(url, window.location.href).href : url;
+    const res = await fetch(resolvedUrl, { mode: "cors" });
+    if (!res.ok) {
+      console.error(`Failed to fetch image URL (${res.status}): ${resolvedUrl}`);
+      return "";
+    }
+    const contentType = res.headers.get("content-type")?.toLowerCase() ?? "";
+    if (!contentType.startsWith("image/")) {
+      console.error(`Unexpected image content type: ${contentType} for ${resolvedUrl}`);
+      return "";
+    }
+    const blob = await res.blob();
+    const type = blob.type.toLowerCase();
+    if (type === "image/png" || type === "image/jpeg" || type === "image/jpg") {
+      return await blobToDataUrl(blob);
+    }
+    return await convertBlobToPngDataUrl(blob);
+  } catch (error) {
+    console.error("Failed to convert image URL to data URL:", error, url);
+    return "";
+  }
+}
+
+async function header(doc: jsPDF, title: string, subtitle?: string) {
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+  doc.setDrawColor(BRAND[0], BRAND[1], BRAND[2]);
+
+  doc.setLineWidth(2);
+  doc.line(0, 2, pageWidth, 2);
+
+  doc.setLineWidth(0.5);
+  doc.line(0, 6, pageWidth, 6);
+
+  try {
+    if (typeof window !== "undefined") {
+      const logoData = await urlToDataUrl(whatsappLogoUrl);
+      if (logoData) {
+        doc.addImage(logoData, getImageTypeFromDataUrl(logoData), 14, 6.4, 70, 18);
+      }
+    }
+  } catch (err) {
+    // Non-fatal — continue without logo
+    // eslint-disable-next-line no-console
+    console.error("Header logo not added:", err);
+  }
+
+  // doc.setFontSize(20);
+  // doc.setTextColor(BRAND[0], BRAND[1], BRAND[2]);
+  // doc.text("FUSIONPRO", 14, 18);
+  // doc.setFontSize(9);
+  // doc.setTextColor(110);
+  // doc.text("RealArc Estates · Operations", 14, 23);
   doc.setFontSize(13);
   doc.setTextColor(20);
   doc.text(title, 200, 18, { align: "right" });
@@ -52,9 +147,9 @@ export interface QuotePdfInput {
   notes?: string | null;
 }
 
-export function generateQuotationPdf(q: QuotePdfInput) {
+export async function generateQuotationPdf(q: QuotePdfInput) {
   const doc = new jsPDF();
-  header(doc, "QUOTATION", `No: ${q.quoteNo || "DRAFT"}  •  ${q.date}`);
+  await header(doc, "QUOTATION", `No: ${q.quoteNo || "DRAFT"}  •  ${q.date}`);
 
   const y = 34;
   doc.setFontSize(10);
@@ -77,7 +172,7 @@ export function generateQuotationPdf(q: QuotePdfInput) {
       i.amount.toFixed(2),
     ]),
     styles: { fontSize: 9 },
-    headStyles: { fillColor: [30, 30, 30] },
+    headStyles: { fillColor: BRAND, textColor: 255 },
     columnStyles: { 2: { halign: "right" }, 3: { halign: "right" }, 4: { halign: "right" } },
   });
 
@@ -138,9 +233,9 @@ export interface InspectionPdfInput {
   };
 }
 
-export function generateInspectionPdf(input: InspectionPdfInput) {
+export async function generateInspectionPdf(input: InspectionPdfInput) {
   const doc = new jsPDF();
-  header(doc, "INSPECTION REPORT", input.inspectionDate);
+  await header(doc, "INSPECTION REPORT", input.inspectionDate);
   const y = 34;
   doc.setFontSize(10);
   doc.setTextColor(20);
@@ -158,30 +253,93 @@ export function generateInspectionPdf(input: InspectionPdfInput) {
   left.forEach((l, i) => doc.text(l, 14, y + i * 6));
   right.forEach((l, i) => doc.text(l, 120, y + i * 6));
 
+  const passCount = input.checklist.filter((c) => c.pass).length;
+  const failCount = input.checklist.filter((c) => !c.pass).length;
+  const boxWidth = 50;
+  const boxHeight = 10;
+  const boxY = y + 28;
+  const tableLeft = 14;
+  const tableRight = doc.internal.pageSize.getWidth() - 14;
+
+  doc.setDrawColor(BRAND[0], BRAND[1], BRAND[2]);
+  doc.setLineWidth(1);
+  doc.line(tableLeft, boxY - 2, tableRight, boxY - 2);
+
+  doc.setFillColor(0, 128, 0);
+  doc.rect(tableLeft, boxY, boxWidth, boxHeight, "F");
+  doc.setFontSize(8);
+  doc.setTextColor(255, 255, 255);
+  doc.text(`Passed: ${passCount}`, tableLeft + 2, boxY + 7);
+
+  doc.setFillColor(BRAND[0], BRAND[1], BRAND[2]);
+  doc.rect(tableLeft + boxWidth + 8, boxY, boxWidth, boxHeight, "F");
+  doc.text(`Failed: ${failCount}`, tableLeft + boxWidth + 10, boxY + 7);
+
+  const tableStartY = boxY + boxHeight + 8;
   autoTable(doc, {
-    startY: y + 28,
+    startY: tableStartY,
     head: [["Work Item", "Remarks", "Status"]],
     body: input.checklist.map((c) => [c.item, c.remark ?? "", c.pass ? "PASS" : "FAIL"]),
     styles: { fontSize: 9 },
-    headStyles: { fillColor: [30, 30, 30] },
+    headStyles: { fillColor: BRAND, textColor: 255 },
     columnStyles: { 2: { halign: "center", cellWidth: 22 } },
+    didParseCell: (data: any) => {
+      if (data.section !== "body" || data.column.index !== 2) return;
+      const statusText = String(data.cell.text?.[0] ?? "");
+      if (statusText === "PASS") {
+        data.cell.styles.textColor = [0, 128, 0];
+      } else if (statusText === "FAIL") {
+        data.cell.styles.textColor = [255, 0, 0];
+      }
+    },
   });
 
   let fy = getY(doc) + 6;
   if (input.photoEvidence.length) {
+    console.log("generateInspectionPdf received photoEvidence:", JSON.stringify(input.photoEvidence, null, 2));
+    console.log(
+      "generateInspectionPdf received photoEvidence summary:",
+      input.photoEvidence.map((p) => ({ before: p.before?.slice(0, 80), during: p.during?.slice(0, 80), after: p.after?.slice(0, 80) })),
+    );
     doc.setFontSize(11);
     doc.text("Photo Evidence", 14, fy);
     fy += 4;
+
+    const photosData = await Promise.all(
+      input.photoEvidence.map(async (p) => ({
+        before: p.before ? await urlToDataUrl(p.before) : "",
+        during: p.during ? await urlToDataUrl(p.during) : "",
+        after: p.after ? await urlToDataUrl(p.after) : "",
+      })),
+    );
+
+    console.log(
+      "generateInspectionPdf converted photo data:",
+      photosData.map((p) => ({ before: p.before ? p.before.length : 0, during: p.during ? p.during.length : 0, after: p.after ? p.after.length : 0 })),
+    );
+
     autoTable(doc, {
       startY: fy,
       head: [["Before", "During", "After"]],
-      body: input.photoEvidence.map((p) => [
-        p.before ? "✓" : "—",
-        p.during ? "✓" : "—",
-        p.after ? "✓" : "—",
-      ]),
-      styles: { fontSize: 9, halign: "center" },
-      headStyles: { fillColor: [30, 30, 30], halign: "center" },
+      body: photosData.map((p) => [p.before || "", p.during || "", p.after || ""]),
+      styles: { fontSize: 9, halign: "center", valign: "middle" },
+      headStyles: { fillColor: BRAND, textColor: 255, halign: "center" },
+      columnStyles: { 0: { cellWidth: 60 }, 1: { cellWidth: 60 }, 2: { cellWidth: 60 } },
+      didDrawCell: (data: any) => {
+        if (data.section !== "body") return;
+        const raw = data.cell.raw as string;
+        if (typeof raw !== "string" || !raw.startsWith("data:image")) return;
+
+        const x = data.cell.x + 2;
+        const yCell = data.cell.y + 2;
+        const w = Math.max(0, data.cell.width - 4);
+        const h = Math.max(0, data.cell.height - 4);
+        try {
+          doc.addImage(raw, getImageTypeFromDataUrl(raw), x, yCell, w, h);
+        } catch (error) {
+          console.error("Failed to draw image in PDF cell:", error);
+        }
+      },
     });
     fy = getY(doc) + 6;
   }
@@ -225,9 +383,9 @@ export interface WorksheetPdfInput {
   signatures: { technician_name?: string; supervisor_name?: string; client_name?: string };
 }
 
-export function generateWorksheetPdf(w: WorksheetPdfInput) {
+export async function generateWorksheetPdf(w: WorksheetPdfInput) {
   const doc = new jsPDF();
-  header(doc, "WORKSHEET", `Job ${w.jobNo}  •  ${w.jobDate}`);
+  await header(doc, "WORKSHEET", `Job ${w.jobNo}  •  ${w.jobDate}`);
   let y = 34;
   doc.setFontSize(10);
   doc.setTextColor(20);
@@ -257,13 +415,25 @@ export function generateWorksheetPdf(w: WorksheetPdfInput) {
     head: [["Technician's Observation", "Action to Be Taken"]],
     body: w.observations.map((o) => [o.observation, o.action]),
     styles: { fontSize: 9 },
-    headStyles: { fillColor: [30, 30, 30] },
+    headStyles: { fillColor: BRAND, textColor: 255 },
   });
   let fy = getY(doc) + 8;
   if (w.imagesBefore.length) {
     doc.setFontSize(10);
     doc.text(`Images Before: ${w.imagesBefore.length} attached`, 14, fy);
     fy += 6;
+
+    const imgData = await Promise.all(w.imagesBefore.map((img) => urlToDataUrl(img)));
+    const imageYStart = fy;
+    const imageWidth = 60;
+    const imageHeight = 45;
+    imgData.forEach((img, index) => {
+      if (!img) return;
+      const x = 14 + (index % 3) * (imageWidth + 10);
+      const yPos = imageYStart + Math.floor(index / 3) * (imageHeight + 10);
+      doc.addImage(img, x, yPos, imageWidth, imageHeight);
+    });
+    fy += Math.ceil(w.imagesBefore.length / 3) * (imageHeight + 10);
   }
   if (fy > 240) {
     doc.addPage();

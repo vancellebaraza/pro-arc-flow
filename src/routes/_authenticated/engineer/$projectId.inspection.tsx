@@ -72,12 +72,20 @@ function InspectionPage() {
     const { data: u } = await supabase.auth.getUser();
     if (!u.user) throw new Error("Not signed in");
     const path = `${u.user.id}/insp/${projectId}/${Date.now()}-${file.name}`;
-    const { error } = await supabase.storage.from("project-images").upload(path, file);
-    if (error) throw error;
-    const { data: signed } = await supabase.storage
+    const { error: uploadError } = await supabase.storage.from("project-images").upload(path, file);
+    if (uploadError) throw uploadError;
+
+    const { data: signed, error: signedError } = await supabase.storage
       .from("project-images")
       .createSignedUrl(path, 60 * 60 * 24 * 365);
-    return signed?.signedUrl ?? "";
+    if (signedError) throw signedError;
+    if (!signed?.signedUrl) {
+      console.error("uploadImage failed to create signed URL", { path, signed });
+      throw new Error("Failed to create signed URL for uploaded image");
+    }
+
+    console.log("uploadImage signed URL created", { path, signedUrl: signed.signedUrl });
+    return signed.signedUrl;
   }
 
   async function pickFile(field: keyof PhotoRow, idx: number) {
@@ -86,12 +94,21 @@ function InspectionPage() {
     input.accept = "image/*";
     input.onchange = async () => {
       const f = input.files?.[0];
-      if (!f) return;
+      if (!f) {
+        console.log("pickFile: no file selected", field, idx);
+        return;
+      }
       try {
         const url = await uploadImage(f);
-        setPhotos((arr) => arr.map((p, i) => (i === idx ? { ...p, [field]: url } : p)));
+        console.log("pickFile uploaded image", { field, idx, fileName: f.name, url });
+        setPhotos((arr) => {
+          const next = arr.map((p, i) => (i === idx ? { ...p, [field]: url } : p));
+          console.log("pickFile updated photos", next);
+          return next;
+        });
         toast.success("Image uploaded");
       } catch (e) {
+        console.error("pickFile upload failed", e);
         toast.error(e instanceof Error ? e.message : "Upload failed");
       }
     };
@@ -144,8 +161,13 @@ function InspectionPage() {
     }
   }
 
-  function exportPdf() {
-    generateInspectionPdf({
+  async function exportPdf() {
+    console.log("Exporting inspection PDF with photoEvidence:", JSON.stringify(photos, null, 2));
+    console.log(
+      "Exporting inspection PDF photoEvidence summary:",
+      photos.map((p) => ({ before: p.before?.slice(0, 80), during: p.during?.slice(0, 80), after: p.after?.slice(0, 80) })),
+    );
+    await generateInspectionPdf({
       workCategory: SERVICES.find((s) => s.key === workCategory)?.label ?? workCategory,
       projectName: projectTitle,
       clientName,

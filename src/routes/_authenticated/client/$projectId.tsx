@@ -107,22 +107,26 @@ function ProjectDetail() {
     load();
   }
 
-  function downloadPdf() {
+  async function downloadPdf() {
     if (!quote || !project) return;
-    const labour = items.reduce((sum, it) => sum + Number(it.amount), 0);
-    generateQuotationPdf({
-      projectTitle: project.title,
-      service: SERVICES.find((s) => s.key === project.service)?.label ?? project.service,
-      location: project.location,
-      quoteNo: quote.id.slice(0, 8).toUpperCase(),
-      billTo: project.title,
-      date: new Date(quote.created_at).toLocaleDateString(),
-      items,
-      labour,
-      subtotal: Number(quote.subtotal),
-      grandTotal: Number(quote.grand_total),
-      notes: quote.notes,
-    });
+    try {
+      const labour = items.reduce((sum, it) => sum + Number(it.amount), 0);
+      await generateQuotationPdf({
+        projectTitle: project.title,
+        service: SERVICES.find((s) => s.key === project.service)?.label ?? project.service,
+        location: project.location,
+        quoteNo: quote.id.slice(0, 8).toUpperCase(),
+        billTo: project.title,
+        date: new Date(quote.created_at).toLocaleDateString(),
+        items,
+        labour,
+        subtotal: Number(quote.subtotal),
+        grandTotal: Number(quote.grand_total),
+        notes: quote.notes,
+      });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to generate PDF");
+    }
   }
 
   if (loading) return <div className="p-8 text-sm text-muted-foreground">Loading…</div>;

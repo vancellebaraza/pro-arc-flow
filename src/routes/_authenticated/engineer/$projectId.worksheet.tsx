@@ -32,6 +32,7 @@ interface VendorOption {
   category: string;
   whatsapp_phone: string | null;
   phone: string;
+  cost: number | null;
 }
 
 function WorksheetPage() {
@@ -102,7 +103,7 @@ function WorksheetPage() {
 
     const { data: vendorRows, error: vendorError } = await supabase
       .from("vendors")
-      .select("id,name,category,whatsapp_phone,phone")
+      .select("id,name,category,whatsapp_phone,phone,cost")
       .order("name", { ascending: true });
 
     if (vendorError) {
@@ -215,20 +216,24 @@ function WorksheetPage() {
     }
   }
 
-  function exportPdf() {
-    generateWorksheetPdf({
-      clientName,
-      jobNo,
-      jobLocation,
-      jobDate,
-      jobType,
-      technician,
-      personInCharge,
-      jobDescription,
-      observations,
-      imagesBefore,
-      signatures: { technician_name: sigTech, supervisor_name: sigSup, client_name: sigClient },
-    });
+  async function exportPdf() {
+    try {
+      await generateWorksheetPdf({
+        clientName,
+        jobNo,
+        jobLocation,
+        jobDate,
+        jobType,
+        technician,
+        personInCharge,
+        jobDescription,
+        observations,
+        imagesBefore,
+        signatures: { technician_name: sigTech, supervisor_name: sigSup, client_name: sigClient },
+      });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to generate PDF");
+    }
   }
 
   return (
@@ -341,7 +346,7 @@ function WorksheetPage() {
             <SelectContent>
               {filteredVendors().map((vendor) => (
                 <SelectItem key={vendor.id} value={vendor.id}>
-                  {vendor.name} — {vendor.category}
+                  {vendor.name} — {vendor.category} {vendor.cost != null ? `• ₦${vendor.cost.toFixed(2)}` : ""}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -360,6 +365,7 @@ function WorksheetPage() {
                     <div className="text-sm text-muted-foreground">{vendor.category}</div>
                   </div>
                   <div className="space-y-1 text-sm text-muted-foreground">
+                    <div>Cost: {vendor.cost != null ? `₦${vendor.cost.toFixed(2)}` : "—"}</div>
                     <div>Phone: {vendor.phone}</div>
                     <div>
                       WhatsApp: {vendor.whatsapp_phone ? (

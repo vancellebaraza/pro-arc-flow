@@ -85,6 +85,7 @@ function StaffTodosPage() {
   const [form, setForm] = useState(() => ({ ...emptyTodoForm }));
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
   const visibleDates = useMemo(
     () => Array.from({ length: 7 }, (_, index) => addDays(weekStart, index)),
@@ -100,6 +101,12 @@ function StaffTodosPage() {
     });
     return map;
   }, [todos]);
+
+  const dailyTodos = useMemo(() => {
+    const day = format(selectedDate, "yyyy-MM-dd");
+
+    return todos.filter(todo => todo.todo_date === day);
+  }   , [todos, selectedDate]);
 
   const staffMap = useMemo(
     () => engineers.reduce<Record<string, StaffMember>>((acc, staff) => {
@@ -317,7 +324,7 @@ function StaffTodosPage() {
         </div>
       </div>
 
-      <section className="mt-6 rounded-xl border bg-card p-5">
+      {/* <section className="mt-6 rounded-xl border bg-card p-5">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
             <h2 className="text-lg font-semibold tracking-tight">Add staff row</h2>
@@ -348,7 +355,7 @@ function StaffTodosPage() {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       <section className="mt-6 overflow-x-auto rounded-xl border bg-card">
         <table className="min-w-full border-separate border-spacing-0">
@@ -374,11 +381,10 @@ function StaffTodosPage() {
                   {visibleDates.map((date) => {
                     const todo = todoMap.get(dateKey(staff.id, date));
                     const statusClasses = todo
-                      ? todo.is_done
-                        ? "border-emerald-200 bg-emerald-500/10 text-emerald-900"
-                        : "border-rose-200 bg-rose-500/10 text-rose-900"
-                      : "border-border bg-muted/40 text-muted-foreground";
-
+                    ? todo.is_done
+                    ? "border-emerald-700 bg-emerald-600 text-white"
+                    : "border-rose-700 bg-rose-600 text-white"
+                    : "border-border bg-muted/40 text-muted-foreground";
                     return (
                       <td key={format(date, "yyyy-MM-dd")} className="border-b border-border px-3 py-3 align-top">
                         <button
@@ -387,20 +393,16 @@ function StaffTodosPage() {
                           className={`w-full rounded-xl border p-3 text-left transition hover:shadow-sm ${statusClasses}`}
                         >
                           {todo ? (
-                            <>
-                              <div className="text-sm font-semibold">{todo.activity}</div>
-                              <div className="mt-1 text-xs text-muted-foreground">
-                                {todo.location ?? "No location"}
-                              </div>
-                              <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-white/80 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.15em] text-slate-700">
-                                <span className={todo.is_done ? "text-emerald-700" : "text-rose-700"}>
-                                  {todo.is_done ? "Done" : "Not done"}
-                                </span>
-                              </div>
-                            </>
-                          ) : (
-                            <div className="text-sm text-muted-foreground">No entry</div>
-                          )}
+    <div className="flex h-full items-center justify-center">
+      {/* Intentionally left blank.
+          The background color indicates the task status.
+          Click the cell to view/edit the details. */}
+    </div>
+  ) : (
+    <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+      No entry
+    </div>
+  )}
                         </button>
                       </td>
                     );
@@ -417,7 +419,66 @@ function StaffTodosPage() {
           </tbody>
         </table>
       </section>
+    <section className="mt-6 rounded-xl border bg-card p-5">
+  <div className="flex items-center gap-3 mb-4">
+    <Calendar className="h-5 w-5" />
+    <h2 className="text-lg font-semibold">
+      Daily Calendar
+    </h2>
+  </div>
 
+  <Input
+    type="date"
+    value={format(selectedDate, "yyyy-MM-dd")}
+    onChange={(e) => setSelectedDate(new Date(e.target.value))}
+    className="max-w-xs"
+  />
+
+  <div className="mt-6 space-y-3">
+    {dailyTodos.length === 0 ? (
+      <div className="text-muted-foreground">
+        No tasks scheduled for this day.
+      </div>
+    ) : (
+      dailyTodos.map(todo => {
+        const staff = staffMap[todo.staff_user_id];
+
+        return (
+          <button
+            key={todo.id}
+            onClick={() =>
+              openCellEditor(
+                staff ?? {
+                  id: todo.staff_user_id,
+                  full_name: "Unknown staff",
+                },
+                new Date(todo.todo_date),
+                todo,
+              )
+            }
+            className={`w-full rounded-xl border p-4 text-left ${
+              todo.is_done
+                ? "border-emerald-700 bg-emerald-100"
+                : "border-rose-700 bg-rose-100"
+            }`}
+          >
+            <div className="font-semibold">
+              {staff?.full_name ?? "Unknown staff"}
+            </div>
+
+            <div className="mt-2">
+              {todo.activity}
+            </div>
+
+            <div className="text-sm text-muted-foreground">
+              {todo.location ?? "No location"}
+            </div>
+          </button>
+          );
+        })
+      )}
+     </div>
+     </section>
       <Dialog open={Boolean(editState)} onOpenChange={(open) => {
         if (!open) resetEditor();
       }}>

@@ -33,14 +33,25 @@ function AuthPage() {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({
-      email: String(fd.get("email")),
-      password: String(fd.get("password")),
-    });
-    setLoading(false);
-    if (error) {
-      toast.error(error.message);
+    try {
+      const res = await supabase.auth.signInWithPassword({
+        email: String(fd.get("email")),
+        password: String(fd.get("password")),
+      });
+      if (res.error) {
+        toast.error(res.error.message);
+        return;
+      }
+    } catch (err: unknown) {
+      // Network-level failures (e.g. failed fetch) can throw instead of returning an error
+      // Provide a clearer message to the user.
+      // eslint-disable-next-line no-console
+      console.error("signIn error:", err);
+      const msg = (err instanceof Error && err.message) ? err.message : String(err);
+      toast.error(`Sign-in failed: ${msg}`);
       return;
+    } finally {
+      setLoading(false);
     }
     toast.success("Welcome back");
     navigate({ to: "/dashboard", replace: true });
@@ -50,21 +61,31 @@ function AuthPage() {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
-      email: String(fd.get("email")),
-      password: String(fd.get("password")),
-      options: {
-        emailRedirectTo: window.location.origin,
-        data: {
-          full_name: String(fd.get("full_name") || ""),
-          phone: String(fd.get("phone") || ""),
+    try {
+      const res = await supabase.auth.signUp({
+        email: String(fd.get("email")),
+        password: String(fd.get("password")),
+        options: {
+          emailRedirectTo: window.location.origin,
+          data: {
+            full_name: String(fd.get("full_name") || ""),
+            phone: String(fd.get("phone") || ""),
+          },
         },
-      },
-    });
-    setLoading(false);
-    if (error) {
-      toast.error(error.message);
+      });
+      if (res.error) {
+        toast.error(res.error.message);
+        return;
+      }
+    } catch (err: unknown) {
+      // Handle network/fetch errors
+      // eslint-disable-next-line no-console
+      console.error("signUp error:", err);
+      const msg = (err instanceof Error && err.message) ? err.message : String(err);
+      toast.error(`Sign-up failed: ${msg}`);
       return;
+    } finally {
+      setLoading(false);
     }
     toast.success("Account created. You're signed in.");
     navigate({ to: "/dashboard", replace: true });

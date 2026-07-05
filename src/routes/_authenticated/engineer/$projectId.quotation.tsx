@@ -197,29 +197,33 @@ function QuotationPage() {
     }
   }
 
-  function exportPdf() {
-    generateQuotationPdf({
-      projectTitle,
-      service: SERVICES.find((s) => s.key === projectService)?.label ?? projectService,
-      location: projectLocation,
-      billTo,
-      quoteNo,
-      date,
-      to: recipient,
-      forText,
-      items: items.map((i) => ({
-        description: i.description,
-        unit: i.unit,
-        qty: i.qty,
-        unit_cost: i.unit_cost,
-        amount: i.amount,
-      })),
-      labour: Number(labour || 0),
-      subtotal,
-      grandTotal,
-      authorisedBy,
-      notes,
-    });
+  async function exportPdf() {
+    try {
+      await generateQuotationPdf({
+        projectTitle,
+        service: SERVICES.find((s) => s.key === projectService)?.label ?? projectService,
+        location: projectLocation,
+        billTo,
+        quoteNo,
+        date,
+        to: recipient,
+        forText,
+        items: items.map((i) => ({
+          description: i.description,
+          unit: i.unit,
+          qty: i.qty,
+          unit_cost: i.unit_cost,
+          amount: i.amount,
+        })),
+        labour: Number(labour || 0),
+        subtotal,
+        grandTotal,
+        authorisedBy,
+        notes,
+      });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to generate PDF");
+    }
   }
 
   return (

@@ -30,6 +30,7 @@ interface Vendor {
   category: string;
   services_offered: string | null;
   payment_history: string | null;
+  cost: number | null;
 }
 
 const emptyVendorForm = {
@@ -41,6 +42,7 @@ const emptyVendorForm = {
   category: "",
   services_offered: "",
   payment_history: "",
+  cost: "",
 };
 
 export const Route = createFileRoute("/_authenticated/admin/vendors")({
@@ -67,7 +69,13 @@ function VendorManagementPage() {
       toast.error(error.message);
       return;
     }
-    setVendors((data ?? []) as Vendor[]);
+
+    const normalizedVendors = (data ?? []).map((vendor: any) => ({
+      ...vendor,
+      cost: vendor.cost != null && vendor.cost !== "" ? Number(vendor.cost) : null,
+    })) as Vendor[];
+
+    setVendors(normalizedVendors);
   }, []);
 
   useEffect(() => {
@@ -83,8 +91,10 @@ function VendorManagementPage() {
     setSaving(true);
     try {
       const { data: userData } = await supabase.auth.getUser();
+      const parsedCost = form.cost.trim() === "" ? null : parseFloat(form.cost);
       const payload = {
         ...form,
+        cost: Number.isFinite(parsedCost) ? parsedCost : null,
         created_by: userData?.user?.id ?? null,
       };
 
@@ -121,6 +131,7 @@ function VendorManagementPage() {
       category: vendor.category,
       services_offered: vendor.services_offered ?? "",
       payment_history: vendor.payment_history ?? "",
+      cost: vendor.cost != null ? String(vendor.cost) : "",
     });
   }
 
@@ -204,6 +215,14 @@ function VendorManagementPage() {
               />
             </div>
             <div>
+              <Label>Vendor Cost</Label>
+              <Input
+                value={form.cost}
+                onChange={(e) => setForm({ ...form, cost: e.target.value })}
+                placeholder="0.00"
+              />
+            </div>
+            <div>
               <Label>Category of Works</Label>
               <Select value={form.category} onValueChange={(value) => setForm({ ...form, category: value })}>
                 <SelectTrigger>
@@ -255,6 +274,7 @@ function VendorManagementPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Vendor</TableHead>
+                  <TableHead>Cost</TableHead>
                   <TableHead>Contact</TableHead>
                   <TableHead>Phone</TableHead>
                   <TableHead>WhatsApp</TableHead>
@@ -269,6 +289,7 @@ function VendorManagementPage() {
                 {vendors.map((vendor) => (
                   <TableRow key={vendor.id}>
                     <TableCell>{vendor.name}</TableCell>
+                    <TableCell>{vendor.cost != null ? vendor.cost.toFixed(2) : "—"}</TableCell>
                     <TableCell>{vendor.contact_person ?? "—"}</TableCell>
                     <TableCell>{vendor.phone}</TableCell>
                     <TableCell>
