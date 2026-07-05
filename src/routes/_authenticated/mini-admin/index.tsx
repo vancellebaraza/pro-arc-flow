@@ -2,7 +2,25 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Card, CardContent } from "@/components/ui/card";
 
-export const Route = createFileRoute("/mini-admin/")({
+export const Route = createFileRoute("/_authenticated/mini-admin/")({
+  beforeLoad: async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      throw redirect({ to: "/auth" });
+    }
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    if (profile?.role !== "mini-admin") {
+      throw redirect({ to: "/" });
+    }
+  },
+
   component: MiniAdminDashboard,
 });
 

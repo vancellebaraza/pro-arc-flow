@@ -14,7 +14,7 @@ import {
   ClipboardList,
 } from "lucide-react";
 
-export const Route = createFileRoute("/mini-admin")({
+export const Route = createFileRoute("/_authenticated/mini-admin")({
   component: MiniAdminLayout,
 });
 
@@ -30,7 +30,7 @@ function MiniAdminLayout() {
       icon: LayoutDashboard,
     },
     {
-      to: "/mini-admin/Engineer/engineer",
+      to: "/mini-admin/Engineer",
       label: "Engineer",
       icon: Wrench,
     },
@@ -49,7 +49,7 @@ function MiniAdminLayout() {
   return (
     <div className="flex min-h-screen bg-background">
       {/* Sidebar */}
-      {/* <aside className="w-64 border-r bg-card shadow-sm">
+      <aside className="w-64 border-r bg-card shadow-sm">
         <div className="h-16 flex items-center px-6 border-b">
           <h1 className="text-xl font-bold">
             Mini Admin
@@ -78,7 +78,7 @@ function MiniAdminLayout() {
             );
           })}
         </nav>
-      </aside> */}
+      </aside>
 
       {/* Main Page */}
       <main className="flex-1 overflow-y-auto">

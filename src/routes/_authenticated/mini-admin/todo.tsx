@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/mini-admin/todo')({
+export const Route = createFileRoute('/_authenticated/mini-admin/todo')({
   component: RouteComponent,
 })
 

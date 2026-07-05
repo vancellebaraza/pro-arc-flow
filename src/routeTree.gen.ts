@@ -10,23 +10,24 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
-import { Route as MiniAdminRouteRouteImport } from './routes/mini-admin/route'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as MiniAdminIndexRouteImport } from './routes/mini-admin/index'
-import { Route as MiniAdminTodoRouteImport } from './routes/mini-admin/todo'
-import { Route as MiniAdminMiniAdminRouteImport } from './routes/mini-admin/Mini-Admin'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedMiniAdminRouteRouteImport } from './routes/_authenticated/mini-admin/route'
+import { Route as AuthenticatedMiniAdminIndexRouteImport } from './routes/_authenticated/mini-admin/index'
 import { Route as AuthenticatedEngineerIndexRouteImport } from './routes/_authenticated/engineer/index'
 import { Route as AuthenticatedClientIndexRouteImport } from './routes/_authenticated/client/index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
-import { Route as MiniAdminEngineerEngineerRouteImport } from './routes/mini-admin/Engineer/Engineer'
+import { Route as AuthenticatedMiniAdminTodoRouteImport } from './routes/_authenticated/mini-admin/todo'
+import { Route as AuthenticatedMiniAdminMiniAdminRouteImport } from './routes/_authenticated/mini-admin/Mini-Admin'
 import { Route as AuthenticatedEngineerProjectIdRouteImport } from './routes/_authenticated/engineer/$projectId'
 import { Route as AuthenticatedClientNewRouteImport } from './routes/_authenticated/client/new'
 import { Route as AuthenticatedClientProjectIdRouteImport } from './routes/_authenticated/client/$projectId'
 import { Route as AuthenticatedAdminVendorsRouteImport } from './routes/_authenticated/admin/vendors'
 import { Route as AuthenticatedAdminTodosRouteImport } from './routes/_authenticated/admin/todos'
 import { Route as AuthenticatedAdminAnalysisRouteImport } from './routes/_authenticated/admin/analysis'
+import { Route as AuthenticatedMiniAdminEngineerIndexRouteImport } from './routes/_authenticated/mini-admin/Engineer/index'
+import { Route as AuthenticatedMiniAdminEngineerProjectIdRouteImport } from './routes/_authenticated/mini-admin/Engineer/projectId'
 import { Route as AuthenticatedEngineerProjectIdWorksheetRouteImport } from './routes/_authenticated/engineer/$projectId.worksheet'
 import { Route as AuthenticatedEngineerProjectIdQuotationRouteImport } from './routes/_authenticated/engineer/$projectId.quotation'
 import { Route as AuthenticatedEngineerProjectIdMessagesRouteImport } from './routes/_authenticated/engineer/$projectId.messages'
@@ -38,11 +39,6 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MiniAdminRouteRoute = MiniAdminRouteRouteImport.update({
-  id: '/mini-admin',
-  path: '/mini-admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -52,26 +48,23 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MiniAdminIndexRoute = MiniAdminIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => MiniAdminRouteRoute,
-} as any)
-const MiniAdminTodoRoute = MiniAdminTodoRouteImport.update({
-  id: '/todo',
-  path: '/todo',
-  getParentRoute: () => MiniAdminRouteRoute,
-} as any)
-const MiniAdminMiniAdminRoute = MiniAdminMiniAdminRouteImport.update({
-  id: '/Mini-Admin',
-  path: '/Mini-Admin',
-  getParentRoute: () => MiniAdminRouteRoute,
-} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMiniAdminRouteRoute =
+  AuthenticatedMiniAdminRouteRouteImport.update({
+    id: '/mini-admin',
+    path: '/mini-admin',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedMiniAdminIndexRoute =
+  AuthenticatedMiniAdminIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedMiniAdminRouteRoute,
+  } as any)
 const AuthenticatedEngineerIndexRoute =
   AuthenticatedEngineerIndexRouteImport.update({
     id: '/engineer/',
@@ -89,11 +82,17 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/admin/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const MiniAdminEngineerEngineerRoute =
-  MiniAdminEngineerEngineerRouteImport.update({
-    id: '/Engineer/Engineer',
-    path: '/Engineer/Engineer',
-    getParentRoute: () => MiniAdminRouteRoute,
+const AuthenticatedMiniAdminTodoRoute =
+  AuthenticatedMiniAdminTodoRouteImport.update({
+    id: '/todo',
+    path: '/todo',
+    getParentRoute: () => AuthenticatedMiniAdminRouteRoute,
+  } as any)
+const AuthenticatedMiniAdminMiniAdminRoute =
+  AuthenticatedMiniAdminMiniAdminRouteImport.update({
+    id: '/Mini-Admin',
+    path: '/Mini-Admin',
+    getParentRoute: () => AuthenticatedMiniAdminRouteRoute,
   } as any)
 const AuthenticatedEngineerProjectIdRoute =
   AuthenticatedEngineerProjectIdRouteImport.update({
@@ -129,6 +128,18 @@ const AuthenticatedAdminAnalysisRoute =
     path: '/admin/analysis',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedMiniAdminEngineerIndexRoute =
+  AuthenticatedMiniAdminEngineerIndexRouteImport.update({
+    id: '/Engineer/',
+    path: '/Engineer/',
+    getParentRoute: () => AuthenticatedMiniAdminRouteRoute,
+  } as any)
+const AuthenticatedMiniAdminEngineerProjectIdRoute =
+  AuthenticatedMiniAdminEngineerProjectIdRouteImport.update({
+    id: '/Engineer/projectId',
+    path: '/Engineer/projectId',
+    getParentRoute: () => AuthenticatedMiniAdminRouteRoute,
+  } as any)
 const AuthenticatedEngineerProjectIdWorksheetRoute =
   AuthenticatedEngineerProjectIdWorksheetRouteImport.update({
     id: '/worksheet',
@@ -162,156 +173,161 @@ const AuthenticatedEngineerProjectIdCompareRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/mini-admin': typeof MiniAdminRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/mini-admin': typeof AuthenticatedMiniAdminRouteRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/mini-admin/Mini-Admin': typeof MiniAdminMiniAdminRoute
-  '/mini-admin/todo': typeof MiniAdminTodoRoute
-  '/mini-admin/': typeof MiniAdminIndexRoute
   '/admin/analysis': typeof AuthenticatedAdminAnalysisRoute
   '/admin/todos': typeof AuthenticatedAdminTodosRoute
   '/admin/vendors': typeof AuthenticatedAdminVendorsRoute
   '/client/$projectId': typeof AuthenticatedClientProjectIdRoute
   '/client/new': typeof AuthenticatedClientNewRoute
   '/engineer/$projectId': typeof AuthenticatedEngineerProjectIdRouteWithChildren
-  '/mini-admin/Engineer/Engineer': typeof MiniAdminEngineerEngineerRoute
+  '/mini-admin/Mini-Admin': typeof AuthenticatedMiniAdminMiniAdminRoute
+  '/mini-admin/todo': typeof AuthenticatedMiniAdminTodoRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/client/': typeof AuthenticatedClientIndexRoute
   '/engineer/': typeof AuthenticatedEngineerIndexRoute
+  '/mini-admin/': typeof AuthenticatedMiniAdminIndexRoute
   '/engineer/$projectId/compare': typeof AuthenticatedEngineerProjectIdCompareRoute
   '/engineer/$projectId/inspection': typeof AuthenticatedEngineerProjectIdInspectionRoute
   '/engineer/$projectId/messages': typeof AuthenticatedEngineerProjectIdMessagesRoute
   '/engineer/$projectId/quotation': typeof AuthenticatedEngineerProjectIdQuotationRoute
   '/engineer/$projectId/worksheet': typeof AuthenticatedEngineerProjectIdWorksheetRoute
+  '/mini-admin/Engineer/projectId': typeof AuthenticatedMiniAdminEngineerProjectIdRoute
+  '/mini-admin/Engineer/': typeof AuthenticatedMiniAdminEngineerIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/mini-admin/Mini-Admin': typeof MiniAdminMiniAdminRoute
-  '/mini-admin/todo': typeof MiniAdminTodoRoute
-  '/mini-admin': typeof MiniAdminIndexRoute
   '/admin/analysis': typeof AuthenticatedAdminAnalysisRoute
   '/admin/todos': typeof AuthenticatedAdminTodosRoute
   '/admin/vendors': typeof AuthenticatedAdminVendorsRoute
   '/client/$projectId': typeof AuthenticatedClientProjectIdRoute
   '/client/new': typeof AuthenticatedClientNewRoute
   '/engineer/$projectId': typeof AuthenticatedEngineerProjectIdRouteWithChildren
-  '/mini-admin/Engineer/Engineer': typeof MiniAdminEngineerEngineerRoute
+  '/mini-admin/Mini-Admin': typeof AuthenticatedMiniAdminMiniAdminRoute
+  '/mini-admin/todo': typeof AuthenticatedMiniAdminTodoRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/client': typeof AuthenticatedClientIndexRoute
   '/engineer': typeof AuthenticatedEngineerIndexRoute
+  '/mini-admin': typeof AuthenticatedMiniAdminIndexRoute
   '/engineer/$projectId/compare': typeof AuthenticatedEngineerProjectIdCompareRoute
   '/engineer/$projectId/inspection': typeof AuthenticatedEngineerProjectIdInspectionRoute
   '/engineer/$projectId/messages': typeof AuthenticatedEngineerProjectIdMessagesRoute
   '/engineer/$projectId/quotation': typeof AuthenticatedEngineerProjectIdQuotationRoute
   '/engineer/$projectId/worksheet': typeof AuthenticatedEngineerProjectIdWorksheetRoute
+  '/mini-admin/Engineer/projectId': typeof AuthenticatedMiniAdminEngineerProjectIdRoute
+  '/mini-admin/Engineer': typeof AuthenticatedMiniAdminEngineerIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
-  '/mini-admin': typeof MiniAdminRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/mini-admin': typeof AuthenticatedMiniAdminRouteRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/mini-admin/Mini-Admin': typeof MiniAdminMiniAdminRoute
-  '/mini-admin/todo': typeof MiniAdminTodoRoute
-  '/mini-admin/': typeof MiniAdminIndexRoute
   '/_authenticated/admin/analysis': typeof AuthenticatedAdminAnalysisRoute
   '/_authenticated/admin/todos': typeof AuthenticatedAdminTodosRoute
   '/_authenticated/admin/vendors': typeof AuthenticatedAdminVendorsRoute
   '/_authenticated/client/$projectId': typeof AuthenticatedClientProjectIdRoute
   '/_authenticated/client/new': typeof AuthenticatedClientNewRoute
   '/_authenticated/engineer/$projectId': typeof AuthenticatedEngineerProjectIdRouteWithChildren
-  '/mini-admin/Engineer/Engineer': typeof MiniAdminEngineerEngineerRoute
+  '/_authenticated/mini-admin/Mini-Admin': typeof AuthenticatedMiniAdminMiniAdminRoute
+  '/_authenticated/mini-admin/todo': typeof AuthenticatedMiniAdminTodoRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/client/': typeof AuthenticatedClientIndexRoute
   '/_authenticated/engineer/': typeof AuthenticatedEngineerIndexRoute
+  '/_authenticated/mini-admin/': typeof AuthenticatedMiniAdminIndexRoute
   '/_authenticated/engineer/$projectId/compare': typeof AuthenticatedEngineerProjectIdCompareRoute
   '/_authenticated/engineer/$projectId/inspection': typeof AuthenticatedEngineerProjectIdInspectionRoute
   '/_authenticated/engineer/$projectId/messages': typeof AuthenticatedEngineerProjectIdMessagesRoute
   '/_authenticated/engineer/$projectId/quotation': typeof AuthenticatedEngineerProjectIdQuotationRoute
   '/_authenticated/engineer/$projectId/worksheet': typeof AuthenticatedEngineerProjectIdWorksheetRoute
+  '/_authenticated/mini-admin/Engineer/projectId': typeof AuthenticatedMiniAdminEngineerProjectIdRoute
+  '/_authenticated/mini-admin/Engineer/': typeof AuthenticatedMiniAdminEngineerIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/mini-admin'
     | '/auth'
+    | '/mini-admin'
     | '/dashboard'
-    | '/mini-admin/Mini-Admin'
-    | '/mini-admin/todo'
-    | '/mini-admin/'
     | '/admin/analysis'
     | '/admin/todos'
     | '/admin/vendors'
     | '/client/$projectId'
     | '/client/new'
     | '/engineer/$projectId'
-    | '/mini-admin/Engineer/Engineer'
+    | '/mini-admin/Mini-Admin'
+    | '/mini-admin/todo'
     | '/admin/'
     | '/client/'
     | '/engineer/'
+    | '/mini-admin/'
     | '/engineer/$projectId/compare'
     | '/engineer/$projectId/inspection'
     | '/engineer/$projectId/messages'
     | '/engineer/$projectId/quotation'
     | '/engineer/$projectId/worksheet'
+    | '/mini-admin/Engineer/projectId'
+    | '/mini-admin/Engineer/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/dashboard'
-    | '/mini-admin/Mini-Admin'
-    | '/mini-admin/todo'
-    | '/mini-admin'
     | '/admin/analysis'
     | '/admin/todos'
     | '/admin/vendors'
     | '/client/$projectId'
     | '/client/new'
     | '/engineer/$projectId'
-    | '/mini-admin/Engineer/Engineer'
+    | '/mini-admin/Mini-Admin'
+    | '/mini-admin/todo'
     | '/admin'
     | '/client'
     | '/engineer'
+    | '/mini-admin'
     | '/engineer/$projectId/compare'
     | '/engineer/$projectId/inspection'
     | '/engineer/$projectId/messages'
     | '/engineer/$projectId/quotation'
     | '/engineer/$projectId/worksheet'
+    | '/mini-admin/Engineer/projectId'
+    | '/mini-admin/Engineer'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
-    | '/mini-admin'
     | '/auth'
+    | '/_authenticated/mini-admin'
     | '/_authenticated/dashboard'
-    | '/mini-admin/Mini-Admin'
-    | '/mini-admin/todo'
-    | '/mini-admin/'
     | '/_authenticated/admin/analysis'
     | '/_authenticated/admin/todos'
     | '/_authenticated/admin/vendors'
     | '/_authenticated/client/$projectId'
     | '/_authenticated/client/new'
     | '/_authenticated/engineer/$projectId'
-    | '/mini-admin/Engineer/Engineer'
+    | '/_authenticated/mini-admin/Mini-Admin'
+    | '/_authenticated/mini-admin/todo'
     | '/_authenticated/admin/'
     | '/_authenticated/client/'
     | '/_authenticated/engineer/'
+    | '/_authenticated/mini-admin/'
     | '/_authenticated/engineer/$projectId/compare'
     | '/_authenticated/engineer/$projectId/inspection'
     | '/_authenticated/engineer/$projectId/messages'
     | '/_authenticated/engineer/$projectId/quotation'
     | '/_authenticated/engineer/$projectId/worksheet'
+    | '/_authenticated/mini-admin/Engineer/projectId'
+    | '/_authenticated/mini-admin/Engineer/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
-  MiniAdminRouteRoute: typeof MiniAdminRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
 }
 
@@ -322,13 +338,6 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/mini-admin': {
-      id: '/mini-admin'
-      path: '/mini-admin'
-      fullPath: '/mini-admin'
-      preLoaderRoute: typeof MiniAdminRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -345,33 +354,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/mini-admin/': {
-      id: '/mini-admin/'
-      path: '/'
-      fullPath: '/mini-admin/'
-      preLoaderRoute: typeof MiniAdminIndexRouteImport
-      parentRoute: typeof MiniAdminRouteRoute
-    }
-    '/mini-admin/todo': {
-      id: '/mini-admin/todo'
-      path: '/todo'
-      fullPath: '/mini-admin/todo'
-      preLoaderRoute: typeof MiniAdminTodoRouteImport
-      parentRoute: typeof MiniAdminRouteRoute
-    }
-    '/mini-admin/Mini-Admin': {
-      id: '/mini-admin/Mini-Admin'
-      path: '/Mini-Admin'
-      fullPath: '/mini-admin/Mini-Admin'
-      preLoaderRoute: typeof MiniAdminMiniAdminRouteImport
-      parentRoute: typeof MiniAdminRouteRoute
-    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/mini-admin': {
+      id: '/_authenticated/mini-admin'
+      path: '/mini-admin'
+      fullPath: '/mini-admin'
+      preLoaderRoute: typeof AuthenticatedMiniAdminRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/mini-admin/': {
+      id: '/_authenticated/mini-admin/'
+      path: '/'
+      fullPath: '/mini-admin/'
+      preLoaderRoute: typeof AuthenticatedMiniAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedMiniAdminRouteRoute
     }
     '/_authenticated/engineer/': {
       id: '/_authenticated/engineer/'
@@ -394,12 +396,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/mini-admin/Engineer/Engineer': {
-      id: '/mini-admin/Engineer/Engineer'
-      path: '/Engineer/Engineer'
-      fullPath: '/mini-admin/Engineer/Engineer'
-      preLoaderRoute: typeof MiniAdminEngineerEngineerRouteImport
-      parentRoute: typeof MiniAdminRouteRoute
+    '/_authenticated/mini-admin/todo': {
+      id: '/_authenticated/mini-admin/todo'
+      path: '/todo'
+      fullPath: '/mini-admin/todo'
+      preLoaderRoute: typeof AuthenticatedMiniAdminTodoRouteImport
+      parentRoute: typeof AuthenticatedMiniAdminRouteRoute
+    }
+    '/_authenticated/mini-admin/Mini-Admin': {
+      id: '/_authenticated/mini-admin/Mini-Admin'
+      path: '/Mini-Admin'
+      fullPath: '/mini-admin/Mini-Admin'
+      preLoaderRoute: typeof AuthenticatedMiniAdminMiniAdminRouteImport
+      parentRoute: typeof AuthenticatedMiniAdminRouteRoute
     }
     '/_authenticated/engineer/$projectId': {
       id: '/_authenticated/engineer/$projectId'
@@ -443,6 +452,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAnalysisRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/mini-admin/Engineer/': {
+      id: '/_authenticated/mini-admin/Engineer/'
+      path: '/Engineer'
+      fullPath: '/mini-admin/Engineer/'
+      preLoaderRoute: typeof AuthenticatedMiniAdminEngineerIndexRouteImport
+      parentRoute: typeof AuthenticatedMiniAdminRouteRoute
+    }
+    '/_authenticated/mini-admin/Engineer/projectId': {
+      id: '/_authenticated/mini-admin/Engineer/projectId'
+      path: '/Engineer/projectId'
+      fullPath: '/mini-admin/Engineer/projectId'
+      preLoaderRoute: typeof AuthenticatedMiniAdminEngineerProjectIdRouteImport
+      parentRoute: typeof AuthenticatedMiniAdminRouteRoute
+    }
     '/_authenticated/engineer/$projectId/worksheet': {
       id: '/_authenticated/engineer/$projectId/worksheet'
       path: '/worksheet'
@@ -481,6 +504,30 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedMiniAdminRouteRouteChildren {
+  AuthenticatedMiniAdminMiniAdminRoute: typeof AuthenticatedMiniAdminMiniAdminRoute
+  AuthenticatedMiniAdminTodoRoute: typeof AuthenticatedMiniAdminTodoRoute
+  AuthenticatedMiniAdminIndexRoute: typeof AuthenticatedMiniAdminIndexRoute
+  AuthenticatedMiniAdminEngineerProjectIdRoute: typeof AuthenticatedMiniAdminEngineerProjectIdRoute
+  AuthenticatedMiniAdminEngineerIndexRoute: typeof AuthenticatedMiniAdminEngineerIndexRoute
+}
+
+const AuthenticatedMiniAdminRouteRouteChildren: AuthenticatedMiniAdminRouteRouteChildren =
+  {
+    AuthenticatedMiniAdminMiniAdminRoute: AuthenticatedMiniAdminMiniAdminRoute,
+    AuthenticatedMiniAdminTodoRoute: AuthenticatedMiniAdminTodoRoute,
+    AuthenticatedMiniAdminIndexRoute: AuthenticatedMiniAdminIndexRoute,
+    AuthenticatedMiniAdminEngineerProjectIdRoute:
+      AuthenticatedMiniAdminEngineerProjectIdRoute,
+    AuthenticatedMiniAdminEngineerIndexRoute:
+      AuthenticatedMiniAdminEngineerIndexRoute,
+  }
+
+const AuthenticatedMiniAdminRouteRouteWithChildren =
+  AuthenticatedMiniAdminRouteRoute._addFileChildren(
+    AuthenticatedMiniAdminRouteRouteChildren,
+  )
+
 interface AuthenticatedEngineerProjectIdRouteChildren {
   AuthenticatedEngineerProjectIdCompareRoute: typeof AuthenticatedEngineerProjectIdCompareRoute
   AuthenticatedEngineerProjectIdInspectionRoute: typeof AuthenticatedEngineerProjectIdInspectionRoute
@@ -509,6 +556,7 @@ const AuthenticatedEngineerProjectIdRouteWithChildren =
   )
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedMiniAdminRouteRoute: typeof AuthenticatedMiniAdminRouteRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedAdminAnalysisRoute: typeof AuthenticatedAdminAnalysisRoute
   AuthenticatedAdminTodosRoute: typeof AuthenticatedAdminTodosRoute
@@ -522,6 +570,8 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedMiniAdminRouteRoute:
+    AuthenticatedMiniAdminRouteRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedAdminAnalysisRoute: AuthenticatedAdminAnalysisRoute,
   AuthenticatedAdminTodosRoute: AuthenticatedAdminTodosRoute,
@@ -538,28 +588,9 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
-interface MiniAdminRouteRouteChildren {
-  MiniAdminMiniAdminRoute: typeof MiniAdminMiniAdminRoute
-  MiniAdminTodoRoute: typeof MiniAdminTodoRoute
-  MiniAdminIndexRoute: typeof MiniAdminIndexRoute
-  MiniAdminEngineerEngineerRoute: typeof MiniAdminEngineerEngineerRoute
-}
-
-const MiniAdminRouteRouteChildren: MiniAdminRouteRouteChildren = {
-  MiniAdminMiniAdminRoute: MiniAdminMiniAdminRoute,
-  MiniAdminTodoRoute: MiniAdminTodoRoute,
-  MiniAdminIndexRoute: MiniAdminIndexRoute,
-  MiniAdminEngineerEngineerRoute: MiniAdminEngineerEngineerRoute,
-}
-
-const MiniAdminRouteRouteWithChildren = MiniAdminRouteRoute._addFileChildren(
-  MiniAdminRouteRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
-  MiniAdminRouteRoute: MiniAdminRouteRouteWithChildren,
   AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
