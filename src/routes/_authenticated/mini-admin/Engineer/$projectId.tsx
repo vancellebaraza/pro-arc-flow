@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import { generateProjectPdf } from "@/lib/pdf";
 
 export const Route = createFileRoute("/_authenticated/mini-admin/Engineer/$projectId")({
   component: EngineerProjectHub,
@@ -73,6 +74,188 @@ function EngineerProjectHub() {
       body: waText,
     });
   }
+
+
+async function downloadProjectReport() {
+  if (!project) return;
+
+  try {
+    toast.loading("Generating project report...", {
+      id: "project-report",
+    });
+
+    // Load quotation first because quotation_items depends on quotation.id
+    const { data: quotation, error: quotationError } = await supabase
+      .from("quotations")
+      .select("*")
+      .eq("project_id", project.id)
+      .order("created_at", { ascending: false })
+      .maybeSingle();
+
+    if (quotationError) throw quotationError;
+
+const [
+  { data: quotationItems, error: quotationItemsError },
+  { data: inspections, error: inspectionError },
+  { data: worksheets, error: worksheetError },
+] = await Promise.all([
+  quotation
+    ? supabase
+        .from("quotation_items")
+        .select("*")
+        .eq("quotation_id", quotation.id)
+        .order("sort_order")
+    : Promise.resolve({ data: [], error: null }),
+
+  supabase
+    .from("inspections")
+    .select("*")
+    .eq("project_id", project.id)
+    .order("created_at", { ascending: false })
+    .limit(1),
+
+  supabase
+    .from("worksheets")
+    .select("*")
+    .eq("project_id", project.id)
+    .order("created_at", { ascending: false })
+    .limit(1),
+]);
+
+
+    if (quotationItemsError) throw quotationItemsError;
+    if (inspectionError) throw inspectionError;
+    if (worksheetError) throw worksheetError;
+
+    const inspection = inspections?.[0] ?? null;
+    const worksheet = worksheets?.[0] ?? null;
+
+    const quotationMeta = (quotation?.meta ?? {}) as {
+      bill_to?: string;
+      recipient?: string;
+      for_text?: string;
+      authorised_by?: string;
+      date?: string;
+    };
+
+    const inspectionMeta = (inspection?.meta ?? {}) as {
+      work_category?: string;
+      client_name?: string;
+      inspection_date?: string;
+      inspector_name?: string;
+      technician?: string;
+    };
+
+    const inspectionSignatures = (inspection?.signatures ?? {}) as {
+      client_name?: string;
+      inspector_name?: string;
+      technician_name?: string;
+    };
+
+    const worksheetSignatures = (worksheet?.signatures ?? {}) as {
+      technician_name?: string;
+      supervisor_name?: string;
+      client_name?: string;
+    };
+
+    await generateProjectPdf({
+      project,
+
+      quotation: {
+        projectTitle: project.title,
+        service: project.service,
+        location: project.location,
+
+        billTo: quotationMeta.bill_to ?? "",
+        quoteNo: quotation?.quote_no ?? "",
+        date: quotationMeta.date ?? "",
+        to: quotationMeta.recipient ?? "",
+        forText: quotationMeta.for_text ?? "",
+
+        items:
+          quotationItems?.map((item) => ({
+            description: item.description,
+            unit: item.unit,
+            qty: Number(item.qty),
+            unit_cost: Number(item.unit_cost),
+            amount: Number(item.amount),
+          })) ?? [],
+
+        labour: Number(quotation?.labour ?? 0),
+        subtotal: Number(quotation?.subtotal ?? 0),
+        grandTotal: Number(quotation?.grand_total ?? 0),
+
+        authorisedBy: quotationMeta.authorised_by ?? "",
+        notes: quotation?.notes ?? "",
+      },
+
+      inspection: {
+        workCategory: inspectionMeta.work_category ?? "",
+        projectName: project.title,
+        clientName: inspectionMeta.client_name ?? "",
+        siteLocation: project.location ?? "",
+        inspectionDate: inspectionMeta.inspection_date ?? "",
+        inspectorName: inspectionMeta.inspector_name ?? "",
+        technician: inspectionMeta.technician ?? "",
+
+        checklist:
+          (inspection?.checklist as {
+            item: string;
+            remark: string;
+            pass: boolean;
+          }[]) ?? [],
+
+        photoEvidence:
+          (inspection?.photo_evidence as {
+            before: string;
+            during: string;
+            after: string;
+          }[]) ?? [],
+
+        //  inspection?.remarks ?? "",
+
+        signatures: inspectionSignatures,
+      },
+
+      worksheet: {
+        clientName: worksheet?.client_name ?? "",
+        jobNo: worksheet?.job_no ?? "",
+        jobLocation: worksheet?.job_location ?? "",
+        jobDate: worksheet?.job_date ?? "",
+        jobType: worksheet?.job_type ?? "",
+        technician: worksheet?.technician ?? "",
+        personInCharge: worksheet?.person_in_charge ?? "",
+        jobDescription: worksheet?.job_description ?? "",
+
+        observations:
+          (worksheet?.observations as {
+            observation: string;
+            action: string;
+          }[]) ?? [],
+
+        imagesBefore:
+          (worksheet?.images_before as string[]) ?? [],
+
+        signatures: worksheetSignatures,
+      },
+    });
+
+    toast.success("Project report downloaded.", {
+      id: "project-report",
+    });
+  } catch (error) {
+    console.error(error);
+
+    toast.error(
+      error instanceof Error ? error.message : "Failed to generate report",
+      {
+        id: "project-report",
+      }
+    );
+  }
+}
+
+
 
   const tools: Array<{
     to:
@@ -168,7 +351,10 @@ function EngineerProjectHub() {
           ))}
         </div>
       )}
-
+           <Button onClick={downloadProjectReport}>
+    <FileText className="mr-2 h-4 w-4" />
+    Download Project Report
+</Button>
       <h2 className="mt-10 text-lg font-semibold tracking-tight">Forms & tools</h2>
       <p className="text-sm text-muted-foreground">
         Each form opens in its own page so you have room to work.

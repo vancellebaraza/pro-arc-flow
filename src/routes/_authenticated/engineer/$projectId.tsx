@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import { generateProjectPdf } from "@/lib/pdf";
 
 export const Route = createFileRoute("/_authenticated/engineer/$projectId")({
   component: EngineerProjectHub,
@@ -71,7 +72,7 @@ function EngineerProjectHub() {
       body: waText,
     });
   }
-
+  
   const tools: Array<{
     to:
       | "/engineer/$projectId/inspection"

@@ -147,8 +147,8 @@ export interface QuotePdfInput {
   notes?: string | null;
 }
 
-export async function generateQuotationPdf(q: QuotePdfInput) {
-  const doc = new jsPDF();
+export async function generateQuotationPdf(doc:jsPDF,q: QuotePdfInput) {
+  // const doc = new jsPDF();
   await header(doc, "QUOTATION", `No: ${q.quoteNo || "DRAFT"}  •  ${q.date}`);
 
   const y = 34;
@@ -212,7 +212,7 @@ export async function generateQuotationPdf(q: QuotePdfInput) {
     doc.text("Notes: " + q.notes, 14, fy + 46, { maxWidth: 186 });
   }
 
-  doc.save(`Quotation-${(q.quoteNo || "draft").replace(/\W+/g, "_")}.pdf`);
+  // doc.save(`Quotation-${(q.quoteNo || "draft").replace(/\W+/g, "_")}.pdf`);
 }
 
 // ---------------- INSPECTION ----------------
@@ -233,8 +233,8 @@ export interface InspectionPdfInput {
   };
 }
 
-export async function generateInspectionPdf(input: InspectionPdfInput) {
-  const doc = new jsPDF();
+export async function generateInspectionPdf(doc:jsPDF,input: InspectionPdfInput) {
+  // const doc = new jsPDF();
   await header(doc, "INSPECTION REPORT", input.inspectionDate);
   const y = 34;
   doc.setFontSize(10);
@@ -365,7 +365,7 @@ export async function generateInspectionPdf(input: InspectionPdfInput) {
     doc.text("Signature", x, fy + 19);
   });
 
-  doc.save(`Inspection-${input.projectName.replace(/\W+/g, "_")}-${Date.now()}.pdf`);
+  // doc.save(`Inspection-${input.projectName.replace(/\W+/g, "_")}-${Date.now()}.pdf`);
 }
 
 // ---------------- WORKSHEET ----------------
@@ -383,8 +383,8 @@ export interface WorksheetPdfInput {
   signatures: { technician_name?: string; supervisor_name?: string; client_name?: string };
 }
 
-export async function generateWorksheetPdf(w: WorksheetPdfInput) {
-  const doc = new jsPDF();
+export async function generateWorksheetPdf(doc:jsPDF,w: WorksheetPdfInput) {
+  // const doc = new jsPDF();
   await header(doc, "WORKSHEET", `Job ${w.jobNo}  •  ${w.jobDate}`);
   let y = 34;
   doc.setFontSize(10);
@@ -454,7 +454,81 @@ export async function generateWorksheetPdf(w: WorksheetPdfInput) {
     doc.line(x, fy + 14, x + 55, fy + 14);
     doc.text("Signature", x, fy + 19);
   });
-  doc.save(`Worksheet-${w.jobNo.replace(/\W+/g, "_") || "job"}-${Date.now()}.pdf`);
+  // doc.save(`Worksheet-${w.jobNo.replace(/\W+/g, "_") || "job"}-${Date.now()}.pdf`);
+}
+
+export async function generateProjectPdf({
+    project,
+    quotation,
+    inspection,
+    worksheet,
+}: {
+  project: {
+    title: string;
+    location?: string | null;
+    service: string;
+  };
+  quotation: QuotePdfInput;
+  inspection: InspectionPdfInput;
+  worksheet: WorksheetPdfInput;
+}) {
+    const doc = new jsPDF();
+
+    //
+    // Cover Page
+    //
+
+    await header(doc, "PROJECT REPORT");
+
+const pageWidth = doc.internal.pageSize.getWidth();
+const pageHeight = doc.internal.pageSize.getHeight();
+
+const centerX = pageWidth / 2;
+const centerY = pageHeight / 2;
+
+// Vertical spacing
+const titleY = centerY - 12;
+const locationY = centerY + 2;
+const serviceY = centerY + 12;
+
+doc.setFont("helvetica", "bold");
+doc.setFontSize(40);
+doc.text(project.title, centerX, titleY, {
+  align: "center",
+});
+
+doc.setFont("helvetica", "normal");
+doc.setFontSize(16);
+doc.text(`Location: ${project.location ?? "-"}`, centerX, locationY, {
+  align: "center",
+});
+
+doc.text(`Service: ${project.service}`, centerX, serviceY, {
+  align: "center",
+});
+
+    //
+    // Quotation
+    //
+
+    doc.addPage();
+    await generateQuotationPdf(doc, quotation);
+
+    //
+    // Inspection
+    //
+
+    doc.addPage();
+    await generateInspectionPdf(doc, inspection);
+
+    //
+    // Worksheet
+    //
+
+    doc.addPage();
+    await generateWorksheetPdf(doc, worksheet);
+
+    doc.save(`${project.title}-Project-Report.pdf`);
 }
 
 // ---------------- CSV ----------------
@@ -475,4 +549,5 @@ export function downloadCsv(filename: string, rows: Array<Record<string, unknown
   a.download = filename;
   a.click();
   URL.revokeObjectURL(url);
+  
 }
