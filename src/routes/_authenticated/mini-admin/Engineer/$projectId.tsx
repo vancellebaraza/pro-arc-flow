@@ -17,7 +17,7 @@ import {
 import { toast } from "sonner";
 import WhatsAppButton from "@/components/WhatsAppButton";
 
-export const Route = createFileRoute("/_authenticated/mini-admin/Engineer/projectId")({
+export const Route = createFileRoute("/_authenticated/mini-admin/Engineer/$projectId")({
   component: EngineerProjectHub,
 });
 
@@ -36,6 +36,7 @@ interface Project {
 
 function EngineerProjectHub() {
   const { projectId } = Route.useParams();
+  console.log(projectId);
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -75,41 +76,41 @@ function EngineerProjectHub() {
 
   const tools: Array<{
     to:
-      | "/engineer/$projectId/inspection"
-      | "/engineer/$projectId/quotation"
-      | "/engineer/$projectId/worksheet"
-      | "/engineer/$projectId/compare"
-      | "/engineer/$projectId/messages";
+      | "/mini-admin/Engineer/$projectId/inspection"
+      | "/mini-admin/Engineer/$projectId/quotation"
+      | "/mini-admin/Engineer/$projectId/worksheet"
+      | "/mini-admin/Engineer/$projectId/compare"
+      | "/mini-admin/Engineer/$projectId/messages";
     title: string;
     desc: string;
     icon: typeof FileText;
   }> = [
     {
-      to: "/engineer/$projectId/inspection",
+      to: "/mini-admin/Engineer/$projectId/inspection",
       title: "Inspection report",
       desc: "Checklist, photos, sign-off.",
       icon: ClipboardCheck,
     },
     {
-      to: "/engineer/$projectId/quotation",
+      to: "/mini-admin/Engineer/$projectId/quotation",
       title: "Quotation",
       desc: "Bill-to, line items, totals & bank details.",
       icon: FileText,
     },
     {
-      to: "/engineer/$projectId/worksheet",
+      to: "/mini-admin/Engineer/$projectId/worksheet",
       title: "Job worksheet",
       desc: "Document 2 — site observations & sign-off.",
       icon: ClipboardList,
     },
     {
-      to: "/engineer/$projectId/compare",
+      to: "/mini-admin/Engineer/$projectId/compare",
       title: "Quoted vs Actual",
       desc: "Compare estimated vs actual costs.",
       icon: GitCompare,
     },
     {
-      to: "/engineer/$projectId/messages",
+      to: "/mini-admin/Engineer/$projectId/messages",
       title: "Communication",
       desc: "Internal messages & WhatsApp log.",
       icon: MessageSquare,

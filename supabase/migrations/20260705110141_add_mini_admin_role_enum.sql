@@ -1,2 +1,2 @@
 ALTER TYPE public.app_role
-ADD VALUE 'mini_admin';
+ADD VALUE 'mini-admin';

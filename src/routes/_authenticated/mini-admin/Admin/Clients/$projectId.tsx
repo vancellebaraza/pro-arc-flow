@@ -1,3 +1,4 @@
+
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,7 +10,7 @@ import { generateQuotationPdf } from "@/lib/pdf";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import ProjectProgress from "@/components/ProjectProgress";
 
-export const Route = createFileRoute("/_authenticated/client/$projectId")({  component: ProjectDetail,
+export const Route = createFileRoute("/_authenticated/mini-admin/Admin/Clients/$projectId")({  component: ProjectDetail,
 });
 
 interface Project {
@@ -136,7 +137,7 @@ function ProjectDetail() {
   return (
     <div className="p-6 md:p-10 max-w-4xl mx-auto fade-in">
       <Link
-        to="/client"
+        to="/mini-admin/Admin/Clients"
         className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4 mr-1" />

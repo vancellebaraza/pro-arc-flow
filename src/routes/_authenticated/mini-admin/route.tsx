@@ -12,6 +12,9 @@ import {
   Wrench,
   ShieldCheck,
   ClipboardList,
+  Users,
+  Building2,
+  BarChart3
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/mini-admin")({
@@ -24,28 +27,42 @@ function MiniAdminLayout() {
   });
 
   const links = [
-    {
-      to: "/mini-admin",
-      label: "Dashboard",
-      icon: LayoutDashboard,
-    },
-    {
-      to: "/mini-admin/Engineer",
-      label: "Engineer",
-      icon: Wrench,
-    },
-    {
-      to: "/mini-admin/admin",
-      label: "Admin",
-      icon: ShieldCheck,
-    },
-    {
-      to: "/mini-admin/todos",
-      label: "To Do List",
-      icon: ClipboardList,
-    },
-  ];
-
+  {
+    to: "/mini-admin",
+    label: "Dashboard",
+    icon: LayoutDashboard,
+  },
+  {
+    to: "/mini-admin/Engineer",
+    label: "Engineer",
+    icon: Wrench,
+  },
+  // {
+  //   to: "/mini-admin/admin",
+  //   label: "Admin",
+  //   icon: ShieldCheck,
+  // },
+  {
+    to: "/mini-admin/Admin/vendors",
+    label: "Vendor Management",
+    icon: Building2,
+  },
+  {
+    to: "/mini-admin/Admin/Clients",
+    label: "Clients",
+    icon: Users,
+  },
+  {
+    to: "/mini-admin/Admin/analysis",
+    label: "Analysis",
+    icon: BarChart3,
+  },
+  {
+    to: "/mini-admin/Todo/todo",
+    label: "To Do List",
+    icon: ClipboardList,
+  },
+];
   return (
     <div className="flex min-h-screen bg-background">
       {/* Sidebar */}

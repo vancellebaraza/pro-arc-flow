@@ -13,7 +13,7 @@ function DashboardRedirect() {
     if (loading) return;
     if (primaryRole === "admin") navigate({ to: "/admin", replace: true });
     else if (primaryRole === "engineer") navigate({ to: "/engineer", replace: true });
-    else if (primaryRole === "mini-admin") navigate({ to: "/mini-admin", replace: true });
+    // else if (primaryRole === "mini-admin") navigate({ to: "/mini-admin", replace: true });
     else navigate({ to: "/client", replace: true });
   }, [primaryRole, loading, navigate]);
   return <div className="p-8 text-sm text-muted-foreground">Redirecting…</div>;

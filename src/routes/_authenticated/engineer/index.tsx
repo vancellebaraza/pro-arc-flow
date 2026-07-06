@@ -293,7 +293,7 @@ function EngineerHome() {
           </div>
         </div>
 
-        {staffRowAdded ? (
+        
           <div className="mt-5 overflow-x-auto rounded-xl border">
             <table className="min-w-full border-separate border-spacing-0">
               <thead>
@@ -361,11 +361,9 @@ function EngineerHome() {
               </tbody>
             </table>
           </div>
-        ) : (
-          <div className="mt-5 rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">
-            Add your staff row to start creating activity entries for this week.
-          </div>
-        )}
+        
+        
+        
       </section>
 
       <Dialog

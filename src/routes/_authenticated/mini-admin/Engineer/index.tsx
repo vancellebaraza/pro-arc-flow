@@ -228,7 +228,7 @@ function EngineerHome() {
             return (
               <li key={p.id}>
                 <Link
-                  to="/mini-admin/Engineer/projectId"
+                  to="/mini-admin/Engineer/$projectId"
                   params={{ projectId: p.id }}
                   className="block h-full rounded-xl border bg-card p-5 hover:border-foreground/40 hover:shadow-sm transition"
                 >
@@ -294,7 +294,7 @@ function EngineerHome() {
           </div>
         </div>
 
-        {staffRowAdded ? (
+    
           <div className="mt-5 overflow-x-auto rounded-xl border">
             <table className="min-w-full border-separate border-spacing-0">
               <thead>
@@ -362,11 +362,9 @@ function EngineerHome() {
               </tbody>
             </table>
           </div>
-        ) : (
-          <div className="mt-5 rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">
-            Add your staff row to start creating activity entries for this week.
-          </div>
-        )}
+      
+          
+        
       </section>
 
       <Dialog
