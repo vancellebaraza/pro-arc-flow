@@ -19,7 +19,9 @@ interface Project {
   created_at: string;
   profiles?: {
     full_name: string;
-    email: string;
+    // email: string;
+    phone: string | null;
+    company: string | null;
   } | null;
 }
 
@@ -35,7 +37,8 @@ function ClientHome() {
         .select("id,title,service,status,location,created_at")
         .eq("client_id", u.user.id)
         .order("created_at", { ascending: false });
-  //     const { data, error } = await supabase
+        // console.log(error);
+        console.log(data)
   // .from("projects")
   // .select(`
   //   id,
@@ -51,9 +54,9 @@ function ClientHome() {
   // `)
   // .order("created_at", { ascending: false });
 
-// if (error) {
-//   console.error(error);
-// }
+          //  if (error) {
+          //      console.error(error);
+          //  }
       setProjects((data ?? []) as Project[]);
       setLoading(false);
     })();
