@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { jsPDF } from "jspdf";
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Json } from "@/integrations/supabase/types";
@@ -218,7 +219,8 @@ function WorksheetPage() {
 
   async function exportPdf() {
     try {
-      await generateWorksheetPdf({
+      const doc = new jsPDF();
+      await generateWorksheetPdf(doc, {
         clientName,
         jobNo,
         jobLocation,
@@ -231,6 +233,7 @@ function WorksheetPage() {
         imagesBefore,
         signatures: { technician_name: sigTech, supervisor_name: sigSup, client_name: sigClient },
       });
+      doc.save(`Worksheet-${(jobNo || "job").replace(/\W+/g, "_")}-${Date.now()}.pdf`);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to generate PDF");
     }

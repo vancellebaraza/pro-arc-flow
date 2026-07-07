@@ -4,8 +4,10 @@ import {
   Outlet,
   Link,
   createFileRoute,
+  redirect,
   useRouterState,
 } from "@tanstack/react-router";
+import { supabase } from "@/integrations/supabase/client";
 
 import {
   LayoutDashboard,
@@ -19,6 +21,23 @@ import {
 
 export const Route = createFileRoute("/_authenticated/mini-admin")({
   component: MiniAdminLayout,
+  beforeLoad: async () => {
+    const { data: userData, error } = await supabase.auth.getUser();
+    if (error || !userData.user) throw redirect({ to: "/auth" });
+
+    const { data: rolesData, error: rolesError } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userData.user.id);
+
+    if (rolesError) throw redirect({ to: "/dashboard" });
+    const hasAccess = (rolesData ?? []).some(
+      (role) => role.role === "mini_admin" || role.role === "admin",
+    );
+    if (!hasAccess) throw redirect({ to: "/client" });
+
+    return { user: userData.user };
+  },
 });
 
 function MiniAdminLayout() {

@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { jsPDF } from "jspdf";
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -199,7 +200,8 @@ function QuotationPage() {
 
   async function exportPdf() {
     try {
-      await generateQuotationPdf({
+      const doc = new jsPDF();
+      await generateQuotationPdf(doc, {
         projectTitle,
         service: SERVICES.find((s) => s.key === projectService)?.label ?? projectService,
         location: projectLocation,
@@ -221,6 +223,7 @@ function QuotationPage() {
         authorisedBy,
         notes,
       });
+      doc.save(`Quotation-${(quoteNo || "draft").replace(/\W+/g, "_")}.pdf`);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to generate PDF");
     }

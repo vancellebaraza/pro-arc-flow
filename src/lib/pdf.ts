@@ -321,13 +321,16 @@ export async function generateInspectionPdf(doc:jsPDF,input: InspectionPdfInput)
     autoTable(doc, {
       startY: fy,
       head: [["Before", "During", "After"]],
-      body: photosData.map((p) => [p.before || "", p.during || "", p.after || ""]),
-      styles: { fontSize: 9, halign: "center", valign: "middle" },
+      body: photosData.map(() => ["", "", ""]),
+      styles: { fontSize: 9, halign: "center", valign: "middle", minCellHeight: 42 },
       headStyles: { fillColor: BRAND, textColor: 255, halign: "center" },
       columnStyles: { 0: { cellWidth: 60 }, 1: { cellWidth: 60 }, 2: { cellWidth: 60 } },
       didDrawCell: (data: any) => {
         if (data.section !== "body") return;
-        const raw = data.cell.raw as string;
+        const photo = photosData[data.row.index];
+        if (!photo) return;
+        const key = data.column.index === 0 ? "before" : data.column.index === 1 ? "during" : "after";
+        const raw = photo[key as keyof typeof photo];
         if (typeof raw !== "string" || !raw.startsWith("data:image")) return;
 
         const x = data.cell.x + 2;

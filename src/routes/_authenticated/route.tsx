@@ -26,11 +26,11 @@ import { AIAssistant } from "@/components/AIAssistant";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
-  // beforeLoad: async () => {
-  //   const { data, error } = await supabase.auth.getUser();
-  //   if (error || !data.user) throw redirect({ to: "/auth" });
-  //   return { user: data.user };
-  // },
+  beforeLoad: async () => {
+    const { data, error } = await supabase.auth.getUser();
+    if (error || !data.user) throw redirect({ to: "/auth" });
+    return { user: data.user };
+  },
   component: AuthedLayout,
 });
 
@@ -51,13 +51,14 @@ function AuthedLayout() {
           { to: "/client", label: "Client view", icon: ClipboardPlus },
           { to: "/mini-admin", label: "Mini Admin", icon: ShieldCheck },
         ]
-        
-      : primaryRole === "engineer"
-        ? [{ to: "/engineer", label: "Engineer", icon: Wrench }]
-        : [
-            { to: "/client", label: "My projects", icon: LayoutDashboard },
-            { to: "/client/new", label: "New request", icon: ClipboardPlus },
-          ];
+      : primaryRole === "mini_admin"
+        ? [{ to: "/mini-admin", label: "Mini Admin", icon: ShieldCheck }]
+        : primaryRole === "engineer"
+          ? [{ to: "/engineer", label: "Engineer", icon: Wrench }]
+          : [
+              { to: "/client", label: "My projects", icon: LayoutDashboard },
+              { to: "/client/new", label: "New request", icon: ClipboardPlus },
+            ];
 
   return (
     <div className="min-h-screen flex w-full bg-background">
