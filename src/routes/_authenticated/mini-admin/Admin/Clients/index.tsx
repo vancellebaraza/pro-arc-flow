@@ -6,58 +6,83 @@ import { Button } from "@/components/ui/button";
 import { STATUS_LABEL, SERVICES } from "@/lib/services";
 import { ArrowRight, Plus } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/mini-admin/Admin/Clients/")({
+export const Route = createFileRoute(
+  "/_authenticated/mini-admin/Admin/Clients/"
+)({
   component: ClientHome,
 });
 
 interface Project {
   id: string;
+  client_id: string;
   title: string;
-  service: string;
+ service: string;
   status: string;
   location: string | null;
   created_at: string;
+
   profiles?: {
-    full_name: string;
-    // email: string;
+    full_name: string | null;
     phone: string | null;
     company: string | null;
-  } | null;
+  };
 }
 
 function ClientHome() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     (async () => {
-      const { data: u } = await supabase.auth.getUser();
-      if (!u.user) return;
-      const { data } = await supabase
-        .from("projects")
-        .select("id,title,service,status,location,created_at")
-        .eq("client_id", u.user.id)
-        .order("created_at", { ascending: false });
-        // console.log(error);
-        console.log(data)
-  // .from("projects")
-  // .select(`
-  //   id,
-  //   title,
-  //   service,
-  //   status,
-  //   location,
-  //   created_at,
-  //   profiles!projects_client_id_fkey(
-  //     full_name,
-  //     email
-  //   )
-  // `)
-  // .order("created_at", { ascending: false });
+      setLoading(true);
 
-          //  if (error) {
-          //      console.error(error);
-          //  }
-      setProjects((data ?? []) as Project[]);
+      // Fetch projects
+      const { data: projectsData, error: projectsError } = await supabase
+        .from("projects")
+        .select(
+          "id,client_id,title,service,status,location,created_at"
+        )
+        .order("created_at", { ascending: false });
+
+      if (projectsError) {
+        console.error(projectsError);
+        setLoading(false);
+        return;
+      }
+
+      if (!projectsData) {
+        setProjects([]);
+        setLoading(false);
+        return;
+      }
+
+      // Get unique client ids
+      const clientIds = [
+        ...new Set(projectsData.map((p) => p.client_id)),
+      ];
+
+      // Fetch matching profiles
+      const { data: profilesData, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id, full_name, phone, company")
+        .in("id", clientIds);
+
+      if (profilesError) {
+        console.error(profilesError);
+      }
+
+      // Create lookup object
+      const profileMap = new Map(
+        (profilesData ?? []).map((profile) => [profile.id, profile])
+      );
+
+      // Merge profiles into projects
+      const mergedProjects = projectsData.map((project) => ({
+        ...project,
+        profiles: profileMap.get(project.client_id),
+      }));
+
+      setProjects(mergedProjects as Project[]);
       setLoading(false);
     })();
   }, []);
@@ -66,11 +91,14 @@ function ClientHome() {
     <div className="p-6 md:p-10 max-w-5xl mx-auto fade-in">
       <div className="flex items-end justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Client projects</h1>
+          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">
+            Client Projects
+          </h1>
           <p className="text-muted-foreground mt-1">
             Track requests, view inspections and approve quotations.
           </p>
         </div>
+
         <Button asChild>
           <Link to="/mini-admin/Admin/Clients/new">
             <Plus className="h-4 w-4 mr-1" />
@@ -81,10 +109,11 @@ function ClientHome() {
 
       <div className="mt-8">
         {loading ? (
-          <p className="text-sm text-muted-foreground">Loading…</p>
+          <p className="text-sm text-muted-foreground">Loading...</p>
         ) : projects.length === 0 ? (
           <div className="rounded-xl border bg-card p-10 text-center">
             <p className="text-muted-foreground">No projects yet.</p>
+
             <Button asChild className="mt-4">
               <Link to="/mini-admin/Admin/Clients/new">
                 <Plus className="h-4 w-4 mr-1" />
@@ -96,6 +125,7 @@ function ClientHome() {
           <ul className="divide-y rounded-xl border bg-card">
             {projects.map((p) => {
               const svc = SERVICES.find((s) => s.key === p.service);
+
               return (
                 <li key={p.id}>
                   <Link
@@ -108,18 +138,25 @@ function ClientHome() {
                         <span className="text-xs uppercase tracking-wider text-muted-foreground">
                           {svc?.label ?? p.service}
                         </span>
+
                         <span className="text-xs rounded-full bg-foreground/5 px-2 py-0.5">
                           {STATUS_LABEL[p.status] ?? p.status}
                         </span>
                       </div>
-                      <div className="mt-1 font-medium truncate">{p.title}</div>
+
+                      <div className="mt-1 font-medium truncate">
+                        {p.title}
+                      </div>
+
                       <div className="text-sm text-muted-foreground">
                         Client: {p.profiles?.full_name ?? "Unknown"}
                       </div>
+
                       <div className="text-xs text-muted-foreground truncate">
-                        {p.location ?? "—"}
+                        {p.location || "—"}
                       </div>
                     </div>
+
                     <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground" />
                   </Link>
                 </li>
