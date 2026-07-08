@@ -1,6 +1,5 @@
 
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { jsPDF } from "jspdf";
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Json } from "@/integrations/supabase/types";

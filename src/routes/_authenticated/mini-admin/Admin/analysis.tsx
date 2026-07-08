@@ -69,7 +69,7 @@ function money(value: number) {
 }
 
 function monthKey(date: string) {
-  return new Intl.DateTimeFormat("en", { month: "short", year: "2-digit" }).format(new Date(date));
+  return new Intl.DateTimeFormat("en", { month: "short" }).format(new Date(date));
 }
 
 function shortDate(date: Date | string) {
@@ -419,7 +419,8 @@ function AdminAnalysisPage() {
     </h2>
   </div>
 
-  <div className="mt-6 space-y-4">
+  <div className="mt-6 max-h-[360px] overflow-y-auto pr-2">
+    <div className="space-y-4">
     {analysis.topLocations.length === 0 ? (
       <div className="text-sm text-muted-foreground">
         No work locations available.
@@ -446,9 +447,10 @@ function AdminAnalysisPage() {
       ))
     )}
   </div>
+  </div>
         </section>
 
-        <section className="rounded-lg border bg-card p-5">
+        <section className="rounded-lg border bg-card p-5 lg:col-span-2">
           <h2 className="text-lg font-semibold tracking-tight">New projects by month</h2>
           <div className="mt-6 flex h-56 items-end gap-3">
             {analysis.monthCounts.map((month) => (
