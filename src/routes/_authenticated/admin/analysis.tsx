@@ -68,7 +68,7 @@ function money(value: number) {
 }
 
 function monthKey(date: string) {
-  return new Intl.DateTimeFormat("en", { month: "short", year: "2-digit" }).format(new Date(date));
+  return new Intl.DateTimeFormat("en", { month: "short"}).format(new Date(date));
 }
 
 function shortDate(date: Date | string) {
@@ -187,7 +187,7 @@ function AdminAnalysisPage() {
       const serviceProjects = projects.filter((project) => project.service === service.key);
       const quoted = serviceProjects.reduce((sum, project) => sum + project.quotedAmount, 0);
       const cost = serviceProjects.reduce((sum, project) => sum + project.vendorCost, 0);
-
+      
       return {
         label: service.label,
         count: serviceProjects.length,
@@ -387,7 +387,7 @@ function AdminAnalysisPage() {
         ))}
       </div>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_1.2fr]">
+      <div className="mt-8 grid gap-6  lg:grid-cols-[1fr_1.2fr]">
         <section className="rounded-lg border bg-card p-5">
           <h2 className="text-lg font-semibold tracking-tight">Project status</h2>
           <div className="mt-5 space-y-4">
@@ -410,7 +410,7 @@ function AdminAnalysisPage() {
             ))}
           </div>
         </section>
-        <section className="mt-8 rounded-lg border bg-card p-5">
+        <section className="mt-8 rounded-lg border bg-card p-5  h-[420px] flex flex-col">
   <div className="flex items-center gap-2">
     <BarChart3 className="h-5 w-5 text-muted-foreground" />
     <h2 className="text-lg font-semibold">
@@ -418,7 +418,7 @@ function AdminAnalysisPage() {
     </h2>
   </div>
 
-  <div className="mt-6 space-y-4">
+  <div className="mt-6 space-y-4 overflow-y-auto flex-1 pr-2 scrollbar-custom">
     {analysis.topLocations.length === 0 ? (
       <div className="text-sm text-muted-foreground">
         No work locations available.
@@ -447,7 +447,7 @@ function AdminAnalysisPage() {
   </div>
         </section>
 
-        <section className="rounded-lg border bg-card p-5">
+        <section className="rounded-lg border bg-card p-5 lg:col-span-2">
           <h2 className="text-lg font-semibold tracking-tight">New projects by month</h2>
           <div className="mt-6 flex h-56 items-end gap-3">
             {analysis.monthCounts.map((month) => (
