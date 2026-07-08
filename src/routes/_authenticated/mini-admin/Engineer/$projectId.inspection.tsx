@@ -1,5 +1,6 @@
 
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { jsPDF } from "jspdf";
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Json } from "@/integrations/supabase/types";
@@ -171,7 +172,7 @@ function InspectionPage() {
       photos.map((p) => ({ before: p.before?.slice(0, 80), during: p.during?.slice(0, 80), after: p.after?.slice(0, 80) })),
     );
     const doc = new jsPDF();
-    await generateInspectionPdf(doc,{
+    await generateInspectionPdf(doc, {
       workCategory: SERVICES.find((s) => s.key === workCategory)?.label ?? workCategory,
       projectName: projectTitle,
       clientName,
@@ -187,7 +188,7 @@ function InspectionPage() {
         technician_name: sigTechnician,
       },
     });
-    doc.save(`${projectTitle}-Inspection-Report.pdf`);
+    doc.save(`Inspection-${projectTitle.replace(/\W+/g, "_")}-${Date.now()}.pdf`);
   }
 
   return (
