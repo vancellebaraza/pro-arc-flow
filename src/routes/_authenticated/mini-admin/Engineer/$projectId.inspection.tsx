@@ -163,6 +163,7 @@ function InspectionPage() {
   }
 
   async function exportPdf() {
+    console.log("Photos state:", photos);
     console.log("Exporting inspection PDF with photoEvidence:", JSON.stringify(photos, null, 2));
     console.log(
       "Exporting inspection PDF photoEvidence summary:",

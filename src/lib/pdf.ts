@@ -316,30 +316,40 @@ export async function generateInspectionPdf(doc:jsPDF,input: InspectionPdfInput)
     console.log(
       "generateInspectionPdf converted photo data:",
       photosData.map((p) => ({ before: p.before ? p.before.length : 0, during: p.during ? p.during.length : 0, after: p.after ? p.after.length : 0 })),
-    );
+    ); 
 
     autoTable(doc, {
       startY: fy,
       head: [["Before", "During", "After"]],
-      body: photosData.map((p) => [p.before || "", p.during || "", p.after || ""]),
-      styles: { fontSize: 9, halign: "center", valign: "middle" },
-      headStyles: { fillColor: BRAND, textColor: 255, halign: "center" },
+      body: photosData.map(() => [ "",  "", ""]),
+      styles: { fontSize: 9, halign: "center", valign: "middle",minCellHeight: 45 },
+      headStyles: { fillColor: BRAND, textColor: 255, halign: "center" ,minCellHeight: 10 },
       columnStyles: { 0: { cellWidth: 60 }, 1: { cellWidth: 60 }, 2: { cellWidth: 60 } },
       didDrawCell: (data: any) => {
-        if (data.section !== "body") return;
-        const raw = data.cell.raw as string;
-        if (typeof raw !== "string" || !raw.startsWith("data:image")) return;
+    if (data.section !== "body") return;
 
-        const x = data.cell.x + 2;
-        const yCell = data.cell.y + 2;
-        const w = Math.max(0, data.cell.width - 4);
-        const h = Math.max(0, data.cell.height - 4);
-        try {
-          doc.addImage(raw, getImageTypeFromDataUrl(raw), x, yCell, w, h);
-        } catch (error) {
-          console.error("Failed to draw image in PDF cell:", error);
-        }
-      },
+    const field = ["before", "during", "after"][data.column.index] as
+      | "before"
+      | "during"
+      | "after";
+
+    const img = photosData[data.row.index]?.[field];
+
+    if (!img) return;
+
+    try {
+      doc.addImage(
+        img,
+        getImageTypeFromDataUrl(img),
+        data.cell.x + 2,
+        data.cell.y + 2,
+        data.cell.width - 4,
+        data.cell.height - 4
+      );
+    } catch (err) {
+      console.error("Failed to draw image:", err);
+    }
+  },
     });
     fy = getY(doc) + 6;
   }

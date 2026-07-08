@@ -178,6 +178,19 @@ function StaffTodosPage() {
         toast.error(todoError.message);
         return;
       }
+      const staffIds = [...new Set((todoRows ?? []).map(todo => todo.staff_user_id))];
+
+const { data: profiles, error: profilesError2 } = await supabase
+  .from("profiles")
+  .select("id, full_name")
+  .in("id", staffIds);
+
+if (profilesError2) {
+  toast.error(profilesError2.message);
+  return;
+}
+
+setEngineers(profiles as StaffMember[]);
 
       setTodos((todoRows ?? []) as StaffTodo[]);
     } catch (error) {
@@ -442,6 +455,10 @@ function StaffTodosPage() {
     ) : (
       dailyTodos.map(todo => {
         const staff = staffMap[todo.staff_user_id];
+          console.log("Todo staff id:", todo.staff_user_id);
+  console.log("Engineers:", engineers);
+  console.log("Staff map:", staffMap);
+  console.log("Matched staff:", staff);
 
         return (
           <button

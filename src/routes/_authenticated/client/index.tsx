@@ -87,7 +87,7 @@ function ClientHome() {
                       </div>
                       <div className="mt-1 font-medium truncate">{p.title}</div>
                       <div className="text-xs text-muted-foreground truncate">
-                        {p.location ?? "—"}
+                        Location:{p.location ?? "—"}
                       </div>
                     </div>
                     <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground" />

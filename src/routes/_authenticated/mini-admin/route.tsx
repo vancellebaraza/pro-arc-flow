@@ -49,7 +49,7 @@ function MiniAdminLayout() {
   },
   {
     to: "/mini-admin/Admin/Clients",
-    label: "Clients",
+    label: "Client Projects",
     icon: Users,
   },
   {
