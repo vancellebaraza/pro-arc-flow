@@ -6,8 +6,10 @@ import {
   createFileRoute,
   redirect,
   useRouterState,
+  useNavigate
 } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
 
 import {
   LayoutDashboard,
@@ -16,7 +18,8 @@ import {
   ClipboardList,
   Users,
   Building2,
-  BarChart3
+  BarChart3,
+  LogOut
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/mini-admin")({
@@ -41,10 +44,19 @@ export const Route = createFileRoute("/_authenticated/mini-admin")({
 });
 
 function MiniAdminLayout() {
+  const navigate = useNavigate();
+
   const pathname = useRouterState({
     select: (s) => s.location.pathname,
   });
 
+   async function handleSignOut() {
+    await supabase.auth.signOut();
+    navigate({
+      to: "/auth",
+      replace: true,
+    });
+  }
   const links = [
   {
     to: "/mini-admin/Dashboard",
@@ -85,14 +97,14 @@ function MiniAdminLayout() {
   return (
     <div className="flex min-h-screen bg-background">
       {/* Sidebar */}
-      <aside className="w-64 border-r bg-card shadow-sm">
+      <aside className="w-64 border-r bg-card shadow-sm flex flex-col">
         <div className="h-16 flex items-center px-6 border-b">
           <h1 className="text-xl font-bold">
             Mini Admin
           </h1>
         </div>
 
-        <nav className="p-4 space-y-2">
+        <nav className="flex-1 p-4 space-y-2">
           {links.map((link) => {
             const active =
               pathname === link.to ||
@@ -114,6 +126,16 @@ function MiniAdminLayout() {
             );
           })}
         </nav>
+        <div className="border-t p-4">
+  <Button
+    variant="ghost"
+    className="w-full justify-start"
+    onClick={handleSignOut}
+  >
+    <LogOut className="mr-2 h-5 w-5" />
+    Sign Out
+  </Button>
+</div>
       </aside>
 
       {/* Main Page */}
