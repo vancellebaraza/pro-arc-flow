@@ -40,8 +40,6 @@ function AuthedLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isMiniAdminPage = pathname.startsWith("/mini-admin");
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  // const pathname = useRouterState({ select: (s) => s.location.pathname });
-  // const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   const links =
     primaryRole === "admin"
@@ -52,7 +50,6 @@ function AuthedLayout() {
           { to: "/admin/todos", label: "Staff To Do", icon: Calendar },
           { to: "/engineer", label: "Engineer view", icon: Wrench },
           { to: "/client", label: "Client view", icon: ClipboardPlus },
-          // { to: "/mini-admin", label: "Mini Admin", icon: ShieldCheck },
         ]
       : primaryRole === "mini_admin"
         ? [{ to: "/mini-admin", label: "Mini Admin", icon: ShieldCheck }]

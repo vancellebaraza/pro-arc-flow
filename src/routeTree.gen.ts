@@ -28,7 +28,6 @@ import { Route as AuthenticatedMiniAdminDashboardIndexRouteImport } from './rout
 import { Route as AuthenticatedMiniAdminTodoTodoRouteImport } from './routes/_authenticated/mini-admin/Todo/todo'
 import { Route as AuthenticatedMiniAdminEngineerProjectIdRouteImport } from './routes/_authenticated/mini-admin/Engineer/$projectId'
 import { Route as AuthenticatedMiniAdminAdminVendorsRouteImport } from './routes/_authenticated/mini-admin/Admin/vendors'
-import { Route as AuthenticatedMiniAdminAdminClientsRouteImport } from './routes/_authenticated/mini-admin/Admin/clients'
 import { Route as AuthenticatedMiniAdminAdminAnalysisRouteImport } from './routes/_authenticated/mini-admin/Admin/analysis'
 import { Route as AuthenticatedEngineerProjectIdWorksheetRouteImport } from './routes/_authenticated/engineer/$projectId.worksheet'
 import { Route as AuthenticatedEngineerProjectIdQuotationRouteImport } from './routes/_authenticated/engineer/$projectId.quotation'
@@ -150,12 +149,6 @@ const AuthenticatedMiniAdminAdminVendorsRoute =
     path: '/Admin/vendors',
     getParentRoute: () => AuthenticatedMiniAdminRouteRoute,
   } as any)
-const AuthenticatedMiniAdminAdminClientsRoute =
-  AuthenticatedMiniAdminAdminClientsRouteImport.update({
-    id: '/Admin/clients',
-    path: '/Admin/clients',
-    getParentRoute: () => AuthenticatedMiniAdminRouteRoute,
-  } as any)
 const AuthenticatedMiniAdminAdminAnalysisRoute =
   AuthenticatedMiniAdminAdminAnalysisRouteImport.update({
     id: '/Admin/analysis',
@@ -261,7 +254,6 @@ export interface FileRoutesByFullPath {
   '/engineer/$projectId/quotation': typeof AuthenticatedEngineerProjectIdQuotationRoute
   '/engineer/$projectId/worksheet': typeof AuthenticatedEngineerProjectIdWorksheetRoute
   '/mini-admin/Admin/analysis': typeof AuthenticatedMiniAdminAdminAnalysisRoute
-  '/mini-admin/Admin/clients': typeof AuthenticatedMiniAdminAdminClientsRoute
   '/mini-admin/Admin/vendors': typeof AuthenticatedMiniAdminAdminVendorsRoute
   '/mini-admin/Engineer/$projectId': typeof AuthenticatedMiniAdminEngineerProjectIdRouteWithChildren
   '/mini-admin/Todo/todo': typeof AuthenticatedMiniAdminTodoTodoRoute
@@ -296,7 +288,6 @@ export interface FileRoutesByTo {
   '/engineer/$projectId/quotation': typeof AuthenticatedEngineerProjectIdQuotationRoute
   '/engineer/$projectId/worksheet': typeof AuthenticatedEngineerProjectIdWorksheetRoute
   '/mini-admin/Admin/analysis': typeof AuthenticatedMiniAdminAdminAnalysisRoute
-  '/mini-admin/Admin/clients': typeof AuthenticatedMiniAdminAdminClientsRoute
   '/mini-admin/Admin/vendors': typeof AuthenticatedMiniAdminAdminVendorsRoute
   '/mini-admin/Engineer/$projectId': typeof AuthenticatedMiniAdminEngineerProjectIdRouteWithChildren
   '/mini-admin/Todo/todo': typeof AuthenticatedMiniAdminTodoTodoRoute
@@ -333,7 +324,6 @@ export interface FileRoutesById {
   '/_authenticated/engineer/$projectId/quotation': typeof AuthenticatedEngineerProjectIdQuotationRoute
   '/_authenticated/engineer/$projectId/worksheet': typeof AuthenticatedEngineerProjectIdWorksheetRoute
   '/_authenticated/mini-admin/Admin/analysis': typeof AuthenticatedMiniAdminAdminAnalysisRoute
-  '/_authenticated/mini-admin/Admin/clients': typeof AuthenticatedMiniAdminAdminClientsRoute
   '/_authenticated/mini-admin/Admin/vendors': typeof AuthenticatedMiniAdminAdminVendorsRoute
   '/_authenticated/mini-admin/Engineer/$projectId': typeof AuthenticatedMiniAdminEngineerProjectIdRouteWithChildren
   '/_authenticated/mini-admin/Todo/todo': typeof AuthenticatedMiniAdminTodoTodoRoute
@@ -370,7 +360,6 @@ export interface FileRouteTypes {
     | '/engineer/$projectId/quotation'
     | '/engineer/$projectId/worksheet'
     | '/mini-admin/Admin/analysis'
-    | '/mini-admin/Admin/clients'
     | '/mini-admin/Admin/vendors'
     | '/mini-admin/Engineer/$projectId'
     | '/mini-admin/Todo/todo'
@@ -405,7 +394,6 @@ export interface FileRouteTypes {
     | '/engineer/$projectId/quotation'
     | '/engineer/$projectId/worksheet'
     | '/mini-admin/Admin/analysis'
-    | '/mini-admin/Admin/clients'
     | '/mini-admin/Admin/vendors'
     | '/mini-admin/Engineer/$projectId'
     | '/mini-admin/Todo/todo'
@@ -441,7 +429,6 @@ export interface FileRouteTypes {
     | '/_authenticated/engineer/$projectId/quotation'
     | '/_authenticated/engineer/$projectId/worksheet'
     | '/_authenticated/mini-admin/Admin/analysis'
-    | '/_authenticated/mini-admin/Admin/clients'
     | '/_authenticated/mini-admin/Admin/vendors'
     | '/_authenticated/mini-admin/Engineer/$projectId'
     | '/_authenticated/mini-admin/Todo/todo'
@@ -598,13 +585,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMiniAdminAdminVendorsRouteImport
       parentRoute: typeof AuthenticatedMiniAdminRouteRoute
     }
-    '/_authenticated/mini-admin/Admin/clients': {
-      id: '/_authenticated/mini-admin/Admin/clients'
-      path: '/Admin/clients'
-      fullPath: '/mini-admin/Admin/clients'
-      preLoaderRoute: typeof AuthenticatedMiniAdminAdminClientsRouteImport
-      parentRoute: typeof AuthenticatedMiniAdminRouteRoute
-    }
     '/_authenticated/mini-admin/Admin/analysis': {
       id: '/_authenticated/mini-admin/Admin/analysis'
       path: '/Admin/analysis'
@@ -735,7 +715,6 @@ const AuthenticatedMiniAdminEngineerProjectIdRouteWithChildren =
 
 interface AuthenticatedMiniAdminRouteRouteChildren {
   AuthenticatedMiniAdminAdminAnalysisRoute: typeof AuthenticatedMiniAdminAdminAnalysisRoute
-  AuthenticatedMiniAdminAdminClientsRoute: typeof AuthenticatedMiniAdminAdminClientsRoute
   AuthenticatedMiniAdminAdminVendorsRoute: typeof AuthenticatedMiniAdminAdminVendorsRoute
   AuthenticatedMiniAdminEngineerProjectIdRoute: typeof AuthenticatedMiniAdminEngineerProjectIdRouteWithChildren
   AuthenticatedMiniAdminTodoTodoRoute: typeof AuthenticatedMiniAdminTodoTodoRoute
@@ -750,8 +729,6 @@ const AuthenticatedMiniAdminRouteRouteChildren: AuthenticatedMiniAdminRouteRoute
   {
     AuthenticatedMiniAdminAdminAnalysisRoute:
       AuthenticatedMiniAdminAdminAnalysisRoute,
-    AuthenticatedMiniAdminAdminClientsRoute:
-      AuthenticatedMiniAdminAdminClientsRoute,
     AuthenticatedMiniAdminAdminVendorsRoute:
       AuthenticatedMiniAdminAdminVendorsRoute,
     AuthenticatedMiniAdminEngineerProjectIdRoute:
