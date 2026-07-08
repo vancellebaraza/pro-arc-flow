@@ -11,11 +11,17 @@ export const Route = createFileRoute("/_authenticated/client/")({
 
 interface Project {
   id: string;
+  client_id: string;
   title: string;
   service: string;
   status: string;
   location: string | null;
   created_at: string;
+    profiles?: {
+    full_name: string | null;
+    phone: string | null;
+    company: string | null;
+  };
 }
 
 function ClientHome() {
@@ -23,14 +29,53 @@ function ClientHome() {
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     (async () => {
-      const { data: u } = await supabase.auth.getUser();
-      if (!u.user) return;
-      const { data } = await supabase
+      // const { data: u } = await supabase.auth.getUser();
+      // if (!u.user) return;
+
+      setLoading(true)
+      const { data:projectsData, error:projectsError } = await supabase
         .from("projects")
-        .select("id,title,service,status,location,created_at")
-        .eq("client_id", u.user.id)
+        .select("id,client_id,title,service,status,location,created_at")
         .order("created_at", { ascending: false });
-      setProjects((data ?? []) as Project[]);
+
+        if (projectsError) {
+        console.error(projectsError);
+        setLoading(false);
+        return;
+      }
+
+      if (!projectsData) {
+        setProjects([]);
+        setLoading(false);
+        return;
+      }
+
+      // Get unique client ids
+      const clientIds = [
+        ...new Set(projectsData.map((p) => p.client_id)),
+      ];
+
+      // Fetch matching profiles
+      const { data: profilesData, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id, full_name, phone, company")
+        .in("id", clientIds);
+
+      if (profilesError) {
+        console.error(profilesError);
+      }
+
+      // Create lookup object
+      const profileMap = new Map(
+        (profilesData ?? []).map((profile) => [profile.id, profile])
+      );
+
+      // Merge profiles into projects
+      const mergedProjects = projectsData.map((project) => ({
+        ...project,
+        profiles: profileMap.get(project.client_id),
+      }));
+      setProjects((mergedProjects as Project[]));
       setLoading(false);
     })();
   }, []);
@@ -86,6 +131,9 @@ function ClientHome() {
                         </span>
                       </div>
                       <div className="mt-1 font-medium truncate">{p.title}</div>
+                      <div className="text-sm text-muted-foreground">
+                        Client: {p.profiles?.full_name ?? "Unknown"}
+                      </div>
                       <div className="text-xs text-muted-foreground truncate">
                         Location:{p.location ?? "—"}
                       </div>
