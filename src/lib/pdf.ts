@@ -3,7 +3,7 @@ import autoTable from "jspdf-autotable";
 import { BANK_DETAILS } from "./services";
 
 const BRAND = [218, 31, 38] as const;
-const whatsappLogoUrl = new URL("/WhatsApp Image 2026-07-04 at 09.55.16 (1).jpeg", import.meta.url).href;
+const whatsappLogoUrl = "/WhatsApp Image 2026-07-04 at 09.55.16 (1).jpeg";
 
 function getImageTypeFromDataUrl(dataUrl: string) {
   const match = /^data:image\/(png|jpeg|jpg|webp|bmp)(?:;[^,]*)?,/.exec(dataUrl);
