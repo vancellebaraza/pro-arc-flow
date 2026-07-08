@@ -218,8 +218,8 @@ function WorksheetPage() {
   }
 
   async function exportPdf() {
+    const doc = new jsPDF();
     try {
-      const doc = new jsPDF();
       await generateWorksheetPdf(doc, {
         clientName,
         jobNo,
