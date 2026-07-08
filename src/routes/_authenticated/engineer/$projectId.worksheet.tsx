@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { jsPDF } from "jspdf";
+
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Json } from "@/integrations/supabase/types";
@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { generateWorksheetPdf } from "@/lib/pdf";
 import { toast } from "sonner";
+import { jsPDF } from "jspdf";
 import { ArrowLeft, Plus, Trash2, Save, FileDown, UploadCloud, MessageCircle } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/engineer/$projectId/worksheet")({
@@ -219,8 +220,9 @@ function WorksheetPage() {
 
   async function exportPdf() {
     const doc = new jsPDF();
+    
     try {
-      await generateWorksheetPdf(doc, {
+      await generateWorksheetPdf(doc,{
         clientName,
         jobNo,
         jobLocation,
@@ -237,6 +239,7 @@ function WorksheetPage() {
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to generate PDF");
     }
+     doc.save(`worksheet.pdf`);
   }
 
   return (

@@ -38,6 +38,7 @@ function AuthedLayout() {
   const { primaryRole, loading } = useMyRoles();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isMiniAdminPage = pathname.startsWith("/mini-admin");
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   const links =
@@ -49,7 +50,6 @@ function AuthedLayout() {
           { to: "/admin/todos", label: "Staff To Do", icon: Calendar },
           { to: "/engineer", label: "Engineer view", icon: Wrench },
           { to: "/client", label: "Client view", icon: ClipboardPlus },
-          { to: "/mini-admin", label: "Mini Admin", icon: ShieldCheck },
         ]
       : primaryRole === "mini_admin"
         ? [{ to: "/mini-admin", label: "Mini Admin", icon: ShieldCheck }]
@@ -62,40 +62,50 @@ function AuthedLayout() {
 
   return (
     <div className="min-h-screen flex w-full bg-background">
-      <aside className="hidden md:flex w-60 shrink-0 flex-col border-r surface">
-        <div className="h-16 flex items-center px-5 border-b">
-          <Link to="/">
-            <Logo className="h-7 w-auto" />
-          </Link>
-        </div>
-        <nav className="flex-1 p-3 space-y-1">
-          {links.map((l) => {
-            const active = pathname === l.to || pathname.startsWith(l.to + "/");
-            return (
-              <Link
-                key={l.to}
-                to={l.to}
-                className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition ${active ? "bg-primary text-primary-foreground" : "hover:bg-accent text-foreground"}`}
-              >
-                <l.icon className="h-4 w-4" /> {l.label}
-              </Link>
-            );
-          })}
-        </nav>
-        <div className="p-3 border-t">
-          <Button
-            variant="ghost"
-            className="w-full justify-start"
-            onClick={() => signOutClean(navigate)}
+{!isMiniAdminPage && (
+  <aside className="hidden md:flex w-60 shrink-0 flex-col border-r surface">
+    <div className="h-16 flex items-center px-5 border-b">
+      <Link to="/">
+        <Logo className="h-7 w-auto" />
+      </Link>
+    </div>
+
+    <nav className="flex-1 p-3 space-y-1">
+      {links.map((l) => {
+        const active = pathname === l.to || pathname.startsWith(l.to + "/");
+
+        return (
+          <Link
+            key={l.to}
+            to={l.to}
+            className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition ${
+              active
+                ? "bg-primary text-primary-foreground"
+                : "hover:bg-accent text-foreground"
+            }`}
           >
-            <LogOut className="h-4 w-4 mr-2" />
-            Sign out
-          </Button>
-        </div>
-      </aside>
+            <l.icon className="h-4 w-4" />
+            {l.label}
+          </Link>
+        );
+      })}
+    </nav>
+
+    <div className="p-3 border-t">
+      <Button
+        variant="ghost"
+        className="w-full justify-start"
+        onClick={() => signOutClean(navigate)}
+      >
+        <LogOut className="h-4 w-4 mr-2" />
+        Sign out
+      </Button>
+    </div>
+  </aside>
+)}
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="md:hidden h-14 border-b flex items-center justify-between px-4">
+        {!isMiniAdminPage &&(<header className="md:hidden h-14 border-b flex items-center justify-between px-4">
           <Logo className="h-6 w-auto" />
           <div className="relative">
             <Button variant="ghost" size="sm" onClick={() => setMobileNavOpen((v) => !v)}>
@@ -127,7 +137,7 @@ function AuthedLayout() {
               </div>
             )}
           </div>
-        </header>
+        </header>)}
         <main className="flex-1 min-w-0">
           {loading ? <div className="p-8 text-sm text-muted-foreground">Loading…</div> : <Outlet />}
         </main>

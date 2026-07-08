@@ -206,9 +206,10 @@ function QuotationPage() {
   }
 
   async function exportPdf() {
+    const doc = new jsPDF();
     try {
       const doc = new jsPDF();
-      await generateQuotationPdf(doc, {
+      await generateQuotationPdf(doc,{
         projectTitle,
         service: SERVICES.find((s) => s.key === projectService)?.label ?? projectService,
         location: projectLocation,
@@ -234,6 +235,7 @@ function QuotationPage() {
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to generate PDF");
     }
+    doc.save(`${projectTitle}-Quotation.pdf`);
   }
 
   return (

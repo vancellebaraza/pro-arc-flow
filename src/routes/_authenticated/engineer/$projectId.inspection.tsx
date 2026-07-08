@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { jsPDF } from "jspdf";
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Json } from "@/integrations/supabase/types";
@@ -10,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { SERVICES } from "@/lib/services";
 import { generateInspectionPdf } from "@/lib/pdf";
 import { toast } from "sonner";
+import { jsPDF } from "jspdf";
 import { ArrowLeft, Plus, Trash2, Save, FileDown, UploadCloud } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/engineer/$projectId/inspection")({
@@ -163,13 +163,14 @@ function InspectionPage() {
   }
 
   async function exportPdf() {
+    console.log("Photos state:", photos);
     console.log("Exporting inspection PDF with photoEvidence:", JSON.stringify(photos, null, 2));
     console.log(
       "Exporting inspection PDF photoEvidence summary:",
       photos.map((p) => ({ before: p.before?.slice(0, 80), during: p.during?.slice(0, 80), after: p.after?.slice(0, 80) })),
     );
     const doc = new jsPDF();
-    await generateInspectionPdf(doc, {
+    await generateInspectionPdf(doc,{
       workCategory: SERVICES.find((s) => s.key === workCategory)?.label ?? workCategory,
       projectName: projectTitle,
       clientName,
@@ -184,8 +185,9 @@ function InspectionPage() {
         inspector_name: sigInspector,
         technician_name: sigTechnician,
       },
+      
     });
-    doc.save(`Inspection-${projectTitle.replace(/\W+/g, "_")}-${Date.now()}.pdf`);
+    doc.save(`${projectTitle}-Inspection-Report.pdf`);
   }
 
   return (

@@ -316,33 +316,40 @@ export async function generateInspectionPdf(doc:jsPDF,input: InspectionPdfInput)
     console.log(
       "generateInspectionPdf converted photo data:",
       photosData.map((p) => ({ before: p.before ? p.before.length : 0, during: p.during ? p.during.length : 0, after: p.after ? p.after.length : 0 })),
-    );
+    ); 
 
     autoTable(doc, {
       startY: fy,
       head: [["Before", "During", "After"]],
-      body: photosData.map(() => ["", "", ""]),
-      styles: { fontSize: 9, halign: "center", valign: "middle", minCellHeight: 42 },
-      headStyles: { fillColor: BRAND, textColor: 255, halign: "center" },
+      body: photosData.map(() => [ "",  "", ""]),
+      styles: { fontSize: 9, halign: "center", valign: "middle",minCellHeight: 45 },
+      headStyles: { fillColor: BRAND, textColor: 255, halign: "center" ,minCellHeight: 10 },
       columnStyles: { 0: { cellWidth: 60 }, 1: { cellWidth: 60 }, 2: { cellWidth: 60 } },
       didDrawCell: (data: any) => {
-        if (data.section !== "body") return;
-        const photo = photosData[data.row.index];
-        if (!photo) return;
-        const key = data.column.index === 0 ? "before" : data.column.index === 1 ? "during" : "after";
-        const raw = photo[key as keyof typeof photo];
-        if (typeof raw !== "string" || !raw.startsWith("data:image")) return;
+    if (data.section !== "body") return;
 
-        const x = data.cell.x + 2;
-        const yCell = data.cell.y + 2;
-        const w = Math.max(0, data.cell.width - 4);
-        const h = Math.max(0, data.cell.height - 4);
-        try {
-          doc.addImage(raw, getImageTypeFromDataUrl(raw), x, yCell, w, h);
-        } catch (error) {
-          console.error("Failed to draw image in PDF cell:", error);
-        }
-      },
+    const field = ["before", "during", "after"][data.column.index] as
+      | "before"
+      | "during"
+      | "after";
+
+    const img = photosData[data.row.index]?.[field];
+
+    if (!img) return;
+
+    try {
+      doc.addImage(
+        img,
+        getImageTypeFromDataUrl(img),
+        data.cell.x + 2,
+        data.cell.y + 2,
+        data.cell.width - 4,
+        data.cell.height - 4
+      );
+    } catch (err) {
+      console.error("Failed to draw image:", err);
+    }
+  },
     });
     fy = getY(doc) + 6;
   }
@@ -490,18 +497,22 @@ const centerX = pageWidth / 2;
 const centerY = pageHeight / 2;
 
 // Vertical spacing
-const titleY = centerY - 12;
-const locationY = centerY + 2;
-const serviceY = centerY + 12;
+const titleY = centerY - 25;
+const projecttitleY=centerY- 8;
+const locationY = centerY + 8;
+const serviceY = centerY + 20;
 
 doc.setFont("helvetica", "bold");
 doc.setFontSize(40);
-doc.text(project.title, centerX, titleY, {
+doc.text("Overall Project Report", centerX, titleY, {
   align: "center",
 });
 
 doc.setFont("helvetica", "normal");
 doc.setFontSize(16);
+doc.text(`Project Title: ${project.title}`, centerX, projecttitleY, {
+  align: "center",
+});
 doc.text(`Location: ${project.location ?? "-"}`, centerX, locationY, {
   align: "center",
 });
@@ -509,6 +520,7 @@ doc.text(`Location: ${project.location ?? "-"}`, centerX, locationY, {
 doc.text(`Service: ${project.service}`, centerX, serviceY, {
   align: "center",
 });
+
 
     //
     // Quotation
