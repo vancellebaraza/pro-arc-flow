@@ -19,7 +19,7 @@ import autoTable from "jspdf-autotable";
 import { toast } from "sonner";
 import { FileDown, Check, Calendar } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/mini-admin/")({
+export const Route = createFileRoute("/_authenticated/mini-admin/Dashboard/")({
   component: AdminHome,
 });
 

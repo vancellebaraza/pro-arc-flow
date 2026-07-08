@@ -34,7 +34,7 @@ export const Route = createFileRoute("/_authenticated/mini-admin")({
     const hasAccess = (rolesData ?? []).some(
       (role) => role.role === "mini_admin" || role.role === "admin",
     );
-    if (!hasAccess) throw redirect({ to: "/client" });
+    if (!hasAccess) throw redirect({ to: "/mini-admin/Dashboard" });
 
     return { user: userData.user };
   },
@@ -47,7 +47,7 @@ function MiniAdminLayout() {
 
   const links = [
   {
-    to: "/mini-admin",
+    to: "/mini-admin/Dashboard",
     label: "Dashboard",
     icon: LayoutDashboard,
   },

@@ -414,7 +414,7 @@ function AdminAnalysisPage() {
   <div className="flex items-center gap-2">
     <BarChart3 className="h-5 w-5 text-muted-foreground" />
     <h2 className="text-lg font-semibold">
-      Top 10 Most Visited Work Locations
+      Most Visited Work Locations
     </h2>
   </div>
 
