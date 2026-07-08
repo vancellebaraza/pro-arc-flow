@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { generateQuotationPdf } from "@/lib/pdf";
 import { SERVICES, BANK_DETAILS } from "@/lib/services";
 import { toast } from "sonner";
+import { jsPDF } from "jspdf";
 import { ArrowLeft, Plus, Trash2, Save, FileDown, Send } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/mini-admin/Engineer/$projectId/quotation")({
@@ -205,8 +206,9 @@ function QuotationPage() {
   }
 
   async function exportPdf() {
+    const doc = new jsPDF();
     try {
-      await generateQuotationPdf({
+      await generateQuotationPdf(doc,{
         projectTitle,
         service: SERVICES.find((s) => s.key === projectService)?.label ?? projectService,
         location: projectLocation,
@@ -231,6 +233,7 @@ function QuotationPage() {
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to generate PDF");
     }
+    doc.save(`${projectTitle}-Quotation.pdf`);
   }
 
   return (
