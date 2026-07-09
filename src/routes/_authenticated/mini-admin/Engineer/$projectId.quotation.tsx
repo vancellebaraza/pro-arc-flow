@@ -33,6 +33,7 @@ type QuotationStatus =
 
 
 function QuotationPage() {
+   const [vatRate, setVatRate] = useState(16); // Default 16%
   const { projectId } = Route.useParams();
   const [projectTitle, setProjectTitle] = useState("");
   const [projectLocation, setProjectLocation] = useState("");
@@ -75,6 +76,7 @@ function QuotationPage() {
       setStatus(q.status);
       setNotes(q.notes ?? "");
       setLabour(Number(q.labour ?? 0));
+      setVatRate(Number(q.vat_rate ?? 16));
       setQuoteNo(q.quote_no ?? "");
       const meta = (q.meta ?? {}) as {
         bill_to?: string;
@@ -133,8 +135,15 @@ function QuotationPage() {
     );
   }
 
-  const subtotal = items.reduce((s, it) => s + (Number(it.amount) || 0), 0);
-  const grandTotal = subtotal + Number(labour || 0);
+const subtotal = items.reduce((s, it) => s + (Number(it.amount) || 0), 0);
+
+const labourAmount = Number(labour || 0);
+
+const vatableAmount = subtotal + labourAmount;
+
+const vatAmount = vatableAmount * (vatRate / 100);
+
+const grandTotal = vatableAmount + vatAmount;
 
   async function save(newStatus?: "draft" | "sent") {
     setSaving(true);
@@ -151,10 +160,10 @@ function QuotationPage() {
       const payload = {
         project_id: projectId,
         engineer_id: u.user.id,
-        vat_rate: 0,
+        vat_rate: vatRate,
         notes,
         subtotal,
-        vat_amount: 0,
+        vat_amount: vatAmount,
         grand_total: grandTotal,
         labour: Number(labour || 0),
         quote_no: quoteNo,
@@ -227,6 +236,8 @@ function QuotationPage() {
         })),
         labour: Number(labour || 0),
         subtotal,
+        vatAmount,
+        vatRate,
         grandTotal,
         authorisedBy,
         notes,
@@ -380,27 +391,55 @@ function QuotationPage() {
             />
           </div>
         </div>
-        <div className="rounded-lg border bg-surface p-4 self-start space-y-2">
-          <div className="flex items-center gap-2">
-            <Label className="flex-1">Labour (KES)</Label>
-            <Input
-              type="number"
-              step="0.01"
-              value={labour}
-              onChange={(e) => setLabour(Number(e.target.value))}
-              className="w-32 text-right"
-            />
-          </div>
-          <div className="flex justify-between text-sm">
-            <span>Sub-total</span>
-            <strong className="tabular-nums">{subtotal.toFixed(2)}</strong>
-          </div>
-          <div className="flex justify-between text-base">
-            <span>Grand Total (KES)</span>
-            <strong className="tabular-nums">{grandTotal.toFixed(2)}</strong>
-          </div>
-          <div className="text-xs text-muted-foreground capitalize">Status: {status}</div>
-        </div>
+<div className="rounded-lg border bg-surface p-4 self-start space-y-3">
+  <div className="flex items-center gap-2">
+    <Label className="flex-1">Labour (KES)</Label>
+    <Input
+      type="number"
+      step="0.01"
+      value={labour}
+      onChange={(e) => setLabour(Number(e.target.value))}
+      className="w-32 text-right"
+    />
+  </div>
+
+  <div className="flex items-center gap-2">
+    <Label className="flex-1">VAT (%)</Label>
+    <Input
+      type="number"
+      step="0.01"
+      value={vatRate}
+      onChange={(e) => setVatRate(Number(e.target.value))}
+      className="w-32 text-right"
+    />
+  </div>
+
+  <div className="flex justify-between text-sm">
+    <span>Sub-total</span>
+    <strong>{subtotal.toFixed(2)}</strong>
+  </div>
+
+  <div className="flex justify-between text-sm">
+    <span>Labour</span>
+    <strong>{labourAmount.toFixed(2)}</strong>
+  </div>
+
+  <div className="flex justify-between text-sm">
+    <span>VAT ({vatRate}%)</span>
+    <strong>{vatAmount.toFixed(2)}</strong>
+  </div>
+
+  <hr />
+
+  <div className="flex justify-between text-base font-semibold">
+    <span>Grand Total (KES)</span>
+    <strong>{grandTotal.toFixed(2)}</strong>
+  </div>
+
+  <div className="text-xs text-muted-foreground capitalize">
+    Status: {status}
+  </div>
+</div>
       </section>
 
       <section className="mt-8 rounded-lg border bg-card p-5">
