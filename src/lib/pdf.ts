@@ -166,13 +166,29 @@ export async function generateQuotationPdf(doc:jsPDF,q: QuotePdfInput) {
   autoTable(doc, {
     startY: y + 20,
     head: [["Description / Detail", "Unit", "Quantity", "Unit Cost (KES)", "Amount (KES)"]],
-    body: q.items.map((i) => [
-      i.description,
-      i.unit ?? "",
-      String(i.qty),
-      i.unit_cost.toFixed(2),
-      i.amount.toFixed(2),
-    ]),
+    body: q.items.map(i =>
+
+    i.type === "subtitle"
+
+        ? [
+            {
+                content: i.description,
+                colSpan: 5,
+                styles: {
+                    fillColor: [230,230,230],
+                    fontStyle: "bold",
+                },
+            },
+        ]
+
+        : [
+            i.description,
+            i.unit,
+            i.qty,
+            i.unit_cost.toFixed(2),
+            i.amount.toFixed(2),
+        ]
+),
     styles: { fontSize: 9 },
     headStyles: { fillColor: BRAND, textColor: 255 },
     columnStyles: { 2: { halign: "right" }, 3: { halign: "right" }, 4: { halign: "right" } },

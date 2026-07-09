@@ -18,6 +18,7 @@ export const Route = createFileRoute("/_authenticated/mini-admin/Engineer/$proje
 
 interface Item {
   id?: string;
+  type: "item" | "subtitle";
   description: string;
   unit: string;
   qty: number;
@@ -48,7 +49,8 @@ function QuotationPage() {
   const [authorisedBy, setAuthorisedBy] = useState("");
   const [notes, setNotes] = useState("");
   const [items, setItems] = useState<Item[]>([
-    { description: "", unit: "pcs", qty: 1, unit_cost: 0, amount: 0 },
+      {type: "subtitle",description: "Subtitle",unit: "",qty: 0,unit_cost: 0,amount: 0,},
+    { type: "item", description: "", unit: "pcs", qty: 1, unit_cost: 0, amount: 0 },
   ]);
   const [labour, setLabour] = useState(0);
   const [status, setStatus] = useState<String>("draft");
@@ -108,6 +110,7 @@ function QuotationPage() {
         setItems(
           rows.map((r) => ({
             id: r.id,
+            type: r.type ?? "item",
             description: r.description,
             unit: r.unit ?? "",
             qty: Number(r.qty),
@@ -125,6 +128,14 @@ function QuotationPage() {
   }, [load]);
 
   function update(i: number, patch: Partial<Item>) {
+if (next.type === "subtitle") {
+    next.qty = 0;
+    next.unit = "";
+    next.unit_cost = 0;
+    next.amount = 0;
+
+    return next;
+}
     setItems((arr) =>
       arr.map((it, idx) => {
         if (idx !== i) return it;
@@ -135,7 +146,11 @@ function QuotationPage() {
     );
   }
 
-const subtotal = items.reduce((s, it) => s + (Number(it.amount) || 0), 0);
+const subtotal = items.reduce((sum, item) => {
+    if (item.type === "subtitle") return sum;
+
+    return sum + Number(item.amount || 0);
+}, 0);
 
 const labourAmount = Number(labour || 0);
 
@@ -188,6 +203,7 @@ const grandTotal = vatableAmount + vatAmount;
       if (items.length) {
         const rows = items.map((it, idx) => ({
           quotation_id: qid!,
+          type: it.type,
           description: it.description,
           unit: it.unit || null,
           qty: it.qty,
@@ -306,13 +322,33 @@ const grandTotal = vatableAmount + vatAmount;
             onClick={() =>
               setItems((a) => [
                 ...a,
-                { description: "", unit: "pcs", qty: 1, unit_cost: 0, amount: 0 },
+                { type:"item",description: "", unit: "pcs", qty: 1, unit_cost: 0, amount: 0 },
               ])
             }
           >
             <Plus className="h-4 w-4 mr-1" />
             Add row
           </Button>
+          <Button
+    variant="outline"
+    size="sm"
+    onClick={() =>
+        setItems(a => [
+            ...a,
+            {
+                type: "subtitle",
+                description: "",
+                unit: "",
+                qty: 0,
+                unit_cost: 0,
+                amount: 0,
+            },
+        ])
+    }
+>
+  <Plus className="h-4 w-4 mr-1" />
+    Add Subtitle
+</Button>
         </div>
         <div className="mt-3 overflow-x-auto rounded-lg border">
           <table className="w-full text-sm">
@@ -327,7 +363,40 @@ const grandTotal = vatableAmount + vatAmount;
               </tr>
             </thead>
             <tbody>
-              {items.map((it, i) => (
+              {items.map((it, i) => {
+    if (it.type === "subtitle") {
+        return (
+<tr key={i} className="bg-gray-100">
+  <td colSpan={6} className="p-2">
+    <div className="flex items-center gap-2">
+      <Input
+        value={it.description}
+        placeholder="Subtitle"
+        onChange={(e) =>
+          update(i, {
+            description: e.target.value,
+          })
+        }
+        className="font-bold flex-1"
+      />
+
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        onClick={() =>
+          setItems((a) => a.filter((_, j) => j !== i))
+        }
+      >
+        <Trash2 className="h-4 w-4 text-black-500" />
+      </Button>
+    </div>
+  </td>
+</tr>
+        );
+    }
+              
+              return(
                 <tr key={i} className="border-t">
                   <td className="p-1">
                     <Input
@@ -372,7 +441,7 @@ const grandTotal = vatableAmount + vatAmount;
                     </Button>
                   </td>
                 </tr>
-              ))}
+              );})}
             </tbody>
           </table>
         </div>
