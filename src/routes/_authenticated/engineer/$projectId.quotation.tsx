@@ -17,6 +17,7 @@ export const Route = createFileRoute("/_authenticated/engineer/$projectId/quotat
 
 interface Item {
   id?: string;
+  type:"item"| "subtitle"
   description: string;
   unit: string;
   qty: number;
@@ -41,7 +42,14 @@ function QuotationPage() {
   const [authorisedBy, setAuthorisedBy] = useState("");
   const [notes, setNotes] = useState("");
   const [items, setItems] = useState<Item[]>([
-    { description: "", unit: "pcs", qty: 1, unit_cost: 0, amount: 0 },
+     { type: "subtitle",
+    description: "Subtitle",
+    unit: "",
+    qty: 0,
+    unit_cost: 0,
+    amount: 0,
+  },
+    { type:"item",description: "", unit: "pcs", qty: 1, unit_cost: 0, amount: 0 },
   ]);
   const [labour, setLabour] = useState(0);
   const [status, setStatus] = useState<string>("draft");
@@ -90,6 +98,7 @@ function QuotationPage() {
         .order("sort_order");
       const rows = (it ?? []) as Array<{
         id: string;
+        // type: "item" | "subtitle";
         description: string;
         unit: string | null;
         qty: number;
@@ -101,6 +110,7 @@ function QuotationPage() {
         setItems(
           rows.map((r) => ({
             id: r.id,
+            type: r.type??"item",
             description: r.description,
             unit: r.unit ?? "",
             qty: Number(r.qty),
@@ -130,8 +140,11 @@ function QuotationPage() {
 
   // const subtotal = items.reduce((s, it) => s + (Number(it.amount) || 0), 0);
   // const grandTotal = subtotal + Number(labour || 0);
-  const subtotal = items.reduce((s, it) => s + (Number(it.amount) || 0), 0);
+const subtotal = items.reduce((sum, item) => {
+    if (item.type === "subtitle") return sum;
 
+    return sum + Number(item.amount || 0);
+}, 0);
 const labourAmount = Number(labour || 0);
 
 const vatableAmount = subtotal + labourAmount;
@@ -183,6 +196,7 @@ const grandTotal = vatableAmount + vatAmount;
       if (items.length) {
         const rows = items.map((it, idx) => ({
           quotation_id: qid!,
+          type: it.type ,
           description: it.description,
           unit: it.unit || null,
           qty: it.qty,
@@ -224,6 +238,7 @@ const grandTotal = vatableAmount + vatAmount;
         forText,
         items: items.map((i) => ({
           description: i.description,
+          type:i.type,
           unit: i.unit,
           qty: i.qty,
           unit_cost: i.unit_cost,
@@ -241,7 +256,7 @@ const grandTotal = vatableAmount + vatAmount;
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to generate PDF");
     }
-     doc.save(`${projectTitle}-Quotation-Report.pdf`);
+     
   }
 
   return (
@@ -301,13 +316,33 @@ const grandTotal = vatableAmount + vatAmount;
             onClick={() =>
               setItems((a) => [
                 ...a,
-                { description: "", unit: "pcs", qty: 1, unit_cost: 0, amount: 0 },
+                { type:"item",description: "", unit: "pcs", qty: 1, unit_cost: 0, amount: 0 },
               ])
             }
           >
             <Plus className="h-4 w-4 mr-1" />
             Add row
           </Button>
+          <Button
+  variant="outline"
+  size="sm"
+  onClick={() =>
+    setItems((a) => [
+      ...a,
+      {
+        type: "subtitle",
+        description: "",
+        unit: "",
+        qty: 0,
+        unit_cost: 0,
+        amount: 0,
+      },
+    ])
+  }
+>
+  <Plus className="h-4 w-4 mr-1" />
+  Add Subtitle
+</Button>
         </div>
         <div className="mt-3 overflow-x-auto rounded-lg border">
           <table className="w-full text-sm">
@@ -322,52 +357,96 @@ const grandTotal = vatableAmount + vatAmount;
               </tr>
             </thead>
             <tbody>
-              {items.map((it, i) => (
-                <tr key={i} className="border-t">
-                  <td className="p-1">
-                    <Input
-                      value={it.description}
-                      onChange={(e) => update(i, { description: e.target.value })}
-                      placeholder="Item"
-                    />
-                  </td>
-                  <td className="p-1">
-                    <Input
-                      value={it.unit}
-                      onChange={(e) => update(i, { unit: e.target.value })}
-                      placeholder="pcs / m / hr"
-                    />
-                  </td>
-                  <td className="p-1">
-                    <Input
-                      type="number"
-                      value={it.qty}
-                      onChange={(e) => update(i, { qty: Number(e.target.value) })}
-                      className="text-right"
-                    />
-                  </td>
-                  <td className="p-1">
-                    <Input
-                      type="number"
-                      step="0.01"
-                      value={it.unit_cost}
-                      onChange={(e) => update(i, { unit_cost: Number(e.target.value) })}
-                      className="text-right"
-                    />
-                  </td>
-                  <td className="p-2 text-right tabular-nums">{it.amount.toFixed(2)}</td>
-                  <td className="p-1">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setItems((a) => a.filter((_, j) => j !== i))}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </td>
-                </tr>
-              ))}
+{items.map((it, i) => {
+  if (it.type === "subtitle") {
+    return (
+      <tr key={i} className="bg-gray-100">
+        <td colSpan={6} className="p-2">
+          <div className="flex items-center gap-2">
+            <Input
+              value={it.description}
+              placeholder="Subtitle"
+              onChange={(e) =>
+                update(i, {
+                  description: e.target.value,
+                })
+              }
+              className="font-bold flex-1"
+            />
+
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() =>
+                setItems((a) => a.filter((_, j) => j !== i))
+              }
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        </td>
+      </tr>
+    );
+  }
+
+  return (
+    <tr key={i} className="border-t">
+      <td className="p-1">
+        <Input
+          value={it.description}
+          onChange={(e) => update(i, { description: e.target.value })}
+          placeholder="Item"
+        />
+      </td>
+
+      <td className="p-1">
+        <Input
+          value={it.unit}
+          onChange={(e) => update(i, { unit: e.target.value })}
+        />
+      </td>
+
+      <td className="p-1">
+        <Input
+          type="number"
+          value={it.qty}
+          onChange={(e) => update(i, { qty: Number(e.target.value) })}
+          className="text-right"
+        />
+      </td>
+
+      <td className="p-1">
+        <Input
+          type="number"
+          step="0.01"
+          value={it.unit_cost}
+          onChange={(e) =>
+            update(i, { unit_cost: Number(e.target.value) })
+          }
+          className="text-right"
+        />
+      </td>
+
+      <td className="p-2 text-right tabular-nums">
+        {it.amount.toFixed(2)}
+      </td>
+
+      <td className="p-1">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={() =>
+            setItems((a) => a.filter((_, j) => j !== i))
+          }
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      </td>
+    </tr>
+  );
+})}
             </tbody>
           </table>
         </div>

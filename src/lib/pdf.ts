@@ -124,6 +124,7 @@ function getY(doc: jsPDF) {
 
 // ---------------- QUOTATION ----------------
 export interface QuoteItem {
+  type: "item" | "subtitle";
   description: string;
   unit?: string | null;
   qty: number;
@@ -166,41 +167,54 @@ export async function generateQuotationPdf(doc:jsPDF,q: QuotePdfInput) {
   autoTable(doc, {
     startY: y + 20,
     head: [["Description / Detail", "Unit", "Quantity", "Unit Cost (KES)", "Amount (KES)"]],
-    body: q.items.map(i =>
+    body: q.items.map((i) => {
+  if (i.type === "subtitle") {
+    return [
+      {
+        content: i.description,
+        colSpan: 5,
+        styles: {
+          // fillColor: [235, 235, 235],
+          textColor: [30, 30, 30],
+          fontStyle: "bold",
+          halign: "center",
+          valign: "middle",
+          fontSize: 10,
+        },
+      },
+    ];
+  }
 
-    i.type === "subtitle"
+  return [
+    i.description,
+    i.unit ?? "",
+    String(i.qty),
+    i.unit_cost.toFixed(2),
+    i.amount.toFixed(2),
+  ];
+}),
+theme: "grid",
 
-        ? [
-            {
-                content: i.description,
-                colSpan: 5,
-                styles: {
-                    fillColor: [230,230,230],
-                    fontStyle: "bold",
-                },
-            },
-        ]
-
-        : [
-            i.description,
-            i.unit,
-            i.qty,
-            i.unit_cost.toFixed(2),
-            i.amount.toFixed(2),
-        ]
-),
-    styles: { fontSize: 9 },
-    headStyles: { fillColor: BRAND, textColor: 255 },
-    columnStyles: { 2: { halign: "right" }, 3: { halign: "right" }, 4: { halign: "right" } },
+    styles: { fontSize: 9 , cellPadding: 3,lineColor: [220, 220, 220],linewidth:0.2,valign:"middle"},
+    
+    headStyles: { fillColor: BRAND, textColor: 255 ,fontstyle:"bold",halign:"center"},
+    columnStyles: { 0:{cellWidth:82},1:{cellwidth:22,halign:"center"},2: { cellwidth:24,halign: "right" }, 3: { cellwidth:32,halign: "right" }, 4: { cellwidth:30,halign: "right" } },
+      alternateRowStyles: {
+    fillColor: [252, 252, 252],
+  },
   });
 
-  let fy = getY(doc) + 6;
+  let fy = getY(doc) + 8;
   doc.setFontSize(10);
   doc.text(`Labour: KES ${q.labour.toFixed(2)}`, 200, fy, { align: "right" });
-  doc.text(`Sub-total: KES ${q.subtotal.toFixed(2)}`, 200, fy + 6, { align: "right" });
-  doc.text(`VAT (${q.vatRate}%): KES ${q.vatAmount.toFixed(2)}`,200,fy + 12,{ align: "right" });
+  doc.text(`Sub-total: KES ${q.subtotal.toFixed(2)}`, 200, fy + 7, { align: "right" });
+  doc.text(`VAT (${q.vatRate}%): KES ${q.vatAmount.toFixed(2)}`,200,fy + 14,{ align: "right" });
   doc.setFontSize(12);
-  doc.text(`Grand Total: KES ${q.grandTotal.toFixed(2)}`, 200, fy + 20, { align: "right" });
+  doc.setFont("helvetica", "bold");
+  doc.text(`Grand Total: KES ${q.grandTotal.toFixed(2)}`, 200, fy + 26, { align: "right" });
+  doc.setFont("helvetica", "normal");
+
+
 
   fy += 24;
   doc.setFontSize(10);

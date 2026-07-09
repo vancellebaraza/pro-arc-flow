@@ -244,6 +244,7 @@ const grandTotal = vatableAmount + vatAmount;
         to: recipient,
         forText,
         items: items.map((i) => ({
+          type: i.type,
           description: i.description,
           unit: i.unit,
           qty: i.qty,
@@ -262,7 +263,7 @@ const grandTotal = vatableAmount + vatAmount;
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to generate PDF");
     }
-    doc.save(`${projectTitle}-Quotation.pdf`);
+    
   }
 
   return (

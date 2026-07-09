@@ -239,7 +239,7 @@ function WorksheetPage() {
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to generate PDF");
     }
-     doc.save(`worksheet.pdf`);
+    
   }
 
   return (
