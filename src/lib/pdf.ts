@@ -131,6 +131,8 @@ export interface QuoteItem {
   amount: number;
 }
 export interface QuotePdfInput {
+  vatRate: number;
+  vatAmount: number;
   projectTitle: string;
   service: string;
   location?: string | null;
@@ -180,8 +182,9 @@ export async function generateQuotationPdf(doc:jsPDF,q: QuotePdfInput) {
   doc.setFontSize(10);
   doc.text(`Labour: KES ${q.labour.toFixed(2)}`, 200, fy, { align: "right" });
   doc.text(`Sub-total: KES ${q.subtotal.toFixed(2)}`, 200, fy + 6, { align: "right" });
+  doc.text(`VAT (${q.vatRate}%): KES ${q.vatAmount.toFixed(2)}`,200,fy + 12,{ align: "right" });
   doc.setFontSize(12);
-  doc.text(`Grand Total: KES ${q.grandTotal.toFixed(2)}`, 200, fy + 14, { align: "right" });
+  doc.text(`Grand Total: KES ${q.grandTotal.toFixed(2)}`, 200, fy + 20, { align: "right" });
 
   fy += 24;
   doc.setFontSize(10);
