@@ -2,7 +2,7 @@ import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { BANK_DETAILS } from "./services";
 
-const BRAND = [218, 31, 38] as const;
+const BRAND: [number, number, number] = [218, 31, 38];
 const logoUrl = "/pdf-header-logo.jpeg";
 
 function getImageTypeFromDataUrl(dataUrl: string) {
@@ -195,10 +195,10 @@ export async function generateQuotationPdf(doc:jsPDF,q: QuotePdfInput) {
 }),
 theme: "grid",
 
-    styles: { fontSize: 9 , cellPadding: 3,lineColor: [220, 220, 220],linewidth:0.2,valign:"middle"},
-    
-    headStyles: { fillColor: BRAND, textColor: 255 ,fontstyle:"bold",halign:"center"},
-    columnStyles: { 0:{cellWidth:82},1:{cellwidth:22,halign:"center"},2: { cellwidth:24,halign: "right" }, 3: { cellwidth:32,halign: "right" }, 4: { cellwidth:30,halign: "right" } },
+    styles: { fontSize: 9, cellPadding: 3, lineColor: [220, 220, 220], lineWidth: 0.2, valign: "middle" },
+
+    headStyles: { fillColor: BRAND, textColor: 255, fontStyle: "bold", halign: "center" },
+    columnStyles: { 0: { cellWidth: 82 }, 1: { cellWidth: 22, halign: "center" }, 2: { cellWidth: 24, halign: "right" }, 3: { cellWidth: 32, halign: "right" }, 4: { cellWidth: 30, halign: "right" } },
       alternateRowStyles: {
     fillColor: [252, 252, 252],
   },
