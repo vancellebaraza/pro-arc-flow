@@ -3,7 +3,7 @@ import autoTable from "jspdf-autotable";
 import { BANK_DETAILS } from "./services";
 
 const BRAND = [218, 31, 38] as const;
-const whatsappLogoUrl = "/WhatsApp Image 2026-07-04 at 09.55.16 (1).jpeg";
+const logoUrl = "/pdf-header-logo.jpeg";
 
 function getImageTypeFromDataUrl(dataUrl: string) {
   const match = /^data:image\/(png|jpeg|jpg|webp|bmp)(?:;[^,]*)?,/.exec(dataUrl);
@@ -89,7 +89,7 @@ async function header(doc: jsPDF, title: string, subtitle?: string) {
 
   try {
     if (typeof window !== "undefined") {
-      const logoData = await urlToDataUrl(whatsappLogoUrl);
+      const logoData = await urlToDataUrl(logoUrl);
       if (logoData) {
         doc.addImage(logoData, getImageTypeFromDataUrl(logoData), 14, 6.4, 70, 18);
       }
