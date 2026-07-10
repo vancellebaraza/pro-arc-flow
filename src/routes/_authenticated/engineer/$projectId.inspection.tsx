@@ -76,17 +76,8 @@ function InspectionPage() {
     const { error: uploadError } = await supabase.storage.from("project-images").upload(path, file);
     if (uploadError) throw uploadError;
 
-    const { data: signed, error: signedError } = await supabase.storage
-      .from("project-images")
-      .createSignedUrl(path, 60 * 60 * 24 * 365);
-    if (signedError) throw signedError;
-    if (!signed?.signedUrl) {
-      console.error("uploadImage failed to create signed URL", { path, signed });
-      throw new Error("Failed to create signed URL for uploaded image");
-    }
-
-    console.log("uploadImage signed URL created", { path, signedUrl: signed.signedUrl });
-    return signed.signedUrl;
+    const { data } = supabase.storage.from("project-images").getPublicUrl(path);
+    return data.publicUrl;
   }
 
   async function pickFile(field: keyof PhotoRow, idx: number) {
