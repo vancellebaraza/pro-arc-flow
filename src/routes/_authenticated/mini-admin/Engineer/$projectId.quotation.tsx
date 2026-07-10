@@ -128,18 +128,17 @@ function QuotationPage() {
   }, [load]);
 
   function update(i: number, patch: Partial<Item>) {
-if (next.type === "subtitle") {
-    next.qty = 0;
-    next.unit = "";
-    next.unit_cost = 0;
-    next.amount = 0;
-
-    return next;
-}
     setItems((arr) =>
       arr.map((it, idx) => {
         if (idx !== i) return it;
         const next = { ...it, ...patch };
+        if (next.type === "subtitle") {
+          next.qty = 0;
+          next.unit = "";
+          next.unit_cost = 0;
+          next.amount = 0;
+          return next;
+        }
         next.amount = Number(next.qty) * Number(next.unit_cost) || 0;
         return next;
       }),
