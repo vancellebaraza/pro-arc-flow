@@ -247,6 +247,8 @@ function AdminHome() {
   function exportPdf() {
     const doc = new jsPDF();
     const date = new Date().toISOString().slice(0, 10);
+
+    
     doc.setFontSize(16);
     doc.text("FusionPro Work Data Sheet", 14, 20);
     doc.setFontSize(9);
