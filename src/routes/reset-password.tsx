@@ -4,6 +4,7 @@ import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/PasswordInput";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
@@ -69,11 +70,11 @@ function ResetPasswordPage() {
         <form onSubmit={updatePassword} className="space-y-4">
           <div>
             <Label htmlFor="password">New password</Label>
-            <Input id="password" name="password" type="password" required minLength={6} />
+            <PasswordInput id="password" name="password" required minLength={6} />
           </div>
           <div>
             <Label htmlFor="confirm">Confirm password</Label>
-            <Input id="confirm" name="confirm" type="password" required minLength={6} />
+            <PasswordInput id="confirm" name="confirm" required minLength={6} />
           </div>
           <Button type="submit" disabled={loading} className="w-full">
             {loading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}Update password

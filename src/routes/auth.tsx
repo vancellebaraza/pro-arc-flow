@@ -5,6 +5,7 @@ import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/PasswordInput";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
@@ -153,7 +154,7 @@ function AuthPage() {
                 </div>
                 <div>
                   <Label htmlFor="password">Password</Label>
-                  <Input id="password" name="password" type="password" required minLength={6} />
+                  <PasswordInput id="password" name="password" required minLength={6} />
                 </div>
                 <Button type="submit" disabled={loading} className="w-full">
                   {loading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}Sign in
@@ -212,7 +213,7 @@ function AuthPage() {
                 </div>
                 <div>
                   <Label htmlFor="password2">Password</Label>
-                  <Input id="password2" name="password" type="password" required minLength={6} />
+                  <PasswordInput id="password2" name="password" required minLength={6} />
                 </div>
                 <Button type="submit" disabled={loading} className="w-full">
                   {loading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}Create client
