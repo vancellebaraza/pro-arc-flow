@@ -97,9 +97,9 @@ function MiniAdminLayout() {
   return (
     <div className="flex min-h-screen bg-background">
       {/* Sidebar */}
-      <aside className="w-64 border-r bg-card shadow-sm flex flex-col">
+    <aside className="w-20 sm:w-24 md:w-56 lg:w-64 border-r bg-card shadow-sm flex flex-col transition-all duration-300">
         <div className="h-16 flex items-center px-6 border-b">
-          <h1 className="text-xl font-bold">
+          <h1 className="hidden md:block text-xl font-bold">
             Mini Admin
           </h1>
         </div>
@@ -114,14 +114,14 @@ function MiniAdminLayout() {
               <Link
                 key={link.to}
                 to={link.to}
-                className={`flex items-center gap-3 rounded-lg px-4 py-3 transition-all ${
+                className={`flex items-center justify-center md:justify-start gap-3 px-3 md:px-4 py-3 rounded-lg transition-all ${
                   active
                     ? "bg-primary text-primary-foreground"
                     : "hover:bg-accent"
                 }`}
               >
                 <link.icon className="h-5 w-5" />
-                {link.label}
+                <span className="hidden md:inline">{link.label}</span>
               </Link>
             );
           })}
@@ -129,11 +129,11 @@ function MiniAdminLayout() {
         <div className="border-t p-4">
   <Button
     variant="ghost"
-    className="w-full justify-start"
+    className="w-full justify-center md:justify-start"
     onClick={handleSignOut}
   >
     <LogOut className="mr-2 h-5 w-5" />
-    Sign Out
+   <span className="hidden md:inline">Sign Out</span>
   </Button>
 </div>
       </aside>
