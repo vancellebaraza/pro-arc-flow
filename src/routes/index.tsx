@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SERVICES } from "@/lib/services";
 import { Logo } from "@/components/Logo";
 import { ArrowRight, ShieldCheck, ClipboardList, BarChart3 } from "lucide-react";
+import Footer from "@/components/ui/footer";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -145,17 +146,7 @@ function Landing() {
         </div>
       </section>
 
-      <footer className="border-t">
-        <div className="mx-auto max-w-6xl px-6 py-8 flex flex-wrap items-center justify-between gap-4 text-sm text-muted-foreground">
-          <div className="flex items-center gap-3">
-            <Logo className="h-6 w-auto" />
-            <span>© {new Date().getFullYear()} RealArc Estates</span>
-          </div>
-          <Link to="/auth" className="hover:text-foreground transition">
-            Sign in
-          </Link>
-        </div>
-      </footer>
+<Footer />
     </div>
   );
 }
