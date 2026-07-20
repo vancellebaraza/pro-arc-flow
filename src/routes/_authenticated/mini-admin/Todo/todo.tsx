@@ -66,6 +66,7 @@ const [form, setForm] = useState({
 });
 
 const [savingTodo, setSavingTodo] = useState(false);
+const firstTodo = todos.find((t) => t.staff_user_id === engineerId);
 
 const visibleDates = Array.from(
   { length: 7 },
@@ -237,9 +238,19 @@ async function saveTodo() {
                   </thead>
                   <tbody>
                     <tr className="odd:bg-surface even:bg-card">
-                      <td className="sticky left-0 z-10 border-r border-border bg-background px-4 py-3 font-medium">
-                        {engineerName}
-                      </td>
+<td className="sticky left-0 z-10 border-r border-border bg-background px-4 py-3">
+  <div className="font-medium">{engineerName}</div>
+
+  {firstTodo && (
+    <div className="mt-1 text-xs text-muted-foreground">
+      Created:
+      {" "}
+      {format(new Date(firstTodo.created_at), "dd MMM yyyy")}
+      <br />
+      {format(new Date(firstTodo.created_at), "hh:mm a")}
+    </div>
+  )}
+</td>
                       {visibleDates.map((date) => {
                         const todo = engineerId
                           ? todoMap.get(`${engineerId}|${format(date, "yyyy-MM-dd")}`)
