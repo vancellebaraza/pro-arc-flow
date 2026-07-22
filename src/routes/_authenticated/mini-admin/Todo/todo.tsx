@@ -178,6 +178,34 @@ async function saveTodo() {
     setSavingTodo(false);
   }
 }
+const deleteTodo = async () => {
+  if (!editState?.todo) return;
+
+  const confirmed = window.confirm(
+    "Are you sure you want to delete this task?"
+  );
+
+  if (!confirmed) return;
+
+  const { error } = await supabase
+    .from("staff_todos")
+    .delete()
+    .eq("id", editState.todo.id);
+
+  if (error) {
+    console.error(error);
+    toast.error("Failed to delete task.");
+    return;
+  }
+
+  toast.success("Task deleted successfully.");
+
+  // Refresh your todo list
+  await load(); // Replace with whatever function reloads your todos
+
+  // Close the dialog
+  resetTodoEditor();
+};
   return <div>
           <section className="mb-8 rounded-xl border bg-card p-5">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
@@ -350,14 +378,37 @@ async function saveTodo() {
             </div>
           </div>
 
-          <DialogFooter className="gap-2">
-            <Button type="button" variant="outline" onClick={() => resetTodoEditor()}>
-              Cancel
-            </Button>
-            <Button type="button" onClick={saveTodo} disabled={savingTodo}>
-              Save task
-            </Button>
-          </DialogFooter>
+<DialogFooter className="flex justify-between gap-2">
+  <div>
+    {editState?.todo && (
+      <Button
+        type="button"
+        variant="destructive"
+        onClick={deleteTodo}
+      >
+        Delete
+      </Button>
+    )}
+  </div>
+
+  <div className="flex gap-2">
+    <Button
+      type="button"
+      variant="outline"
+      onClick={resetTodoEditor}
+    >
+      Cancel
+    </Button>
+
+    <Button
+      type="button"
+      onClick={saveTodo}
+      disabled={savingTodo}
+    >
+      Save task
+    </Button>
+  </div>
+</DialogFooter>
           <DialogClose className="absolute right-4 top-4 text-muted-foreground hover:text-foreground">
             Close
           </DialogClose>

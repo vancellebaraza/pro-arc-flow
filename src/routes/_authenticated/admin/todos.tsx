@@ -266,6 +266,35 @@ setEngineers(profiles as StaffMember[]);
       setSaving(false);
     }
   }
+  async function deleteTodo() {
+  if (!editState?.todo) return;
+
+  const confirmed = window.confirm(
+    "Are you sure you want to delete this task?"
+  );
+
+  if (!confirmed) return;
+
+  try {
+    const { error } = await supabase
+      .from("staff_todos")
+      .delete()
+      .eq("id", editState.todo.id);
+
+    if (error) throw error;
+
+    toast.success("Task deleted.");
+
+    resetEditor();
+    await loadTodos();
+  } catch (error) {
+    toast.error(
+      error instanceof Error
+        ? error.message
+        : "Unable to delete task"
+    );
+  }
+}
 
   function addStaffRow() {
     if (!selectedEngineerId) return;
@@ -285,6 +314,8 @@ setEngineers(profiles as StaffMember[]);
   if (loading) {
     return <div className="p-8 text-sm text-muted-foreground">Loading…</div>;
   }
+
+  
 
   return (
     <div className="p-4 md:p-8 fade-in max-w-7xl mx-auto">
@@ -542,14 +573,37 @@ setEngineers(profiles as StaffMember[]);
             </div>
           </div>
 
-          <DialogFooter className="gap-2">
-            <Button type="button" variant="outline" onClick={() => resetEditor()}>
-              Cancel
-            </Button>
-            <Button type="button" onClick={saveTodo} disabled={saving}>
-              Save task
-            </Button>
-          </DialogFooter>
+<DialogFooter className="flex justify-between gap-2">
+  <div>
+    {editState?.todo && (
+      <Button
+        type="button"
+        variant="destructive"
+        onClick={deleteTodo}
+      >
+        Delete Task
+      </Button>
+    )}
+  </div>
+
+  <div className="flex gap-2">
+    <Button
+      type="button"
+      variant="outline"
+      onClick={resetEditor}
+    >
+      Cancel
+    </Button>
+
+    <Button
+      type="button"
+      onClick={saveTodo}
+      disabled={saving}
+    >
+      Save Task
+    </Button>
+  </div>
+</DialogFooter>
           <DialogClose className="absolute right-4 top-4 text-muted-foreground hover:text-foreground">
             Close
           </DialogClose>
