@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { STATUS_LABEL, SERVICES } from "@/lib/services";
+import { STATUS_LABEL, SERVICES, statusColorClasses } from "@/lib/services";
 import { ArrowRight, Plus } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/client/")({
@@ -114,19 +114,22 @@ function ClientHome() {
           <ul className="divide-y rounded-xl border bg-card">
             {projects.map((p) => {
               const svc = SERVICES.find((s) => s.key === p.service);
+              const colors = statusColorClasses(p.status);
               return (
                 <li key={p.id}>
                   <Link
                     to="/client/$projectId"
                     params={{ projectId: p.id }}
-                    className="flex items-center justify-between gap-4 p-5 hover:bg-accent/50 transition"
+                    className="relative flex items-center justify-between gap-4 overflow-hidden p-5 pl-6 hover:bg-accent/50 transition"
                   >
+                    <div className={`absolute inset-y-0 left-0 w-[3px] ${colors.dot}`} />
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="text-xs uppercase tracking-wider text-muted-foreground">
                           {svc?.label ?? p.service}
                         </span>
-                        <span className="text-xs rounded-full bg-foreground/5 px-2 py-0.5">
+                        <span className={`inline-flex items-center gap-2 rounded-full px-2 py-0.5 text-xs ${colors.badge}`}>
+                          <span className={`h-1.5 w-1.5 rounded-full ${colors.dot}`} />
                           {STATUS_LABEL[p.status] ?? p.status}
                         </span>
                       </div>

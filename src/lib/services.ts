@@ -76,6 +76,46 @@ export const STATUS_LABEL: Record<string, string> = {
   rejected: "Rejected",
 };
 
+export type StatusColorGroup = "pending" | "rejected" | "ongoing" | "completed";
+
+export const STATUS_COLOR_GROUP: Record<string, StatusColorGroup> = {
+  requested: "pending",
+  inspected: "pending",
+  quoted: "pending",
+  approved: "ongoing",
+  scheduled: "ongoing",
+  in_progress: "ongoing",
+  completed: "completed",
+  rejected: "rejected",
+};
+
+export const STATUS_COLOR_CLASSES: Record<StatusColorGroup, { dot: string; badge: string }> = {
+  pending: {
+    dot: "bg-red-500",
+    badge: "bg-red-500/10 text-red-700 border border-red-200",
+  },
+  rejected: {
+    dot: "bg-orange-500",
+    badge: "bg-orange-500/10 text-orange-700 border border-orange-200",
+  },
+  ongoing: {
+    dot: "bg-blue-500",
+    badge: "bg-blue-500/10 text-blue-700 border border-blue-200",
+  },
+  completed: {
+    dot: "bg-green-500",
+    badge: "bg-green-500/10 text-green-700 border border-green-200",
+  },
+};
+
+export function statusColorGroup(status: string): StatusColorGroup {
+  return STATUS_COLOR_GROUP[status] ?? "pending";
+}
+
+export function statusColorClasses(status: string) {
+  return STATUS_COLOR_CLASSES[statusColorGroup(status)];
+}
+
 export const BANK_DETAILS = {
   bank: "KCB",
   account_name: "Fusionpro Limited",
