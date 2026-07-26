@@ -165,19 +165,28 @@ export default function SignaturePad({ value, onChange, label = "Signature" }: P
     ctx.clearRect(0, 0, c.width, c.height);
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, c.width, c.height);
-    // use Dancing Script font
     ctx.fillStyle = "#111827";
-    const fontSize = Math.min(90, Math.max(56, c.width / Math.max(6, text.length)));
+    const fontSize = Math.min(140, Math.max(84, c.width / Math.max(4, text.length)));
     ctx.font = `${fontSize}px 'Ballet', cursive`;
     ctx.textBaseline = "middle";
     ctx.textAlign = "center";
     ctx.fillText(text, c.width / 2, c.height / 2 + fontSize * 0.08);
+    ctx.lineWidth = 1.2;
+    ctx.strokeStyle = "#111827";
+    ctx.strokeText(text, c.width / 2, c.height / 2 + fontSize * 0.08);
   }
 
   return (
     <div>
       <div className="relative">
-        <canvas ref={canvasRef} width={300} height={80} className="w-full h-20 rounded" onClick={openDialog} />
+        <canvas
+        ref={canvasRef}
+        width={360}
+        height={100}
+        className="w-full h-24 rounded"
+        style={{ fontVariationSettings: '"opsz" 144' }}
+        onClick={openDialog}
+      />
         {value ? (
           <button
             aria-label="Clear signature"
@@ -210,9 +219,10 @@ export default function SignaturePad({ value, onChange, label = "Signature" }: P
             <div className="rounded border bg-white p-2">
               <canvas
                 ref={dialogCanvasRef}
-                width={500}
-                height={200}
+                width={600}
+                height={240}
                 className="w-full touch-none"
+                style={{ fontVariationSettings: '"opsz" 144' }}
                 onPointerDown={handlePointerDown}
                 onPointerMove={handlePointerMove}
                 onPointerUp={handlePointerUp}
