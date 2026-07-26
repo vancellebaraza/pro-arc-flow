@@ -90,6 +90,7 @@ function EngineerHome() {
           supabase
             .from("projects")
             .select("id,title,service,status,location,engineer_id,created_at,scheduled_date")
+            .eq("archived", false)
             .order("created_at", { ascending: false }),
           supabase.from("profiles").select("full_name").eq("id", userData.user.id).maybeSingle(),
           (supabase as any)

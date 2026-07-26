@@ -122,6 +122,7 @@ function AdminAnalysisPage() {
       .select(
         "id,title,service,status,created_at,scheduled_date,location,quotations(project_id,grand_total,payment_status,status,created_at)",
       )
+      .eq("archived", false)
       .order("created_at", { ascending: false });
 
     if (projectError) {

@@ -168,7 +168,7 @@ function StaffTodosPage() {
       const endDate = format(addDays(weekStart, 6), "yyyy-MM-dd");
 
       const { data: todoRows, error: todoError } = await supabase
-        .from<StaffTodo>("staff_todos")
+        .from("staff_todos")
         .select("*")
         .gte("todo_date", startDate)
         .lte("todo_date", endDate)
@@ -192,7 +192,7 @@ if (profilesError2) {
 
 setEngineers(profiles as StaffMember[]);
 
-      setTodos((todoRows ?? []) as StaffTodo[]);
+      setTodos((todoRows ?? []) as unknown as StaffTodo[]);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Unable to load staff todos");
     } finally {

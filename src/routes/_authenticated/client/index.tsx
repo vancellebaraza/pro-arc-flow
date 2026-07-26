@@ -36,6 +36,7 @@ function ClientHome() {
       const { data:projectsData, error:projectsError } = await supabase
         .from("projects")
         .select("id,client_id,title,service,status,location,created_at")
+        .eq("archived", false)
         .order("created_at", { ascending: false });
 
         if (projectsError) {
