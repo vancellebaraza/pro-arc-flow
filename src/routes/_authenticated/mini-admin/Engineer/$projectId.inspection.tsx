@@ -52,6 +52,8 @@ function InspectionPage() {
   const [remarks, setRemarks] = useState("");
   const [stage, setStage] = useState("initial");
   const [saving, setSaving] = useState(false);
+  const [inspectionId, setInspectionId] = useState<string | null>(null);
+  const [loadingSaved, setLoadingSaved] = useState(false);
 
   const load = useCallback(async () => {
     const { data: p } = await supabase
@@ -65,10 +67,16 @@ function InspectionPage() {
       setProjectService(p.service);
       setWorkCategory(p.service);
     }
+    await loadInspectionForStage(stage);
   }, [projectId]);
   useEffect(() => {
     load();
   }, [load]);
+
+  useEffect(() => {
+    loadInspectionForStage(stage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stage, projectId]);
 
   async function uploadImage(file: File): Promise<string> {
     const { data: u } = await supabase.auth.getUser();
@@ -88,6 +96,47 @@ function InspectionPage() {
 
     console.log("uploadImage signed URL created", { path, signedUrl: signed.signedUrl });
     return signed.signedUrl;
+  }
+
+  async function loadInspectionForStage(stageToLoad: string) {
+    setLoadingSaved(true);
+    setInspectionId(null);
+    try {
+      const { data: row, error } = await supabase
+        .from("inspections")
+        .select("*")
+        .eq("project_id", projectId)
+        .eq("stage", stageToLoad)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      if (row) {
+        setInspectionId((row as any).id);
+        const r: any = row;
+        const loadedChecklist = Array.isArray(r.checklist) ? r.checklist : r.checklist ?? [];
+        setChecklist(
+          (loadedChecklist as any[]).map((c) => ({ item: c.item ?? "", remark: c.remark ?? "", pass: c.pass ?? false })),
+        );
+        setPhotos((r.photo_evidence as any) ?? [{ before: "", during: "", after: "" }]);
+        setSigClient((r.signatures as any)?.client_name ?? "");
+        setSigInspector((r.signatures as any)?.inspector_name ?? "");
+        setSigTechnician((r.signatures as any)?.technician_name ?? "");
+        setRemarks(r.remarks ?? "");
+        const meta = (r.meta as any) ?? {};
+        setWorkCategory(meta.work_category ?? workCategory);
+        setClientName(meta.client_name ?? "");
+        setInspectionDate(meta.inspection_date ?? inspectionDate);
+        setInspectorName(meta.inspector_name ?? "");
+        setTechnician(meta.technician ?? "");
+      } else {
+        setInspectionId(null);
+      }
+    } catch (e) {
+      console.error("loadInspectionForStage error", e);
+    } finally {
+      setLoadingSaved(false);
+    }
   }
 
   async function pickFile(field: keyof PhotoRow, idx: number) {
@@ -139,17 +188,37 @@ function InspectionPage() {
         inspector_name: sigInspector,
         technician_name: sigTechnician,
       };
-      const { error } = await supabase.from("inspections").insert({
-        project_id: projectId,
-        engineer_id: u.user.id,
-        stage,
-        checklist: checklistJson as unknown as Json,
-        remarks,
-        meta: meta as unknown as Json,
-        photo_evidence: photos as unknown as Json,
-        signatures: signatures as unknown as Json,
-        image_urls: photos.flatMap((p) => [p.before, p.during, p.after].filter(Boolean)),
-      });
+      let error = null;
+      if (inspectionId) {
+        const res = await supabase.from("inspections").update({
+          engineer_id: u.user.id,
+          checklist: checklistJson as unknown as Json,
+          remarks,
+          meta: meta as unknown as Json,
+          photo_evidence: photos as unknown as Json,
+          signatures: signatures as unknown as Json,
+          image_urls: photos.flatMap((p) => [p.before, p.during, p.after].filter(Boolean)),
+        }).eq("id", inspectionId);
+        error = (res as any).error;
+      } else {
+        const res = await supabase.from("inspections").insert({
+          project_id: projectId,
+          engineer_id: u.user.id,
+          stage,
+          checklist: checklistJson as unknown as Json,
+          remarks,
+          meta: meta as unknown as Json,
+          photo_evidence: photos as unknown as Json,
+          signatures: signatures as unknown as Json,
+          image_urls: photos.flatMap((p) => [p.before, p.during, p.after].filter(Boolean)),
+        }).select("id").maybeSingle();
+        if ((res as any).error) {
+          error = (res as any).error;
+        } else {
+          const newId = (res as any).data?.id ?? ((res as any)[0]?.id ?? null);
+          if (newId) setInspectionId(newId);
+        }
+      }
       if (error) throw error;
       await supabase
         .from("projects")
