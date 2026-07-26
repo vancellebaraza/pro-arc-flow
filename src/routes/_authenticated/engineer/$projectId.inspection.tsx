@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import SignaturePad from "@/components/SignaturePad";
 import { SERVICES } from "@/lib/services";
 import { generateInspectionPdf } from "@/lib/pdf";
 import { toast } from "sonner";
@@ -482,25 +483,19 @@ function InspectionPage() {
         <h2 className="text-lg font-semibold tracking-tight">Sign-off</h2>
         <div className="mt-3 grid md:grid-cols-3 gap-4">
           <div className="rounded-lg border p-4 bg-card">
-            <Label>Client Name</Label>
-            <Input value={sigClient} onChange={(e) => setSigClient(e.target.value)} />
-            <div className="mt-3 text-xs text-muted-foreground">
-              Client signature collected on site.
-            </div>
+            <Label>Client Signature</Label>
+            <SignaturePad value={sigClient || null} onChange={(v) => setSigClient(v ?? "")} label="Client signature" />
+            <div className="mt-3 text-xs text-muted-foreground">Client signature collected on site.</div>
           </div>
           <div className="rounded-lg border p-4 bg-card">
-            <Label>Inspector Name</Label>
-            <Input value={sigInspector} onChange={(e) => setSigInspector(e.target.value)} />
-            <div className="mt-3 text-xs text-muted-foreground">
-              Inspector signature collected on site.
-            </div>
+            <Label>Inspector Signature</Label>
+            <SignaturePad value={sigInspector || null} onChange={(v) => setSigInspector(v ?? "")} label="Inspector signature" />
+            <div className="mt-3 text-xs text-muted-foreground">Inspector signature collected on site.</div>
           </div>
           <div className="rounded-lg border p-4 bg-card">
-            <Label>Technician Name</Label>
-            <Input value={sigTechnician} onChange={(e) => setSigTechnician(e.target.value)} />
-            <div className="mt-3 text-xs text-muted-foreground">
-              Technician signature collected on site.
-            </div>
+            <Label>Technician Signature</Label>
+            <SignaturePad value={sigTechnician || null} onChange={(v) => setSigTechnician(v ?? "")} label="Technician signature" />
+            <div className="mt-3 text-xs text-muted-foreground">Technician signature collected on site.</div>
           </div>
         </div>
       </section>
