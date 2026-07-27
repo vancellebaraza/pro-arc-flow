@@ -40,30 +40,46 @@ function Landing() {
         </div>
       </header>
 
-      <section className="mx-auto max-w-6xl px-6 pt-24 pb-20 fade-in">
-        <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-          RealArc Estates · Operations
-        </p>
-        <h1 className="mt-4 text-4xl md:text-6xl font-semibold tracking-tight leading-[1.05] max-w-3xl">
-          One system for every property service request, inspection, and report.
-        </h1>
-        <p className="mt-6 max-w-2xl text-base md:text-lg text-muted-foreground leading-relaxed">
-          FusionPro coordinates clients, engineers, and admins across electrical, plumbing,
-          landscaping, painting, property management, and tank cleaning — from intake to completion.
-        </p>
-        <div className="mt-10 flex flex-wrap gap-3">
-          <Link
-            to="/auth"
-            className="inline-flex items-center gap-2 rounded-md bg-primary text-primary-foreground px-5 py-3 text-sm font-medium hover:opacity-90 transition"
-          >
-            Get started <ArrowRight className="h-4 w-4" />
-          </Link>
-          <a
-            href="#services"
-            className="inline-flex items-center rounded-md border border-border bg-background px-5 py-3 text-sm font-medium hover:bg-accent transition"
-          >
-            View services
-          </a>
+      <section className="relative overflow-hidden bg-white fade-in">
+        <div className="pointer-events-none absolute inset-0">
+          <img
+            src="/images/hero-engineer.png"
+            alt="Engineer on site"
+            className="absolute inset-0 h-full w-full object-cover object-[right_center]"
+          />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.98),transparent_24%),radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.96),transparent_28%),linear-gradient(90deg,rgba(255,255,255,0.98),rgba(255,255,255,0.6) 35%,transparent 65%),linear-gradient(180deg,rgba(255,255,255,0.95),transparent 42%)]" />
+        </div>
+
+        <div className="relative mx-auto max-w-6xl px-6 pt-24 pb-20 z-10">
+          <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center">
+            <div className="relative">
+              <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                RealArc Estates · Operations
+              </p>
+              <h1 className="mt-4 text-4xl md:text-6xl font-semibold tracking-tight leading-[1.05] max-w-3xl">
+                One system for every property service request, inspection, and report.
+              </h1>
+              <p className="mt-6 max-w-2xl text-base md:text-lg text-muted-foreground leading-relaxed">
+                FusionPro coordinates clients, engineers, and admins across electrical, plumbing,
+                landscaping, painting, property management, and tank cleaning — from intake to completion.
+              </p>
+              <div className="mt-10 flex flex-wrap gap-3">
+                <Link
+                  to="/auth"
+                  className="inline-flex items-center gap-2 rounded-md bg-primary text-primary-foreground px-5 py-3 text-sm font-medium hover:opacity-90 transition"
+                >
+                  Get started <ArrowRight className="h-4 w-4" />
+                </Link>
+                <a
+                  href="#services"
+                  className="inline-flex items-center rounded-md border border-border bg-background px-5 py-3 text-sm font-medium hover:bg-accent transition"
+                >
+                  View services
+                </a>
+              </div>
+            </div>
+            <div className="hidden lg:block" />
+          </div>
         </div>
       </section>
 

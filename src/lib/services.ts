@@ -1,10 +1,4 @@
 import { Zap, Droplets, Trees, Paintbrush, Home, Container } from "lucide-react";
-import svcElectrical from "@/assets/svc-electrical.jpg";
-import svcPlumbing from "@/assets/svc-plumbing.jpg";
-import svcLandscaping from "@/assets/svc-landscaping.jpg";
-import svcPainting from "@/assets/svc-painting.jpg";
-import svcProperty from "@/assets/svc-property.jpg";
-import svcTank from "@/assets/svc-tank.jpg";
 
 export type ServiceKey =
   | "electrical"
@@ -26,42 +20,42 @@ export const SERVICES: Array<{
     label: "Electrical",
     icon: Zap,
     desc: "Wiring, lighting, faults, certified installations.",
-    image: svcElectrical,
+    image: "/images/svc-electrical-2.png",
   },
   {
     key: "plumbing",
     label: "Plumbing",
     icon: Droplets,
     desc: "Leaks, fittings, pressure issues, full installs.",
-    image: svcPlumbing,
+    image: "/images/svc-plumbing-2.png",
   },
   {
     key: "landscaping",
     label: "Landscaping",
     icon: Trees,
     desc: "Gardens, irrigation, hardscaping, upkeep.",
-    image: svcLandscaping,
+    image: "/images/svc-landscaping-2.png",
   },
   {
     key: "painting",
     label: "Painting",
     icon: Paintbrush,
     desc: "Interior & exterior, surface prep, finishing.",
-    image: svcPainting,
+    image: "/images/svc-painting-2.png",
   },
   {
     key: "property_management",
     label: "Property Management",
     icon: Home,
     desc: "Ongoing facility care across portfolios.",
-    image: svcProperty,
+    image: "/images/svc-property-2.png",
   },
   {
     key: "tank_cleaning",
     label: "Tank Cleaning",
     icon: Container,
     desc: "Potable water tanks, disinfection, reports.",
-    image: svcTank,
+    image: "/images/svc-tank-2.png",
   },
 ];
 
