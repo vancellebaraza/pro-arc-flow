@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/table";
 import { STATUS_LABEL, SERVICES, type ServiceKey } from "@/lib/services";
 import { downloadCsv } from "@/lib/pdf";
+import { exportHistoricalProjectsPdf } from "@/lib/historicalProjects";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { toast } from "sonner";
@@ -415,6 +416,10 @@ function AdminHome() {
           <Button variant="outline" onClick={exportPdf}>
             <FileDown className="h-4 w-4 mr-1" />
             Export Work Data Sheet (PDF)
+          </Button>
+          <Button variant="outline" onClick={exportHistoricalProjectsPdf}>
+            <FileDown className="h-4 w-4 mr-1" />
+            Export Historical Projects (PDF)
           </Button>
         </div>
       </div>

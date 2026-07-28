@@ -5,6 +5,7 @@ import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/PasswordInput";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
@@ -19,6 +20,8 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [resetMode, setResetMode] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
   const provision = useServerFn(ensureFixedAccounts);
 
   useEffect(() => {
@@ -91,6 +94,29 @@ function AuthPage() {
     navigate({ to: "/dashboard", replace: true });
   }
 
+  async function sendResetLink(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    const email = String(fd.get("reset_email"));
+    setLoading(true);
+    try {
+      const res = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (res.error) {
+        toast.error(res.error.message);
+        return;
+      }
+      setResetSent(true);
+    } catch (err: unknown) {
+      console.error("resetPasswordForEmail error:", err);
+      const msg = err instanceof Error && err.message ? err.message : String(err);
+      toast.error(`Could not send reset email: ${msg}`);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <div className="min-h-screen grid md:grid-cols-2 bg-background">
       <div className="hidden md:flex flex-col justify-between p-10 surface border-r">
@@ -128,12 +154,44 @@ function AuthPage() {
                 </div>
                 <div>
                   <Label htmlFor="password">Password</Label>
-                  <Input id="password" name="password" type="password" required minLength={6} />
+                  <PasswordInput id="password" name="password" required minLength={6} />
                 </div>
                 <Button type="submit" disabled={loading} className="w-full">
                   {loading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}Sign in
                 </Button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setResetMode((v) => !v);
+                    setResetSent(false);
+                  }}
+                  className="block text-xs text-muted-foreground hover:underline"
+                >
+                  Forgot password?
+                </button>
               </form>
+
+              {resetMode && (
+                <div className="mt-4 border-t pt-4">
+                  {resetSent ? (
+                    <p className="text-sm text-muted-foreground">
+                      If an account exists for that email, a reset link is on its way. Check your
+                      inbox.
+                    </p>
+                  ) : (
+                    <form onSubmit={sendResetLink} className="space-y-3">
+                      <div>
+                        <Label htmlFor="reset_email">Email</Label>
+                        <Input id="reset_email" name="reset_email" type="email" required />
+                      </div>
+                      <Button type="submit" disabled={loading} className="w-full" variant="outline">
+                        {loading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}Send reset
+                        link
+                      </Button>
+                    </form>
+                  )}
+                </div>
+              )}
             </TabsContent>
             <TabsContent value="signup">
               <p className="mt-4 text-xs text-muted-foreground leading-relaxed">
@@ -155,7 +213,7 @@ function AuthPage() {
                 </div>
                 <div>
                   <Label htmlFor="password2">Password</Label>
-                  <Input id="password2" name="password" type="password" required minLength={6} />
+                  <PasswordInput id="password2" name="password" required minLength={6} />
                 </div>
                 <Button type="submit" disabled={loading} className="w-full">
                   {loading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}Create client

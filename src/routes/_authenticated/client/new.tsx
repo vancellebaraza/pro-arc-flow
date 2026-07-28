@@ -36,10 +36,8 @@ function NewRequest() {
         const path = `${u.user.id}/${Date.now()}-${file.name}`;
         const { error: upErr } = await supabase.storage.from("project-images").upload(path, file);
         if (upErr) throw upErr;
-        const { data: signed } = await supabase.storage
-          .from("project-images")
-          .createSignedUrl(path, 60 * 60 * 24 * 30);
-        if (signed?.signedUrl) urls.push(signed.signedUrl);
+        const { data } = supabase.storage.from("project-images").getPublicUrl(path);
+        urls.push(data.publicUrl);
       }
       const { error } = await supabase.from("projects").insert({
         client_id: u.user.id,

@@ -168,10 +168,8 @@ function WorksheetPage() {
         toast.error(error.message);
         continue;
       }
-      const { data: signed } = await supabase.storage
-        .from("project-images")
-        .createSignedUrl(path, 60 * 60 * 24 * 365);
-      if (signed?.signedUrl) setImagesBefore((a) => [...a, signed.signedUrl]);
+      const { data } = supabase.storage.from("project-images").getPublicUrl(path);
+      setImagesBefore((a) => [...a, data.publicUrl]);
     }
   }
 
@@ -240,7 +238,7 @@ function WorksheetPage() {
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to generate PDF");
     }
-    doc.save(`Worksheet-${jobNo || projectId}.pdf`);
+    
   }
 
   return (

@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/table";
 import { STATUS_LABEL, SERVICES, type ServiceKey } from "@/lib/services";
 import { downloadCsv } from "@/lib/pdf";
+import { exportHistoricalProjectsPdf } from "@/lib/historicalProjects";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { toast } from "sonner";
@@ -327,6 +328,8 @@ function AdminHome() {
   function exportPdf() {
     const doc = new jsPDF();
     const date = new Date().toISOString().slice(0, 10);
+
+    
     doc.setFontSize(16);
     doc.text("FusionPro Work Data Sheet", 14, 20);
     doc.setFontSize(9);
@@ -414,6 +417,10 @@ function AdminHome() {
           <Button variant="outline" onClick={exportPdf}>
             <FileDown className="h-4 w-4 mr-1" />
             Export Work Data Sheet (PDF)
+          </Button>
+          <Button variant="outline" onClick={exportHistoricalProjectsPdf}>
+            <FileDown className="h-4 w-4 mr-1" />
+            Export Historical Projects (PDF)
           </Button>
         </div>
       </div>
