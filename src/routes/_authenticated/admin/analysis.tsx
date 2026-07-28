@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { SERVICES, STATUS_LABEL } from "@/lib/services";
+import { SERVICES, STATUS_LABEL, statusColorClasses, type StatusColorGroup } from "@/lib/services";
 import { toast } from "sonner";
 import {
   ArrowLeft,
@@ -23,6 +23,13 @@ import {
   TrendingUp,
   Wallet,
 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/_authenticated/admin/analysis")({
   component: AdminAnalysisPage,
@@ -104,6 +111,8 @@ function statusProgress(status: string) {
 function AdminAnalysisPage() {
   const [projects, setProjects] = useState<EnrichedProject[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState<StatusColorGroup | null>(null);
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -113,6 +122,7 @@ function AdminAnalysisPage() {
       .select(
         "id,title,service,status,created_at,scheduled_date,location,quotations(project_id,grand_total,payment_status,status,created_at)",
       )
+      .eq("archived", false)
       .order("created_at", { ascending: false });
 
     if (projectError) {
@@ -182,6 +192,13 @@ function AdminAnalysisPage() {
         return map;
       }, {}),
     ).sort((a, b) => b[1] - a[1]);
+
+    const categoryProjects = {
+      pending: projects.filter((project) => ["requested", "inspected", "quoted"].includes(project.status)),
+      ongoing: projects.filter((project) => ["approved", "scheduled", "in_progress"].includes(project.status)),
+      completed: projects.filter((project) => project.status === "completed"),
+      rejected: projects.filter((project) => project.status === "rejected"),
+    } satisfies Record<StatusColorGroup, EnrichedProject[]>;
 
     const serviceBreakdown = SERVICES.map((service) => {
       const serviceProjects = projects.filter((project) => project.service === service.key);
@@ -298,6 +315,7 @@ function AdminAnalysisPage() {
       paidQuoted,
       outstandingQuoted,
       statusCounts,
+      categoryProjects,
       serviceBreakdown,
       monthCounts,
       topProjects,
@@ -316,6 +334,14 @@ function AdminAnalysisPage() {
     1,
     ...analysis.topLocations.map(([, count]) => count)
   );
+  const categoryCards: Array<{ key: StatusColorGroup; label: string; count: number }> = [
+    { key: "pending", label: "Pending", count: analysis.categoryProjects.pending.length },
+    { key: "ongoing", label: "Ongoing", count: analysis.categoryProjects.ongoing.length },
+    { key: "completed", label: "Completed", count: analysis.categoryProjects.completed.length },
+    { key: "rejected", label: "Rejected", count: analysis.categoryProjects.rejected.length },
+  ];
+  const selectedProjects = selectedCategory ? analysis.categoryProjects[selectedCategory] : [];
+  const selectedProject = selectedProjects.find((project) => project.id === selectedProjectId) ?? null;
 
   return (
     <div className="p-4 md:p-8 fade-in max-w-7xl mx-auto">
@@ -335,23 +361,130 @@ function AdminAnalysisPage() {
       </div>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {[
-          { label: "Total projects", value: analysis.totalProjects, icon: BarChart3 },
-          { label: "Active projects", value: analysis.activeProjects, icon: Clock3 },
-          { label: "Completed", value: analysis.completedProjects, icon: CheckCircle2 },
-          { label: "Paid quotations", value: money(analysis.paidQuoted), icon: Wallet },
-        ].map((metric) => (
-          <div key={metric.label} className="rounded-lg border bg-card p-5">
-            <div className="flex items-center justify-between gap-3">
-              <div className="text-xs uppercase tracking-wider text-muted-foreground">
-                {metric.label}
+        {categoryCards.map((category) => {
+          const colors = statusColorClasses(category.key);
+          return (
+            <button
+              key={category.key}
+              type="button"
+              onClick={() => {
+                setSelectedCategory(category.key);
+                setSelectedProjectId(null);
+              }}
+              className="rounded-lg border bg-card p-5 text-left transition hover:border-foreground/40 hover:shadow-sm"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <span className={`h-2.5 w-2.5 rounded-full ${colors.dot}`} />
+                  <div className="text-sm font-semibold">{category.label}</div>
+                </div>
+                <div className={`h-10 w-[3px] rounded-full ${colors.dot}`} />
               </div>
-              <metric.icon className="h-4 w-4 text-muted-foreground" />
-            </div>
-            <div className="mt-2 text-2xl font-semibold">{loading ? "..." : metric.value}</div>
-          </div>
-        ))}
+              <div className="mt-3 text-2xl font-semibold">{loading ? "..." : category.count}</div>
+            </button>
+          );
+        })}
       </div>
+
+      <Dialog
+        open={selectedCategory !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSelectedCategory(null);
+            setSelectedProjectId(null);
+          }
+        }}
+      >
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>
+              {selectedCategory ? `${categoryCards.find((card) => card.key === selectedCategory)?.label ?? selectedCategory} projects` : "Projects"}
+            </DialogTitle>
+            <DialogDescription>
+              {selectedProject
+                ? "Review the selected project details below."
+                : "Choose a project to inspect details from this category."}
+            </DialogDescription>
+          </DialogHeader>
+          {selectedProject ? (
+            <div className="space-y-4">
+              <Button
+                type="button"
+                variant="outline"
+                className="mb-2"
+                onClick={() => setSelectedProjectId(null)}
+              >
+                Back to list
+              </Button>
+              <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
+                <div>
+                  <div className="text-sm text-muted-foreground">Title</div>
+                  <div className="font-semibold">{selectedProject.title}</div>
+                </div>
+                <div>
+                  <div className="text-sm text-muted-foreground">Service</div>
+                  <div>{SERVICES.find((service) => service.key === selectedProject.service)?.label ?? selectedProject.service}</div>
+                </div>
+                <div>
+                  <div className="text-sm text-muted-foreground">Location</div>
+                  <div>{selectedProject.location ?? "—"}</div>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div>
+                    <div className="text-sm text-muted-foreground">Requested date</div>
+                    <div>{shortDate(selectedProject.created_at)}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-muted-foreground">Scheduled date</div>
+                    <div>{selectedProject.scheduled_date ? shortDate(selectedProject.scheduled_date) : "—"}</div>
+                  </div>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div>
+                    <div className="text-sm text-muted-foreground">Quoted amount</div>
+                    <div>{money(selectedProject.quotedAmount)}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-muted-foreground">Payment status</div>
+                    <div>{selectedProject.paymentStatus ?? "Not quoted"}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="max-h-[60vh] space-y-3 overflow-y-auto pr-1">
+              {selectedProjects.length === 0 ? (
+                <div className="rounded-lg border p-4 text-sm text-muted-foreground">
+                  No projects in this category.
+                </div>
+              ) : (
+                selectedProjects.map((project) => {
+                  const colors = statusColorClasses(project.status);
+                  return (
+                    <button
+                      key={project.id}
+                      type="button"
+                      onClick={() => setSelectedProjectId(project.id)}
+                      className="flex w-full items-start justify-between gap-3 rounded-lg border bg-background/50 p-4 text-left transition hover:border-foreground/40"
+                    >
+                      <div className="min-w-0">
+                        <div className="font-medium">{project.title}</div>
+                        <div className="mt-1 text-sm text-muted-foreground">
+                          {SERVICES.find((service) => service.key === project.service)?.label ?? project.service} • {project.location ?? "—"}
+                        </div>
+                      </div>
+                      <span className={`inline-flex items-center gap-2 rounded-full px-2 py-0.5 text-xs ${colors.badge}`}>
+                        <span className={`h-1.5 w-1.5 rounded-full ${colors.dot}`} />
+                        {STATUS_LABEL[project.status] ?? project.status}
+                      </span>
+                    </button>
+                  );
+                })
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {[

@@ -42,6 +42,7 @@ function ClientHome() {
         .select(
           "id,client_id,title,service,status,location,created_at"
         )
+        .eq("archived", false)
         .order("created_at", { ascending: false });
 
       if (projectsError) {

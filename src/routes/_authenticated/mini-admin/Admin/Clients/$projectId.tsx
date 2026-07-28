@@ -1,15 +1,24 @@
 
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { jsPDF } from "jspdf";
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { STATUS_LABEL, SERVICES } from "@/lib/services";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { STATUS_LABEL, SERVICES, type ServiceKey } from "@/lib/services";
 import { toast } from "sonner";
 import { ArrowLeft, FileDown, MessageCircle, Check, X } from "lucide-react";
 import { generateQuotationPdf } from "@/lib/pdf";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import ProjectProgress from "@/components/ProjectProgress";
+import DeleteProjectDialog from "@/components/DeleteProjectDialog";
 
 export const Route = createFileRoute("/_authenticated/mini-admin/Admin/Clients/$projectId")({  component: ProjectDetail,
 });
@@ -53,11 +62,17 @@ interface Inspection {
 
 function ProjectDetail() {
   const { projectId } = Route.useParams();
+  const navigate = useNavigate();
   const [project, setProject] = useState<Project | null>(null);
   const [quote, setQuote] = useState<Quotation | null>(null);
   const [items, setItems] = useState<Item[]>([]);
   const [inspections, setInspections] = useState<Inspection[]>([]);
   const [loading, setLoading] = useState(true);
+  const [canManage, setCanManage] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [editTitle, setEditTitle] = useState("");
+  const [editService, setEditService] = useState<ServiceKey | "">("");
+  const [savingEdit, setSavingEdit] = useState(false);
 
   const load = useCallback(async () => {
     const { data: p } = await supabase
@@ -94,6 +109,39 @@ function ProjectDetail() {
     load();
   }, [load]);
 
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadRoles() {
+      const { data: userData, error } = await supabase.auth.getUser();
+      if (!mounted || error || !userData.user) return;
+
+      const { data: rolesData, error: rolesError } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userData.user.id);
+
+      if (!mounted || rolesError) return;
+
+      const isManageRole = (rolesData ?? []).some(
+        (role: { role: string }) => role.role === "admin" || role.role === "mini_admin",
+      );
+      setCanManage(isManageRole);
+    }
+
+    loadRoles();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (project) {
+      setEditTitle(project.title);
+      setEditService(project.service as ServiceKey);
+    }
+  }, [project]);
+
   async function decide(status: "approved" | "rejected") {
     if (!quote) return;
     const { error } = await supabase.from("quotations").update({ status }).eq("id", quote.id);
@@ -106,6 +154,31 @@ function ProjectDetail() {
     }
     toast.success(`Quotation ${status}`);
     load();
+  }
+
+  async function handleEditSave() {
+    if (!project || !editTitle.trim() || !editService) return;
+
+    setSavingEdit(true);
+    try {
+      const { error } = await supabase
+        .from("projects")
+        .update({ title: editTitle.trim(), service: editService })
+        .eq("id", project.id);
+
+      if (error) throw error;
+
+      setProject((current) =>
+        current ? { ...current, title: editTitle.trim(), service: editService } : current,
+      );
+      setEditOpen(false);
+      toast.success("Project updated");
+      await load();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Unable to update project");
+    } finally {
+      setSavingEdit(false);
+    }
   }
 
   async function downloadPdf() {
@@ -156,12 +229,68 @@ function ProjectDetail() {
           </h1>
           <p className="text-muted-foreground mt-1">{project.location}</p>
         </div>
-        <WhatsAppButton
-          projectId={project.id}
-          recipientRole="engineer"
-          messageType="custom"
-          customMessage={waText}
-        />
+        <div className="flex items-center gap-2">
+          {canManage && (
+            <>
+              <Button variant="outline" onClick={() => setEditOpen(true)}>
+                Edit project
+              </Button>
+              <Dialog open={editOpen} onOpenChange={setEditOpen}>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Edit project</DialogTitle>
+                    <DialogDescription>Update the project title and service.</DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 py-2">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Title</label>
+                      <Input
+                        value={editTitle}
+                        onChange={(event) => setEditTitle(event.target.value)}
+                        placeholder="Project title"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Service</label>
+                      <select
+                        value={editService}
+                        onChange={(event) => setEditService(event.target.value as ServiceKey)}
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                      >
+                        {SERVICES.map((service) => (
+                          <option key={service.key} value={service.key}>
+                            {service.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                  <div className="flex justify-end gap-2">
+                    <Button variant="outline" onClick={() => setEditOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button onClick={handleEditSave} disabled={savingEdit || !editTitle.trim()}>
+                      {savingEdit ? "Saving..." : "Save"}
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </>
+          )}
+          <DeleteProjectDialog
+            projectId={project.id}
+            projectTitle={project.title}
+            onDeleted={() => navigate({ to: "/mini-admin/Admin/Clients" })}
+          >
+            <Button variant="destructive">Delete project</Button>
+          </DeleteProjectDialog>
+          <WhatsAppButton
+            projectId={project.id}
+            recipientRole="engineer"
+            messageType="custom"
+            customMessage={waText}
+          />
+        </div>
       </div>
 
       <ProjectProgress status={project.status} className="mt-6" />

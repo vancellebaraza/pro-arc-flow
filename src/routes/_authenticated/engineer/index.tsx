@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState, useCallback } from "react";
 import { addDays, addWeeks, format, startOfWeek, subWeeks } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
-import { SERVICES, STATUS_LABEL } from "@/lib/services";
+import { SERVICES, STATUS_LABEL, statusColorClasses } from "@/lib/services";
 import { ArrowLeft, ArrowRight, Check, Plus, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -90,6 +90,7 @@ function EngineerHome() {
           supabase
             .from("projects")
             .select("id,title,service,status,location,engineer_id,created_at,scheduled_date")
+            .eq("archived", false)
             .order("created_at", { ascending: false }),
           supabase.from("profiles").select("full_name").eq("id", userData.user.id).maybeSingle(),
           (supabase as any)
@@ -224,18 +225,21 @@ function EngineerHome() {
         <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 mb-8">
           {filtered.map((p) => {
             const svc = SERVICES.find((s) => s.key === p.service);
+            const colors = statusColorClasses(p.status);
             return (
               <li key={p.id}>
                 <Link
                   to="/engineer/$projectId"
                   params={{ projectId: p.id }}
-                  className="block h-full rounded-xl border bg-card p-5 hover:border-foreground/40 hover:shadow-sm transition"
+                  className="relative block h-full overflow-hidden rounded-xl border bg-card p-5 pl-6 hover:border-foreground/40 hover:shadow-sm transition"
                 >
+                  <div className={`absolute inset-y-0 left-0 w-[3px] ${colors.dot}`} />
                   <div className="flex items-center justify-between">
                     <span className="text-xs uppercase tracking-wider text-muted-foreground">
                       {svc?.label ?? p.service}
                     </span>
-                    <span className="text-xs rounded-full bg-foreground/5 px-2 py-0.5">
+                    <span className={`inline-flex items-center gap-2 rounded-full px-2 py-0.5 text-xs ${colors.badge}`}>
+                      <span className={`h-1.5 w-1.5 rounded-full ${colors.dot}`} />
                       {STATUS_LABEL[p.status] ?? p.status}
                     </span>
                   </div>

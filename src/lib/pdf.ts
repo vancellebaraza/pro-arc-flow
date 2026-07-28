@@ -401,12 +401,39 @@ export async function generateInspectionPdf(doc:jsPDF,input: InspectionPdfInput)
     { role: "Inspector", name: input.signatures.inspector_name ?? "—" },
     { role: "Technician", name: input.signatures.technician_name ?? "—" },
   ];
-  sigs.forEach((s, i) => {
+  for (let i = 0; i < sigs.length; i++) {
+    const s = sigs[i];
     const x = 14 + i * 62;
-    doc.text(`${s.role}: ${s.name}`, x, fy);
-    doc.line(x, fy + 14, x + 55, fy + 14);
-    doc.text("Signature", x, fy + 19);
-  });
+    // draw role label
+    doc.text(`${s.role}:`, x, fy);
+    const sigY = fy + 6;
+    const sigW = 55;
+    const sigH = 20;
+    // if this looks like an image data URL, attempt to render it
+    try {
+      const val = s.name ?? "";
+      if (typeof val === "string" && val.startsWith("data:image/")) {
+        const imgData = await urlToDataUrl(val);
+        if (imgData) {
+          try {
+            doc.addImage(imgData, getImageTypeFromDataUrl(imgData), x, sigY, sigW, sigH);
+          } catch (err) {
+            console.error("Failed to add signature image to PDF", err);
+            doc.line(x, sigY + sigH + 4, x + sigW, sigY + sigH + 4);
+          }
+        } else {
+          doc.line(x, sigY + sigH + 4, x + sigW, sigY + sigH + 4);
+        }
+      } else {
+        doc.text(val || "—", x, sigY + 6);
+        doc.line(x, sigY + sigH + 4, x + sigW, sigY + sigH + 4);
+      }
+    } catch (err) {
+      console.error("Error rendering signature:", err);
+      doc.line(x, sigY + sigH + 4, x + sigW, sigY + sigH + 4);
+    }
+    doc.text("Signature", x, sigY + sigH + 12);
+  }
 
   // doc.save(`Inspection-${input.projectName.replace(/\W+/g, "_")}-${Date.now()}.pdf`);
 }

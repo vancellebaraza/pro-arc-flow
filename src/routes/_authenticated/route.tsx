@@ -20,8 +20,15 @@ import {
   Briefcase,
   Calendar,
   BarChart3,
+  Bell,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { AIAssistant } from "@/components/AIAssistant";
 
 export const Route = createFileRoute("/_authenticated")({
@@ -40,6 +47,49 @@ function AuthedLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isMiniAdminPage = pathname.startsWith("/mini-admin");
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [notifications, setNotifications] = useState<Array<{ id: string; title: string; body: string | null; link: string | null; read_at: string | null }>>([]);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    async function loadNotifications() {
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData.user || !mounted) return;
+      const { data } = await supabase
+        .from("notifications")
+        .select("id,title,body,link,read_at")
+        .eq("user_id", userData.user.id)
+        .is("read_at", null)
+        .order("created_at", { ascending: false })
+        .limit(20);
+      if (mounted) {
+        setNotifications(
+          (data ?? []) as Array<{
+            id: string;
+            title: string;
+            body: string | null;
+            link: string | null;
+            read_at: string | null;
+          }>,
+        );
+      }
+    }
+    if (notificationsOpen || pathname) {
+      loadNotifications();
+    }
+    return () => {
+      mounted = false;
+    };
+  }, [notificationsOpen, pathname]);
+
+  async function handleNotificationClick(notificationId: string, link: string | null) {
+    await supabase.from("notifications").update({ read_at: new Date().toISOString() }).eq("id", notificationId);
+    setNotifications((current) => current.filter((notification) => notification.id !== notificationId));
+    if (link) {
+      navigate({ to: link as string });
+    }
+    setNotificationsOpen(false);
+  }
 
   const links =
     primaryRole === "admin"
@@ -138,6 +188,40 @@ function AuthedLayout() {
             )}
           </div>
         </header>)}
+        {!isMiniAdminPage && (
+          <header className="hidden md:flex h-16 items-center justify-end border-b px-4">
+            <DropdownMenu open={notificationsOpen} onOpenChange={setNotificationsOpen}>
+              <DropdownMenuTrigger asChild>
+                <button className="relative rounded-full p-2 text-muted-foreground hover:bg-accent">
+                  <Bell className="h-5 w-5" />
+                  {notifications.length > 0 && (
+                    <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-medium text-white">
+                      {notifications.length}
+                    </span>
+                  )}
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-80">
+                {notifications.length === 0 ? (
+                  <div className="px-3 py-2 text-sm text-muted-foreground">No unread notifications.</div>
+                ) : (
+                  notifications.map((notification) => (
+                    <DropdownMenuItem
+                      key={notification.id}
+                      onSelect={() => handleNotificationClick(notification.id, notification.link)}
+                      className="flex cursor-pointer flex-col items-start gap-1 rounded-md px-3 py-2"
+                    >
+                      <div className="text-sm font-medium">{notification.title}</div>
+                      {notification.body && (
+                        <div className="text-xs text-muted-foreground">{notification.body}</div>
+                      )}
+                    </DropdownMenuItem>
+                  ))
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </header>
+        )}
         <main className="flex-1 min-w-0">
           {loading ? <div className="p-8 text-sm text-muted-foreground">Loading…</div> : <Outlet />}
         </main>

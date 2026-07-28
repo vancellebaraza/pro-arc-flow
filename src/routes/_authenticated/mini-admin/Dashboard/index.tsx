@@ -3,6 +3,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -12,13 +19,14 @@ import {
   TableHead,
   TableCell,
 } from "@/components/ui/table";
-import { STATUS_LABEL, SERVICES } from "@/lib/services";
+import { STATUS_LABEL, SERVICES, type ServiceKey } from "@/lib/services";
 import { downloadCsv } from "@/lib/pdf";
 import { exportHistoricalProjectsPdf } from "@/lib/historicalProjects";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { toast } from "sonner";
-import { FileDown, Check, Calendar } from "lucide-react";
+import { FileDown, Check, Calendar, Trash2 } from "lucide-react";
+import DeleteProjectDialog from "@/components/DeleteProjectDialog";
 
 export const Route = createFileRoute("/_authenticated/mini-admin/Dashboard/")({
   component: AdminHome,
@@ -96,6 +104,11 @@ function AdminHome() {
     PendingVendorAssignmentRow[]
   >([]);
   const [filter, setFilter] = useState("");
+  const [canManage, setCanManage] = useState(false);
+  const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editService, setEditService] = useState<ServiceKey | "">("");
+  const [savingEdit, setSavingEdit] = useState(false);
 
   const load = useCallback(async () => {
     const { data } = await supabase
@@ -103,6 +116,7 @@ function AdminHome() {
       .select(
         `id,title,service,status,location,scheduled_date,created_at,job_number,client_id,engineer_id,quotations(project_id,grand_total,payment_status,created_at)`,
       )
+      .eq("archived", false)
       .order("created_at", { ascending: false });
 
     const profileIds = Array.from(
@@ -114,11 +128,11 @@ function AdminHome() {
     ) as string[];
 
     const { data: profiles } = profileIds.length
-      ? await supabase.from<ProfileRow>("profiles").select("id,full_name").in("id", profileIds)
+      ? await supabase.from("profiles").select("id,full_name").in("id", profileIds as string[])
       : { data: [] as ProfileRow[] };
 
     const profileMap = (profiles ?? []).reduce<Record<string, string>>((map, profile) => {
-      map[profile.id] = profile.full_name ?? "";
+      map[(profile as ProfileRow).id] = (profile as ProfileRow).full_name ?? "";
       return map;
     }, {});
 
@@ -130,7 +144,7 @@ function AdminHome() {
       return {
         ...row,
         client_name: profileMap[row.client_id] ?? null,
-        engineer_name: profileMap[row.engineer_id] ?? null,
+        engineer_name: row.engineer_id ? profileMap[row.engineer_id] ?? null : null,
         quoted_amount: latestQuotation?.grand_total ?? null,
         payment_status: latestQuotation?.payment_status ?? null,
         vendor_cost: 0,
@@ -189,11 +203,77 @@ function AdminHome() {
     load();
   }, [load]);
 
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadRoles() {
+      const { data: userData, error } = await supabase.auth.getUser();
+      if (!mounted || error || !userData.user) return;
+
+      const { data: rolesData, error: rolesError } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userData.user.id);
+
+      if (!mounted || rolesError) return;
+
+      const isManageRole = (rolesData ?? []).some(
+        (role: { role: string }) => role.role === "admin" || role.role === "mini_admin",
+      );
+      setCanManage(isManageRole);
+    }
+
+    loadRoles();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   async function approveQuote(qid: string, pid: string) {
     await supabase.from("quotations").update({ status: "approved" }).eq("id", qid);
     await supabase.from("projects").update({ status: "approved" }).eq("id", pid);
     toast.success("Quotation approved");
     load();
+  }
+
+  function openEditDialog(project: Row) {
+    setEditingProjectId(project.id);
+    setEditTitle(project.title);
+    setEditService(project.service as ServiceKey);
+  }
+
+  async function saveProjectEdit() {
+    if (!editingProjectId || !editTitle.trim() || !editService) return;
+
+    setSavingEdit(true);
+    try {
+      const { error } = await supabase
+        .from("projects")
+        .update({ title: editTitle.trim(), service: editService })
+        .eq("id", editingProjectId);
+
+      if (error) throw error;
+
+      setRows((current) =>
+        current.map((row) =>
+          row.id === editingProjectId
+            ? { ...row, title: editTitle.trim(), service: editService }
+            : row,
+        ),
+      );
+      setEditingProjectId(null);
+      setEditTitle("");
+      setEditService("");
+      toast.success("Project updated");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Unable to update project");
+    } finally {
+      setSavingEdit(false);
+    }
+  }
+
+  function handleDeleted(projectId: string) {
+    setRows((current) => current.filter((row) => row.id !== projectId));
   }
 
   async function schedule(p: Row) {
@@ -324,7 +404,7 @@ function AdminHome() {
         </div>
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" asChild>
-            <Link to="/mini-admin/Admin">Vendor management</Link>
+            <Link to="/mini-admin/Admin/vendors">Vendor management</Link>
           </Button>
           <Button variant="outline" asChild>
             <Link to="/mini-admin">Staff To Do List</Link>
@@ -343,6 +423,56 @@ function AdminHome() {
           </Button>
         </div>
       </div>
+
+      <Dialog
+        open={Boolean(editingProjectId)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setEditingProjectId(null);
+            setEditTitle("");
+            setEditService("");
+          }
+        }}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit project</DialogTitle>
+            <DialogDescription>Update the project title and service.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Title</label>
+              <Input
+                value={editTitle}
+                onChange={(event) => setEditTitle(event.target.value)}
+                placeholder="Project title"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Service</label>
+              <select
+                value={editService}
+                onChange={(event) => setEditService(event.target.value as ServiceKey)}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                {SERVICES.map((service) => (
+                  <option key={service.key} value={service.key}>
+                    {service.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setEditingProjectId(null)}>
+              Cancel
+            </Button>
+            <Button onClick={saveProjectEdit} disabled={savingEdit || !editTitle.trim()}>
+              {savingEdit ? "Saving..." : "Save"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <div className="mt-6 grid md:grid-cols-3 gap-4">
         {[
@@ -499,10 +629,26 @@ function AdminHome() {
                     <td className="p-3 text-muted-foreground">{r.location ?? "—"}</td>
                     <td className="p-3">{r.scheduled_date ?? "—"}</td>
                     <td className="p-3 text-right">
-                      <Button size="sm" variant="ghost" onClick={() => schedule(r)}>
-                        <Calendar className="h-4 w-4 mr-1" />
-                        Schedule
-                      </Button>
+                      <div className="flex items-center justify-end gap-2">
+                        {canManage && (
+                          <Button size="sm" variant="ghost" onClick={() => openEditDialog(r)}>
+                            Edit
+                          </Button>
+                        )}
+                        <DeleteProjectDialog
+                          projectId={r.id}
+                          projectTitle={r.title}
+                          onDeleted={() => handleDeleted(r.id)}
+                        >
+                          <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </DeleteProjectDialog>
+                        <Button size="sm" variant="ghost" onClick={() => schedule(r)}>
+                          <Calendar className="h-4 w-4 mr-1" />
+                          Schedule
+                        </Button>
+                      </div>
                     </td>
                   </tr>
                 );
