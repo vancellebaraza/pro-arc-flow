@@ -194,7 +194,8 @@ function AdminAnalysisPage() {
     ).sort((a, b) => b[1] - a[1]);
 
     const categoryProjects = {
-      pending: projects.filter((project) => ["requested", "inspected", "quoted"].includes(project.status)),
+      pending: projects.filter((project) => ["requested", "quoted"].includes(project.status)),
+      scope: projects.filter((project) => project.status === "inspected"),
       ongoing: projects.filter((project) => ["approved", "scheduled", "in_progress"].includes(project.status)),
       completed: projects.filter((project) => project.status === "completed"),
       rejected: projects.filter((project) => project.status === "rejected"),
@@ -336,6 +337,7 @@ function AdminAnalysisPage() {
   );
   const categoryCards: Array<{ key: StatusColorGroup; label: string; count: number }> = [
     { key: "pending", label: "Pending", count: analysis.categoryProjects.pending.length },
+    { key: "scope", label: "Scope of Work", count: analysis.categoryProjects.scope.length },
     { key: "ongoing", label: "Ongoing", count: analysis.categoryProjects.ongoing.length },
     { key: "completed", label: "Completed", count: analysis.categoryProjects.completed.length },
     { key: "rejected", label: "Rejected", count: analysis.categoryProjects.rejected.length },

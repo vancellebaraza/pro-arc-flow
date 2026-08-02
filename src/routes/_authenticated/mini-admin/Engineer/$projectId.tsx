@@ -174,6 +174,7 @@ const [
 
         items:
           quotationItems?.map((item) => ({
+            type: (item as { type?: "item" | "subtitle" }).type ?? "item",
             description: item.description,
             unit: item.unit,
             qty: Number(item.qty),
@@ -182,6 +183,8 @@ const [
           })) ?? [],
 
         labour: Number(quotation?.labour ?? 0),
+        vatRate: Number(quotation?.vat_rate ?? 0),
+        vatAmount: Number(quotation?.vat_amount ?? 0),
         subtotal: Number(quotation?.subtotal ?? 0),
         grandTotal: Number(quotation?.grand_total ?? 0),
 
