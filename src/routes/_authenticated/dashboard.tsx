@@ -12,6 +12,7 @@ function DashboardRedirect() {
   useEffect(() => {
     if (loading) return;
     if (primaryRole === "admin") navigate({ to: "/admin", replace: true });
+    else if (primaryRole === "accountant") navigate({ to: "/accountant", replace: true });
     else if (primaryRole === "engineer") navigate({ to: "/engineer", replace: true });
     else if (primaryRole === "mini_admin") navigate({ to: "/mini-admin/Dashboard", replace: true });
     else navigate({ to: "/client", replace: true });

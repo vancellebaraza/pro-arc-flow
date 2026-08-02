@@ -12,6 +12,43 @@ import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { ensureFixedAccounts } from "@/lib/setup.functions";
 
+async function redirectToRoleHome(navigate: ReturnType<typeof useNavigate>) {
+  const { data: userData } = await supabase.auth.getUser();
+  if (!userData.user) {
+    navigate({ to: "/auth", replace: true });
+    return;
+  }
+
+  const { data: rolesData } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userData.user.id);
+
+  const roles = (rolesData ?? []).map((role) => role.role as string);
+  const primaryRole = roles.includes("admin")
+    ? "admin"
+    : roles.includes("accountant")
+      ? "accountant"
+      : roles.includes("mini_admin")
+        ? "mini_admin"
+        : roles.includes("engineer")
+          ? "engineer"
+          : "client";
+
+  const destination =
+    primaryRole === "admin"
+      ? "/admin"
+      : primaryRole === "accountant"
+        ? "/accountant"
+        : primaryRole === "mini_admin"
+          ? "/mini-admin/Dashboard"
+          : primaryRole === "engineer"
+            ? "/engineer"
+            : "/client";
+
+  navigate({ to: destination, replace: true });
+}
+
 export const Route = createFileRoute("/auth")({
   head: () => ({ meta: [{ title: "Sign in — FusionPro" }] }),
   component: AuthPage,
@@ -28,7 +65,9 @@ function AuthPage() {
     // Ensure fixed admin/engineer accounts exist (idempotent)
     provision({ data: undefined }).catch(() => {});
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/dashboard", replace: true });
+      if (data.session) {
+        void redirectToRoleHome(navigate);
+      }
     });
   }, [navigate, provision]);
 
@@ -57,7 +96,7 @@ function AuthPage() {
       setLoading(false);
     }
     toast.success("Welcome back");
-    navigate({ to: "/dashboard", replace: true });
+    await redirectToRoleHome(navigate);
   }
 
   async function signUp(e: React.FormEvent<HTMLFormElement>) {
@@ -91,7 +130,7 @@ function AuthPage() {
       setLoading(false);
     }
     toast.success("Account created. You're signed in.");
-    navigate({ to: "/dashboard", replace: true });
+    await redirectToRoleHome(navigate);
   }
 
   async function sendResetLink(e: React.FormEvent<HTMLFormElement>) {

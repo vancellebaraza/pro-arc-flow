@@ -4,12 +4,12 @@ import {
   Outlet,
   Link,
   createFileRoute,
-  redirect,
   useRouterState,
   useNavigate
 } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { requireRole } from "@/lib/requireRole";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,21 +32,7 @@ import {
 export const Route = createFileRoute("/_authenticated/mini-admin")({
   component: MiniAdminLayout,
   beforeLoad: async () => {
-    const { data: userData, error } = await supabase.auth.getUser();
-    if (error || !userData.user) throw redirect({ to: "/auth" });
-
-    const { data: rolesData, error: rolesError } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userData.user.id);
-
-    if (rolesError) throw redirect({ to: "/dashboard" });
-    const hasAccess = (rolesData ?? []).some(
-      (role) => role.role === "mini_admin" || role.role === "admin",
-    );
-    if (!hasAccess) throw redirect({ to: "/mini-admin/Dashboard" });
-
-    return { user: userData.user };
+    await requireRole(["mini_admin", "admin"], "/auth");
   },
 });
 

@@ -46,6 +46,8 @@ function AuthedLayout() {
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isMiniAdminPage = pathname.startsWith("/mini-admin");
+  const isAccountantPage = pathname.startsWith("/accountant");
+  const isStandaloneSectionPage = isMiniAdminPage || isAccountantPage;
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [notifications, setNotifications] = useState<Array<{ id: string; title: string; body: string | null; link: string | null; read_at: string | null }>>([]);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -95,24 +97,27 @@ function AuthedLayout() {
     primaryRole === "admin"
       ? [
           { to: "/admin", label: "Admin", icon: ShieldCheck },
+          { to: "/accountant", label: "Accountant", icon: ShieldCheck },
           { to: "/admin/analysis", label: "Analysis", icon: BarChart3 },
           { to: "/admin/vendors", label: "Vendor Management", icon: Briefcase },
           { to: "/admin/todos", label: "Staff To Do", icon: Calendar },
           { to: "/engineer", label: "Engineer view", icon: Wrench },
           { to: "/client", label: "Client view", icon: ClipboardPlus },
         ]
-      : primaryRole === "mini_admin"
-        ? [{ to: "/mini-admin", label: "Mini Admin", icon: ShieldCheck }]
-        : primaryRole === "engineer"
-          ? [{ to: "/engineer", label: "Engineer", icon: Wrench }]
-          : [
-              { to: "/client", label: "My projects", icon: LayoutDashboard },
-              { to: "/client/new", label: "New request", icon: ClipboardPlus },
-            ];
+      : primaryRole === "accountant"
+        ? [{ to: "/accountant", label: "Accountant", icon: ShieldCheck }]
+        : primaryRole === "mini_admin"
+          ? [{ to: "/mini-admin", label: "Mini Admin", icon: ShieldCheck }]
+          : primaryRole === "engineer"
+            ? [{ to: "/engineer", label: "Engineer", icon: Wrench }]
+            : [
+                { to: "/client", label: "My projects", icon: LayoutDashboard },
+                { to: "/client/new", label: "New request", icon: ClipboardPlus },
+              ];
 
   return (
     <div className="min-h-screen flex w-full bg-background">
-{!isMiniAdminPage && (
+{!isStandaloneSectionPage && (
   <aside className="hidden md:flex w-60 shrink-0 flex-col border-r surface">
     <div className="h-16 flex items-center px-5 border-b">
       <Link to="/">
@@ -155,7 +160,7 @@ function AuthedLayout() {
 )}
 
       <div className="flex-1 flex flex-col min-w-0">
-        {!isMiniAdminPage &&(<header className="md:hidden h-14 border-b flex items-center justify-between px-4">
+        {!isStandaloneSectionPage && (<header className="md:hidden h-14 border-b flex items-center justify-between px-4">
           <Logo className="h-6 w-auto" />
           <div className="relative">
             <Button variant="ghost" size="sm" onClick={() => setMobileNavOpen((v) => !v)}>
@@ -188,7 +193,7 @@ function AuthedLayout() {
             )}
           </div>
         </header>)}
-        {!isMiniAdminPage && (
+        {!isStandaloneSectionPage && (
           <header className="hidden md:flex h-16 items-center justify-end border-b px-4">
             <DropdownMenu open={notificationsOpen} onOpenChange={setNotificationsOpen}>
               <DropdownMenuTrigger asChild>
