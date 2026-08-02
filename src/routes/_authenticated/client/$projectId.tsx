@@ -36,7 +36,9 @@ interface Quotation {
 }
 interface Item {
   id: string;
+  type: "item" | "subtitle";
   description: string;
+  unit?: string | null;
   qty: number;
   unit_cost: number;
   amount: number;
@@ -78,7 +80,26 @@ function ProjectDetail() {
         .select("*")
         .eq("quotation_id", q.id)
         .order("sort_order");
-      setItems((it ?? []) as Item[]);
+      setItems(
+        ((it ?? []) as Array<{
+          id: string;
+          description: string;
+          unit: string | null;
+          qty: number;
+          unit_cost: number;
+          amount: number;
+          sort_order: number;
+        }>).map((item) => ({
+          id: item.id,
+          type: "item" as const,
+          description: item.description,
+          unit: item.unit,
+          qty: Number(item.qty),
+          unit_cost: Number(item.unit_cost),
+          amount: Number(item.amount),
+          sort_order: item.sort_order,
+        })),
+      );
     }
     const { data: ins } = await supabase
       .from("inspections")
@@ -121,6 +142,8 @@ function ProjectDetail() {
         date: new Date(quote.created_at).toLocaleDateString(),
         items,
         labour,
+        vatRate: Number(quote.vat_rate ?? 0),
+        vatAmount: Number(quote.vat_amount ?? 0),
         subtotal: Number(quote.subtotal),
         grandTotal: Number(quote.grand_total),
         notes: quote.notes,

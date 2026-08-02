@@ -7,7 +7,7 @@ type Props = {
 
 const STAGES = [
   { key: "requested", label: "Requested" },
-  { key: "inspected", label: "Inspected" },
+  { key: "inspected", label: "Scope of Work" },
   { key: "quoted", label: "Quoted" },
   { key: "approved", label: "Approved" },
   { key: "scheduled", label: "Scheduled" },

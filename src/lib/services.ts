@@ -61,7 +61,7 @@ export const SERVICES: Array<{
 
 export const STATUS_LABEL: Record<string, string> = {
   requested: "Requested",
-  inspected: "Inspected",
+  inspected: "Scope of Work",
   quoted: "Quoted",
   approved: "Approved",
   scheduled: "Scheduled",
@@ -70,17 +70,18 @@ export const STATUS_LABEL: Record<string, string> = {
   rejected: "Rejected",
 };
 
-export type StatusColorGroup = "pending" | "rejected" | "ongoing" | "completed";
+export type StatusColorGroup = "pending" | "rejected" | "ongoing" | "completed" | "scope";
 
 export const STATUS_COLOR_GROUP: Record<string, StatusColorGroup> = {
   requested: "pending",
-  inspected: "pending",
+  inspected: "scope",
   quoted: "pending",
   approved: "ongoing",
   scheduled: "ongoing",
   in_progress: "ongoing",
   completed: "completed",
   rejected: "rejected",
+  scope: "scope",
 };
 
 export const STATUS_COLOR_CLASSES: Record<StatusColorGroup, { dot: string; badge: string }> = {
@@ -97,6 +98,10 @@ export const STATUS_COLOR_CLASSES: Record<StatusColorGroup, { dot: string; badge
     badge: "bg-blue-500/10 text-blue-700 border border-blue-200",
   },
   completed: {
+    dot: "bg-green-500",
+    badge: "bg-green-500/10 text-green-700 border border-green-200",
+  },
+  scope: {
     dot: "bg-green-500",
     badge: "bg-green-500/10 text-green-700 border border-green-200",
   },

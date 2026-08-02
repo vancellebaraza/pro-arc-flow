@@ -98,7 +98,7 @@ function QuotationPage() {
         .order("sort_order");
       const rows = (it ?? []) as Array<{
         id: string;
-        // type: "item" | "subtitle";
+        type?: "item" | "subtitle";
         description: string;
         unit: string | null;
         qty: number;
@@ -205,7 +205,7 @@ const grandTotal = vatableAmount + vatAmount;
           actual_cost: it.actual_cost ?? null,
           sort_order: idx,
         }));
-        const { error } = await supabase.from("quotation_items").insert(rows);
+        const { error } = await (supabase.from("quotation_items") as any).insert(rows);
         if (error) throw error;
       }
       if (newStatus) setStatus(newStatus);

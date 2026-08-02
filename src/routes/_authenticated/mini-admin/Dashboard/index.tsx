@@ -43,6 +43,7 @@ interface Row {
   engineer_id: string | null;
   engineer_name: string | null;
   scheduled_date: string | null;
+  scheduled_end_date: string | null;
   created_at: string;
   job_number: string | null;
   quoted_amount: number | null;
@@ -72,6 +73,7 @@ interface ProjectQueryRow {
   status: string;
   location: string | null;
   scheduled_date: string | null;
+  scheduled_end_date: string | null;
   created_at: string;
   job_number: string | null;
   client_id: string;
@@ -89,6 +91,36 @@ interface VendorCostRow {
   cost: number | null;
 }
 
+function formatScheduleDate(value: string | null) {
+  if (!value) return "—";
+
+  const parsed = new Date(`${value}T00:00:00`);
+  if (Number.isNaN(parsed.getTime())) return value;
+
+  return parsed.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+  });
+}
+
+function renderScheduleDisplay(startDate: string | null, endDate: string | null) {
+  const startLabel = formatScheduleDate(startDate);
+  const endLabel = formatScheduleDate(endDate);
+
+  if (startLabel === "—" && endLabel === "—") {
+    return <span className="text-muted-foreground">—</span>;
+  }
+
+  return (
+    <div className="flex flex-col gap-1">
+      <span>{startLabel === "—" ? "Start: —" : `Start: ${startLabel}`}</span>
+      <span className="text-muted-foreground">
+        {endLabel === "—" ? "End: —" : `End: ${endLabel}`}
+      </span>
+    </div>
+  );
+}
+
 function AdminHome() {
   const [rows, setRows] = useState<Row[]>([]);
   const [pendingQuotes, setPendingQuotes] = useState<
@@ -104,6 +136,13 @@ function AdminHome() {
     PendingVendorAssignmentRow[]
   >([]);
   const [filter, setFilter] = useState("");
+  const [serviceFilter, setServiceFilter] = useState("all");
+  const [completionFilter, setCompletionFilter] = useState<"all" | "completed" | "not_completed">(
+    "all",
+  );
+  const [paymentFilter, setPaymentFilter] = useState<"all" | "paid" | "partial" | "unpaid">(
+    "all",
+  );
   const [canManage, setCanManage] = useState(false);
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
@@ -111,17 +150,18 @@ function AdminHome() {
   const [savingEdit, setSavingEdit] = useState(false);
 
   const load = useCallback(async () => {
-    const { data } = await supabase
-      .from("projects")
+    const { data } = await (supabase.from("projects") as any)
       .select(
-        `id,title,service,status,location,scheduled_date,created_at,job_number,client_id,engineer_id,quotations(project_id,grand_total,payment_status,created_at)`,
+        `id,title,service,status,location,scheduled_date,scheduled_end_date,created_at,job_number,client_id,engineer_id,quotations(project_id,grand_total,payment_status,created_at)`,
       )
       .eq("archived", false)
       .order("created_at", { ascending: false });
 
+    const projectRows = (data ?? []) as ProjectQueryRow[];
+
     const profileIds = Array.from(
       new Set(
-        (data ?? []).flatMap((row: ProjectQueryRow) =>
+        projectRows.flatMap((row: ProjectQueryRow) =>
           [row.client_id, row.engineer_id].filter(Boolean),
         ),
       ),
@@ -136,7 +176,7 @@ function AdminHome() {
       return map;
     }, {});
 
-    const rowsWithAggregates = (data ?? []).map((row: ProjectQueryRow) => {
+    const rowsWithAggregates = projectRows.map((row: ProjectQueryRow) => {
       const projectQuotations = Array.isArray(row.quotations) ? row.quotations : [];
       const latestQuotation = projectQuotations.sort(
         (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
@@ -277,13 +317,20 @@ function AdminHome() {
   }
 
   async function schedule(p: Row) {
-    const date = prompt("Schedule date (YYYY-MM-DD)", p.scheduled_date ?? "");
-    if (!date) return;
-    await supabase
-      .from("projects")
-      .update({ scheduled_date: date, status: "scheduled" })
+    const startDate = window.prompt("Schedule start date (YYYY-MM-DD)", p.scheduled_date ?? "");
+    if (startDate === null) return;
+
+    const endDate = window.prompt("Schedule end date (YYYY-MM-DD)", p.scheduled_end_date ?? "");
+    if (endDate === null) return;
+
+    await (supabase.from("projects") as any)
+      .update({
+        scheduled_date: startDate.trim() || null,
+        scheduled_end_date: endDate.trim() || null,
+        status: "scheduled",
+      })
       .eq("id", p.id);
-    toast.success("Scheduled");
+    toast.success("Schedule updated");
     load();
   }
 
@@ -321,6 +368,7 @@ function AdminHome() {
         : "—",
       location: r.location ?? "",
       scheduled_date: r.scheduled_date ?? "",
+      scheduled_end_date: r.scheduled_end_date ?? "",
       created_at: r.created_at,
     }));
     downloadCsv(`fusionpro-work-data-sheet-${Date.now()}.csv`, data);
@@ -366,7 +414,9 @@ function AdminHome() {
           ? `${(((r.quoted_amount - r.vendor_cost) / r.quoted_amount) * 100).toFixed(1)}%`
           : "—",
         STATUS_LABEL[r.status] ?? r.status,
-        r.scheduled_date ?? "—",
+        [r.scheduled_date, r.scheduled_end_date]
+          .filter((value) => value)
+          .join(" – ") || "—",
       ]),
       styles: { fontSize: 8 },
       headStyles: { fillColor: [30, 30, 30] },
@@ -378,20 +428,31 @@ function AdminHome() {
     doc.save(`fusionpro-work-data-sheet-${date}.pdf`);
   }
 
-  const filtered = rows.filter(
-    (r) =>
-      !filter ||
-      r.title.toLowerCase().includes(filter.toLowerCase()) ||
-      r.service.includes(filter.toLowerCase()) ||
-      (r.job_number ?? "").toLowerCase().includes(filter.toLowerCase()) ||
-      (r.client_name ?? "").toLowerCase().includes(filter.toLowerCase()) ||
-      (r.engineer_name ?? "").toLowerCase().includes(filter.toLowerCase()) ||
-      (r.payment_status ?? "").toLowerCase().includes(filter.toLowerCase()) ||
-      (r.location ?? "").toLowerCase().includes(filter.toLowerCase()) ||
-      (r.scheduled_date ?? "").toLowerCase().includes(filter.toLowerCase()) ||
-      String(r.quoted_amount ?? "").includes(filter.toLowerCase()) ||
-      String(r.vendor_cost).includes(filter.toLowerCase()),
-  );
+  const filtered = rows.filter((r) => {
+    const normalizedFilter = filter.trim().toLowerCase();
+    const matchesText =
+      !normalizedFilter ||
+      r.title.toLowerCase().includes(normalizedFilter) ||
+      r.service.toLowerCase().includes(normalizedFilter) ||
+      (r.job_number ?? "").toLowerCase().includes(normalizedFilter) ||
+      (r.client_name ?? "").toLowerCase().includes(normalizedFilter) ||
+      (r.engineer_name ?? "").toLowerCase().includes(normalizedFilter) ||
+      (r.payment_status ?? "").toLowerCase().includes(normalizedFilter) ||
+      (r.location ?? "").toLowerCase().includes(normalizedFilter) ||
+      (r.scheduled_date ?? "").toLowerCase().includes(normalizedFilter) ||
+      (r.scheduled_end_date ?? "").toLowerCase().includes(normalizedFilter) ||
+      String(r.quoted_amount ?? "").includes(normalizedFilter) ||
+      String(r.vendor_cost).includes(normalizedFilter);
+
+    const matchesService = serviceFilter === "all" || r.service === serviceFilter;
+    const matchesCompletion =
+      completionFilter === "all" ||
+      (completionFilter === "completed" ? r.status === "completed" : r.status !== "completed");
+    const matchesPayment =
+      paymentFilter === "all" || (r.payment_status ?? "unpaid").toLowerCase() === paymentFilter;
+
+    return matchesText && matchesService && matchesCompletion && matchesPayment;
+  });
 
   return (
     <div className="p-4 md:p-8 fade-in">
@@ -575,12 +636,58 @@ function AdminHome() {
       <section className="mt-8">
         <div className="flex items-end justify-between gap-3 flex-wrap mb-3">
           <h2 className="text-lg font-semibold tracking-tight">Work Data Sheet</h2>
-          <Input
-            placeholder="Filter…"
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className="max-w-xs"
-          />
+          <div className="flex flex-wrap items-end gap-2">
+            <div className="space-y-1">
+              <label className="text-xs text-muted-foreground">Service</label>
+              <select
+                value={serviceFilter}
+                onChange={(event) => setServiceFilter(event.target.value)}
+                className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                <option value="all">All services</option>
+                {SERVICES.map((service) => (
+                  <option key={service.key} value={service.key}>
+                    {service.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs text-muted-foreground">Completion Status</label>
+              <select
+                value={completionFilter}
+                onChange={(event) =>
+                  setCompletionFilter(event.target.value as "all" | "completed" | "not_completed")
+                }
+                className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                <option value="all">All</option>
+                <option value="completed">Completed</option>
+                <option value="not_completed">Not completed</option>
+              </select>
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs text-muted-foreground">Payment Status</label>
+              <select
+                value={paymentFilter}
+                onChange={(event) =>
+                  setPaymentFilter(event.target.value as "all" | "paid" | "partial" | "unpaid")
+                }
+                className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                <option value="all">All</option>
+                <option value="paid">Paid</option>
+                <option value="partial">Partial</option>
+                <option value="unpaid">Unpaid</option>
+              </select>
+            </div>
+            <Input
+              placeholder="Search…"
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="max-w-xs"
+            />
+          </div>
         </div>
         <div className="rounded-xl border bg-card overflow-x-auto">
           <table className="w-full text-sm">
@@ -627,7 +734,7 @@ function AdminHome() {
                     <td className="p-3">{r.payment_status ?? "unpaid"}</td>
                     <td className="p-3">{STATUS_LABEL[r.status] ?? r.status}</td>
                     <td className="p-3 text-muted-foreground">{r.location ?? "—"}</td>
-                    <td className="p-3">{r.scheduled_date ?? "—"}</td>
+                    <td className="p-3">{renderScheduleDisplay(r.scheduled_date, r.scheduled_end_date)}</td>
                     <td className="p-3 text-right">
                       <div className="flex items-center justify-end gap-2">
                         {canManage && (
