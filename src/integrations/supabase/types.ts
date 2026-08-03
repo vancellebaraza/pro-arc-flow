@@ -39,6 +39,141 @@ export type Database = {
   }
   public: {
     Tables: {
+      invoices: {
+        Row: {
+          id: string
+          quotation_id: string
+          client_id: string
+          invoice_number: string
+          issue_date: string
+          due_date: string | null
+          status: string
+          subtotal: number
+          vat_amount: number
+          total: number
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          quotation_id: string
+          client_id: string
+          invoice_number: string
+          issue_date?: string
+          due_date?: string | null
+          status?: string
+          subtotal?: number
+          vat_amount?: number
+          total?: number
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          quotation_id?: string
+          client_id?: string
+          invoice_number?: string
+          issue_date?: string
+          due_date?: string | null
+          status?: string
+          subtotal?: number
+          vat_amount?: number
+          total?: number
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      invoice_lines: {
+        Row: {
+          id: string
+          invoice_id: string
+          description: string
+          unit: string | null
+          qty: number
+          unit_cost: number
+          amount: number
+          sort_order: number
+        }
+        Insert: {
+          id?: string
+          invoice_id: string
+          description: string
+          unit?: string | null
+          qty?: number
+          unit_cost?: number
+          amount?: number
+          sort_order?: number
+        }
+        Update: {
+          id?: string
+          invoice_id?: string
+          description?: string
+          unit?: string | null
+          qty?: number
+          unit_cost?: number
+          amount?: number
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      payments: {
+        Row: {
+          id: string
+          client_id: string
+          amount: number
+          method: string | null
+          received_date: string
+          reference: string | null
+          created_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          client_id: string
+          amount: number
+          method?: string | null
+          received_date?: string
+          reference?: string | null
+          created_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          client_id?: string
+          amount?: number
+          method?: string | null
+          received_date?: string
+          reference?: string | null
+          created_by?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      payment_allocations: {
+        Row: {
+          id: string
+          payment_id: string
+          invoice_id: string
+          amount_applied: number
+        }
+        Insert: {
+          id?: string
+          payment_id: string
+          invoice_id: string
+          amount_applied: number
+        }
+        Update: {
+          id?: string
+          payment_id?: string
+          invoice_id?: string
+          amount_applied?: number
+        }
+        Relationships: []
+      }
       accounts: {
         Row: {
           id: string
