@@ -149,7 +149,7 @@ const openService = (service: (typeof SERVICES)[number]) => {
           <div className="md:col-span-1">
             <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">About</h2>
             <p className="mt-3 text-muted-foreground">
-              Built for RealArc Estates&apos; multi-trade operations team.
+              Built for Fusion Pro Limited &apos; multi-trade operations team.
             </p>
           </div>
           <div className="md:col-span-2 grid sm:grid-cols-3 gap-6">
@@ -204,7 +204,7 @@ const openService = (service: (typeof SERVICES)[number]) => {
           <div className="mt-6 flex items-center gap-2">
             <selectedService.icon className="h-5 w-5 text-primary" />
             <span className="font-medium">
-              RealArc Estates Service
+              Fusion Pro Services
             </span>
           </div>
 
