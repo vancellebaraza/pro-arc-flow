@@ -71,7 +71,7 @@ function InvoicesPage() {
 
     const { data: quotations, error: quotationsError } = await supabase
       .from("quotations")
-      .select("id,project_id,client_id,subtotal,vat_amount,grand_total,projects(title)")
+      .select("id,project_id,subtotal,vat_amount,grand_total,projects(title,client_id)")
       .eq("status", "approved");
 
     if (quotationsError) {
@@ -82,15 +82,18 @@ function InvoicesPage() {
 
     const mapped = (quotations ?? [])
       .filter((q) => !invoicedQuotationIds.has(q.id))
-      .map((q) => ({
-        id: q.id,
-        project_id: q.project_id,
-        project_title: (q.projects as unknown as { title: string } | null)?.title ?? "Untitled project",
-        client_id: q.client_id,
-        subtotal: Number(q.subtotal) || 0,
-        vat_amount: Number(q.vat_amount) || 0,
-        grand_total: Number(q.grand_total) || 0,
-      }));
+      .map((q) => {
+        const project = q.projects as unknown as { title: string; client_id: string } | null;
+        return {
+          id: q.id,
+          project_id: q.project_id,
+          project_title: project?.title ?? "Untitled project",
+          client_id: project?.client_id ?? "",
+          subtotal: Number(q.subtotal) || 0,
+          vat_amount: Number(q.vat_amount) || 0,
+          grand_total: Number(q.grand_total) || 0,
+        };
+      });
 
     setAvailableQuotations(mapped);
     setLoading(false);
