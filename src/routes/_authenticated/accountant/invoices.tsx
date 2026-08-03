@@ -24,6 +24,7 @@ interface ApprovableQuotation {
   project_title: string;
   client_id: string;
   subtotal: number;
+  labour: number;
   vat_amount: number;
   grand_total: number;
 }
@@ -71,7 +72,7 @@ function InvoicesPage() {
 
     const { data: quotations, error: quotationsError } = await supabase
       .from("quotations")
-      .select("id,project_id,subtotal,vat_amount,grand_total,projects(title,client_id)")
+      .select("id,project_id,subtotal,labour,vat_amount,grand_total,projects(title,client_id)")
       .eq("status", "approved");
 
     if (quotationsError) {
@@ -90,6 +91,7 @@ function InvoicesPage() {
           project_title: project?.title ?? "Untitled project",
           client_id: project?.client_id ?? "",
           subtotal: Number(q.subtotal) || 0,
+          labour: Number(q.labour) || 0,
           vat_amount: Number(q.vat_amount) || 0,
           grand_total: Number(q.grand_total) || 0,
         };
@@ -124,7 +126,9 @@ function InvoicesPage() {
           invoice_number: invoiceNumber.trim(),
           due_date: dueDate || null,
           status: "draft",
-          subtotal: creating.subtotal,
+          // Fold labour into subtotal so subtotal + vat_amount always equals total —
+          // the ledger posting trigger relies on this invariant holding exactly.
+          subtotal: creating.subtotal + creating.labour,
           vat_amount: creating.vat_amount,
           total: creating.grand_total,
           created_by: userData.user?.id ?? null,
