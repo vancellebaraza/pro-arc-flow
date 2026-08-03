@@ -39,6 +39,108 @@ export type Database = {
   }
   public: {
     Tables: {
+      bills: {
+        Row: {
+          id: string
+          vendor_id: string
+          project_id: string | null
+          expense_account_id: string
+          bill_number: string | null
+          description: string
+          bill_date: string
+          due_date: string | null
+          status: string
+          amount: number
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          vendor_id: string
+          project_id?: string | null
+          expense_account_id: string
+          bill_number?: string | null
+          description: string
+          bill_date?: string
+          due_date?: string | null
+          status?: string
+          amount: number
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          vendor_id?: string
+          project_id?: string | null
+          expense_account_id?: string
+          bill_number?: string | null
+          description?: string
+          bill_date?: string
+          due_date?: string | null
+          status?: string
+          amount?: number
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      vendor_payments: {
+        Row: {
+          id: string
+          vendor_id: string
+          amount: number
+          method: string | null
+          paid_date: string
+          reference: string | null
+          created_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          vendor_id: string
+          amount: number
+          method?: string | null
+          paid_date?: string
+          reference?: string | null
+          created_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          vendor_id?: string
+          amount?: number
+          method?: string | null
+          paid_date?: string
+          reference?: string | null
+          created_by?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      vendor_payment_allocations: {
+        Row: {
+          id: string
+          vendor_payment_id: string
+          bill_id: string
+          amount_applied: number
+        }
+        Insert: {
+          id?: string
+          vendor_payment_id: string
+          bill_id: string
+          amount_applied: number
+        }
+        Update: {
+          id?: string
+          vendor_payment_id?: string
+          bill_id?: string
+          amount_applied?: number
+        }
+        Relationships: []
+      }
       invoices: {
         Row: {
           id: string
