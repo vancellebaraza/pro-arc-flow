@@ -39,6 +39,105 @@ export type Database = {
   }
   public: {
     Tables: {
+      accounts: {
+        Row: {
+          id: string
+          code: string
+          name: string
+          type: string
+          parent_id: string | null
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          code: string
+          name: string
+          type: string
+          parent_id?: string | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          code?: string
+          name?: string
+          type?: string
+          parent_id?: string | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      journal_entries: {
+        Row: {
+          id: string
+          entry_date: string
+          reference: string | null
+          description: string
+          source_type: string | null
+          source_id: string | null
+          status: string
+          created_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          entry_date?: string
+          reference?: string | null
+          description: string
+          source_type?: string | null
+          source_id?: string | null
+          status?: string
+          created_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          entry_date?: string
+          reference?: string | null
+          description?: string
+          source_type?: string | null
+          source_id?: string | null
+          status?: string
+          created_by?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      journal_lines: {
+        Row: {
+          id: string
+          journal_entry_id: string
+          account_id: string
+          debit: number
+          credit: number
+          memo: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          journal_entry_id: string
+          account_id: string
+          debit?: number
+          credit?: number
+          memo?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          journal_entry_id?: string
+          account_id?: string
+          debit?: number
+          credit?: number
+          memo?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
       inspections: {
         Row: {
           checklist: Json
