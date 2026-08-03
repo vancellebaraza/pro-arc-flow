@@ -1,11 +1,15 @@
-import { Zap, Droplets, Trees, Paintbrush, Home, Container } from "lucide-react";
+import { Zap, Droplets, Trees, Paintbrush, Camera,  HardHat, Shield,Sun, Hammer,Warehouse } from "lucide-react";
 
 export type ServiceKey =
   | "electrical"
   | "plumbing"
   | "landscaping"
   | "painting"
-  | "property_management"
+  | "cctv"
+  | "solar"
+  | "civil"
+  | "electric_fence"
+  | "renovation"
   | "tank_cleaning";
 
 export const SERVICES: Array<{
@@ -19,42 +23,70 @@ export const SERVICES: Array<{
     key: "electrical",
     label: "Electrical",
     icon: Zap,
-    desc: "Wiring, lighting, faults, certified installations.",
+    desc: "Installation,maintenance,repair and troubleshooting of electrical systems,lighting,power supply,distribution boards and related equipment",
     image: "/images/svc-electrical-2.png",
   },
   {
     key: "plumbing",
     label: "Plumbing",
     icon: Droplets,
-    desc: "Leaks, fittings, pressure issues, full installs.",
-    image: "/images/svc-plumbing-2.png",
+    desc: "Installation,repair and maintenance of water supply,drainage,sewage systems,sanitary fittings,pumps, and related plumbing works.",
+    image: "/plumbing.jpeg",
   },
   {
     key: "landscaping",
     label: "Landscaping",
     icon: Trees,
-    desc: "Gardens, irrigation, hardscaping, upkeep.",
-    image: "/images/svc-landscaping-2.png",
+    desc: "Design, installation, and maintenance of lawns,gardens,trees,plants,irrigation systems,and other outdoor spaces.",
+    image: "/landscaping.jpeg",
   },
   {
     key: "painting",
     label: "Painting",
     icon: Paintbrush,
-    desc: "Interior & exterior, surface prep, finishing.",
+    desc: "Interior and exterior painting, surface preparation,wall repairs,waterproofing,repainting and application of decorative and protective coatings.",
     image: "/images/svc-painting-2.png",
   },
   {
-    key: "property_management",
-    label: "Property Management",
-    icon: Home,
-    desc: "Ongoing facility care across portfolios.",
-    image: "/images/svc-property-2.png",
+    key: "cctv",
+    label: "CCTV",
+    icon: Camera,
+    desc: "Installation, configuration, maintenance, repair, and upgrading of CCTV surveillance systems, cameras, NVRs, DVRs, monitors, and networking infrastructure.",
+    image: "/cctv.jpeg",
+  },
+  {
+    key: "civil",
+    label: "Civil Works",
+    icon: HardHat,
+    desc: "Construction, repair, and maintenance of masonry, concrete works, paving, drainage, walls, floors, manholes, structural repairs, and other building-related works.",
+    image: "/civil.jpeg",
+  },
+  {
+    key: "electric_fence",
+    label: "Electric Fence Installation",
+    icon: Shield,
+    desc: " Installation, maintenance, repair, and servicing of electric fencing systems, including energizers, HT cables, insulators, earth systems, and fence accessories.",
+    image: "/electric.jpeg",
+  },
+  {
+    key: "solar",
+    label: "Solar Installation",
+    icon: Sun,
+    desc: " Supply, installation, maintenance, and repair of solar power systems, including solar panels, batteries, inverters, solar lighting, and solar water pumping systems.",
+    image: "/solar.jpeg",
+  },
+  {
+    key: "renovation",
+    label: "Renovation",
+    icon: Hammer,
+    desc: "Building improvement and refurbishment works, including repairs, tiling, ceilings, partitions, doors, windows, flooring, fittings, and general property upgrades.",
+    image: "/renovations.jpeg",
   },
   {
     key: "tank_cleaning",
     label: "Tank Cleaning",
-    icon: Container,
-    desc: "Potable water tanks, disinfection, reports.",
+    icon: Warehouse,
+    desc: "Professional  cleaning and disinfection of water storage tanks, including removal of sludge,sediments,algae and other contaminants to maintain clean and safe water storage.",
     image: "/images/svc-tank-2.png",
   },
 ];
