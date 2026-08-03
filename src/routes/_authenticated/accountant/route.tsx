@@ -18,6 +18,7 @@ import {
   LayoutDashboard,
   Landmark,
   BarChart3,
+  FileText,
   LogOut,
   Menu,
 } from "lucide-react";
@@ -48,6 +49,11 @@ function AccountantLayout() {
       to: "/accountant/accounts",
       label: "Chart of Accounts",
       icon: Landmark,
+    },
+    {
+      to: "/accountant/invoices",
+      label: "Invoices",
+      icon: FileText,
     },
     {
       to: "/accountant/analysis",
