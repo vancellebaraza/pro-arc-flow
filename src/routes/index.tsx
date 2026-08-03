@@ -73,15 +73,14 @@ const openService = (service: (typeof SERVICES)[number]) => {
           <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center">
             <div className="relative">
               <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                RealArc Estates · Operations
+                Fusion Pro limited · Repairs & Renovations 
               </p>
               <h1 className="mt-4 text-4xl md:text-6xl font-semibold tracking-tight leading-[1.05] max-w-3xl">
-                One system for every property service request, inspection, and report.
+                Your trusted partner for repairs, renovations, and property improvement.
               </h1>
               <p className="mt-6 max-w-2xl text-base md:text-lg text-muted-foreground leading-relaxed">
-                FusionPro coordinates clients, engineers, and admins across electrical, plumbing,
-                landscaping, painting, property management, and tank cleaning — from intake to completion.
-              </p>
+                Fusion Pro Limited delivers reliable repair, maintenance,renovation, and  home improvement services for home owners,landlords,businesses, and property managers. FRom small fixes to complete renovations, we handle every project with quality craftsmanship and attention to detail.
+                </p>
               <div className="mt-10 flex flex-wrap gap-3">
                 <Link
                   to="/auth"
