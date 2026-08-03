@@ -19,7 +19,7 @@ export default function Footer() {
             <Logo className="h-29 w-auto" />
 
             <p className="mt-5 text-sm leading-6 text-muted-foreground">
-              FusionPro streamlines property operations for RealArc Estates,
+              FusionPro streamlines property operations for Fusion Pro Limited,
               helping clients, engineers, and administrators manage every
               service request from inspection to completion.
             </p>
@@ -82,7 +82,7 @@ export default function Footer() {
             </h3>
 
             <p className="mt-5 text-sm text-muted-foreground">
-              Follow RealArc Estates for updates and property management news.
+              Follow Fusion Pro Limited for updates and property management news.
             </p>
 
             <div className="mt-6 flex gap-3">
@@ -109,7 +109,7 @@ export default function Footer() {
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t pt-6 text-sm text-muted-foreground md:flex-row">
           <p>
-            © {new Date().getFullYear()} RealArc Estates. All rights reserved.
+            © {new Date().getFullYear()} Fusion Pro Limited. All rights reserved.
           </p>
 
           <div className="flex gap-6">
