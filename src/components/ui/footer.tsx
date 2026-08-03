@@ -16,7 +16,7 @@ export default function Footer() {
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
           {/* Company */}
           <div>
-            <Logo className="h-10 w-auto" />
+            <Logo className="h-29 w-auto" />
 
             <p className="mt-5 text-sm leading-6 text-muted-foreground">
               FusionPro streamlines property operations for RealArc Estates,

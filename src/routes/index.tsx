@@ -3,6 +3,14 @@ import { SERVICES } from "@/lib/services";
 import { Logo } from "@/components/Logo";
 import { ArrowRight, ShieldCheck, ClipboardList, BarChart3 } from "lucide-react";
 import Footer from "@/components/ui/footer";
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -19,11 +27,21 @@ export const Route = createFileRoute("/")({
 });
 
 function Landing() {
+  const [selectedService, setSelectedService] = useState<
+  (typeof SERVICES)[number] | null
+>(null);
+
+const [open, setOpen] = useState(false);
+
+const openService = (service: (typeof SERVICES)[number]) => {
+  setSelectedService(service);
+  setOpen(true);
+};
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b bg-background/80 backdrop-blur sticky top-0 z-30">
         <div className="mx-auto max-w-6xl flex items-center justify-between px-6 h-16">
-          <Logo className="h-9 w-auto" />
+          <Logo className="h-29 w-auto" />
           <nav className="flex items-center gap-6 text-sm">
             <a href="#services" className="text-muted-foreground hover:text-foreground transition">
               Services
@@ -96,10 +114,11 @@ function Landing() {
           </div>
           <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {SERVICES.map((s) => (
-              <article
-                key={s.key}
-                className="group overflow-hidden rounded-xl border bg-card transition hover:border-foreground/30 hover:-translate-y-0.5 hover:shadow-md"
-              >
+<article
+  key={s.key}
+  onClick={() => openService(s)}
+  className="group cursor-pointer overflow-hidden rounded-xl border bg-card transition hover:border-foreground/30 hover:-translate-y-1 hover:shadow-xl"
+>
                 <div className="relative aspect-[16/10] overflow-hidden">
                   <img
                     src={s.image}
@@ -161,6 +180,48 @@ function Landing() {
           </div>
         </div>
       </section>
+      <Dialog open={open} onOpenChange={setOpen}>
+  <DialogContent className="max-w-3xl p-0 overflow-hidden">
+    {selectedService && (
+      <>
+        <img
+          src={selectedService.image}
+          alt={selectedService.label}
+          className="h-72 w-full object-cover"
+        />
+
+        <div className="p-6">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">
+              {selectedService.label}
+            </DialogTitle>
+          </DialogHeader>
+
+          <p className="mt-4 text-muted-foreground leading-7">
+            {selectedService.desc}
+          </p>
+
+          {/* Optional extra details */}
+          <div className="mt-6 flex items-center gap-2">
+            <selectedService.icon className="h-5 w-5 text-primary" />
+            <span className="font-medium">
+              RealArc Estates Service
+            </span>
+          </div>
+
+          <div className="mt-8 flex justify-end">
+            <button
+              onClick={() => setOpen(false)}
+              className="rounded-md bg-primary px-5 py-2 text-primary-foreground hover:opacity-90"
+            >
+              ← Back
+            </button>
+          </div>
+        </div>
+      </>
+    )}
+  </DialogContent>
+</Dialog>
 
 <Footer />
     </div>

@@ -160,7 +160,7 @@ function AuthPage() {
     <div className="min-h-screen grid md:grid-cols-2 bg-background">
       <div className="hidden md:flex flex-col justify-between p-10 surface border-r">
         <Link to="/">
-          <Logo className="h-10 w-auto" />
+          <Logo className="h-29 w-auto" />
         </Link>
         <div>
           <h1 className="text-3xl font-semibold tracking-tight max-w-md leading-tight">
@@ -178,7 +178,7 @@ function AuthPage() {
       <div className="flex items-center justify-center p-6">
         <div className="w-full max-w-sm">
           <div className="md:hidden mb-6">
-            <Logo className="h-8 w-auto" />
+            <Logo className="h-29 w-auto" />
           </div>
           <Tabs defaultValue="signin">
             <TabsList className="grid grid-cols-2 w-full">
