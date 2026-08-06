@@ -87,8 +87,8 @@ export default function Footer() {
 
             <div className="mt-6 flex gap-3">
               {[
-                { icon: Facebook, href: "#" },
-                { icon: Instagram, href: "#" },
+                { icon: Facebook, href: "https://www.facebook.com/profile.php?id=61593030472174" },
+                { icon: Instagram, href: "https://www.instagram.com/fusionproltd?igsh=OW9kbDBxN2V6NDRs" },
                 { icon: Linkedin, href: "#" },
               ].map(({ icon: Icon, href }) => (
                 <a
