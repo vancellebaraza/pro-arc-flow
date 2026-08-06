@@ -18,43 +18,28 @@ export const SERVICES: Array<{
   icon: typeof Zap;
   desc: string;
   image: string;
-}> = [
-  {
-    key: "electrical",
-    label: "Electrical",
-    icon: Zap,
-    desc: "Installation,maintenance,repair and troubleshooting of electrical systems,lighting,power supply,distribution boards and related equipment",
-    image: "/images/svc-electrical-2.png",
-  },
-  {
-    key: "plumbing",
-    label: "Plumbing",
-    icon: Droplets,
-    desc: "Installation,repair and maintenance of water supply,drainage,sewage systems,sanitary fittings,pumps, and related plumbing works.",
-    image: "/plumbing.jpeg",
-  },
-  {
-    key: "landscaping",
-    label: "Landscaping",
-    icon: Trees,
-    desc: "Design, installation, and maintenance of lawns,gardens,trees,plants,irrigation systems,and other outdoor spaces.",
-    image: "/landscaping.jpeg",
-  },
-  {
+}> = [  {
     key: "painting",
     label: "Painting",
     icon: Paintbrush,
     desc: "Interior and exterior painting, surface preparation,wall repairs,waterproofing,repainting and application of decorative and protective coatings.",
     image: "/images/svc-painting-2.png",
   },
-  {
+    {
+    key: "electric_fence",
+    label: "Electric Fence Installation",
+    icon: Shield,
+    desc: " Installation, maintenance, repair, and servicing of electric fencing systems, including energizers, HT cables, insulators, earth systems, and fence accessories.",
+    image: "/electric.jpeg",
+  },
+    {
     key: "cctv",
     label: "CCTV",
     icon: Camera,
     desc: "Installation, configuration, maintenance, repair, and upgrading of CCTV surveillance systems, cameras, NVRs, DVRs, monitors, and networking infrastructure.",
     image: "/cctv.jpeg",
   },
-  {
+    {
     key: "civil",
     label: "Civil Works",
     icon: HardHat,
@@ -62,11 +47,25 @@ export const SERVICES: Array<{
     image: "/civil.jpeg",
   },
   {
-    key: "electric_fence",
-    label: "Electric Fence Installation",
-    icon: Shield,
-    desc: " Installation, maintenance, repair, and servicing of electric fencing systems, including energizers, HT cables, insulators, earth systems, and fence accessories.",
-    image: "/electric.jpeg",
+    key: "renovation",
+    label: "Renovation",
+    icon: Hammer,
+    desc: "Building improvement and refurbishment works, including repairs, tiling, ceilings, partitions, doors, windows, flooring, fittings, and general property upgrades.",
+    image: "/renovations.jpeg",
+  },
+    {
+    key: "tank_cleaning",
+    label: "Tank Cleaning",
+    icon: Warehouse,
+    desc: "Professional  cleaning and disinfection of water storage tanks, including removal of sludge,sediments,algae and other contaminants to maintain clean and safe water storage.",
+    image: "/images/svc-tank-2.png",
+  },
+    {
+    key: "plumbing",
+    label: "Plumbing",
+    icon: Droplets,
+    desc: "Installation,repair and maintenance of water supply,drainage,sewage systems,sanitary fittings,pumps, and related plumbing works.",
+    image: "/plumbing.jpeg",
   },
   {
     key: "solar",
@@ -76,19 +75,22 @@ export const SERVICES: Array<{
     image: "/solar.jpeg",
   },
   {
-    key: "renovation",
-    label: "Renovation",
-    icon: Hammer,
-    desc: "Building improvement and refurbishment works, including repairs, tiling, ceilings, partitions, doors, windows, flooring, fittings, and general property upgrades.",
-    image: "/renovations.jpeg",
+    key: "electrical",
+    label: "Electrical",
+    icon: Zap,
+    desc: "Installation,maintenance,repair and troubleshooting of electrical systems,lighting,power supply,distribution boards and related equipment",
+    image: "/images/svc-electrical-2.png",
   },
   {
-    key: "tank_cleaning",
-    label: "Tank Cleaning",
-    icon: Warehouse,
-    desc: "Professional  cleaning and disinfection of water storage tanks, including removal of sludge,sediments,algae and other contaminants to maintain clean and safe water storage.",
-    image: "/images/svc-tank-2.png",
+    key: "landscaping",
+    label: "Landscaping",
+    icon: Trees,
+    desc: "Design, installation, and maintenance of lawns,gardens,trees,plants,irrigation systems,and other outdoor spaces.",
+    image: "/landscaping.jpeg",
   },
+
+
+
 ];
 
 export const STATUS_LABEL: Record<string, string> = {

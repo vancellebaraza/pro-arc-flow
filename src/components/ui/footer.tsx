@@ -35,10 +35,14 @@ export default function Footer() {
                 <span>Nairobi, Kenya</span>
               </div>
 
-              <div className="flex items-center gap-3">
-                <Phone className="h-5 w-5 text-primary" />
-                <span>+254 700 123 456</span>
-              </div>
+<div className="flex items-start gap-3">
+  <Phone className="h-5 w-5 text-primary mt-1" />
+  <div className="flex flex-col">
+    <span>+254 700 123 456</span>
+    <span>+254 106 910 483</span>
+    <span>+254 100 298 453</span>
+  </div>
+</div>
 
               <div className="flex items-center gap-3">
                 <Mail className="h-5 w-5 text-primary" />
@@ -87,8 +91,8 @@ export default function Footer() {
 
             <div className="mt-6 flex gap-3">
               {[
-                { icon: Facebook, href: "#" },
-                { icon: Instagram, href: "#" },
+                { icon: Facebook, href: "https://web.facebook.com/profile.php?id=61593030472174" },
+                { icon: Instagram, href: "https://www.instagram.com/fusionproltd?igsh=OW9kbDBxN2V6NDRs" },
                 { icon: Linkedin, href: "#" },
               ].map(({ icon: Icon, href }) => (
                 <a
