@@ -62,6 +62,8 @@ function WorksheetPage() {
   const [selectedVendorId, setSelectedVendorId] = useState("");
   const [assignmentLoading, setAssignmentLoading] = useState(false);
 
+  const [vendorAmount, setVendorAmount] = useState("");
+
   const load = useCallback(async () => {
     const { data: p } = await supabase
       .from("projects")
@@ -143,12 +145,14 @@ function WorksheetPage() {
       const { error } = await supabase.from("project_vendor_assignments").insert({
         project_id: projectId,
         vendor_id: selectedVendorId,
+        vendor_amount: parseFloat(vendorAmount),
         assigned_by: userData.user.id,
         status: "pending_approval",
       });
       if (error) throw error;
       toast.success("Vendor assignment requested");
       setSelectedVendorId("");
+      setVendorAmount("");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Unable to assign vendor");
     } finally {
@@ -356,6 +360,17 @@ function WorksheetPage() {
             </SelectContent>
           </Select>
         </div>
+        <div className="mt-4">
+  <Label>Vendor Amount (KES)</Label>
+  <Input
+    type="number"
+    min="0"
+    step="0.01"
+    value={vendorAmount}
+    onChange={(e) => setVendorAmount(e.target.value)}
+    placeholder="Enter  amount"
+  />
+</div>
 
         {selectedVendorId ? (
           <div className="mt-4 rounded-lg border bg-surface p-4">
