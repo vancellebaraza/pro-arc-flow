@@ -31,6 +31,7 @@ interface Vendor {
   services_offered: string | null;
   payment_history: string | null;
   cost: number | null;
+  document: string;
 }
 
 const emptyVendorForm = {
@@ -54,6 +55,7 @@ function normalizePhone(phone?: string | null) {
 }
 
 function VendorManagementPage() {
+  const [document, setDocument] = useState<File | null>(null);
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [form, setForm] = useState(emptyVendorForm);
   const [editingVendorId, setEditingVendorId] = useState<string | null>(null);
@@ -83,7 +85,7 @@ function VendorManagementPage() {
   }, [load]);
 
   async function saveVendor() {
-    if (!form.name || !form.contact_person || !form.phone || !form.category) {
+    if (!form.name || !form.contact_person || !form.phone || !form.category || !document) {
       toast.error("Please fill in all required fields.");
       return;
     }
@@ -92,8 +94,18 @@ function VendorManagementPage() {
     try {
       const { data: userData } = await supabase.auth.getUser();
       const parsedCost = form.cost.trim() === "" ? null : parseFloat(form.cost);
+      const extension = document.name.split(".").pop();
+
+const filePath = `contracts/${crypto.randomUUID()}.${extension}`;
+
+const { error: uploadError } = await supabase.storage
+  .from("vendor-contracts")
+  .upload(filePath, document);
+
+if (uploadError) throw uploadError;
       const payload = {
         ...form,
+        document: filePath,
         cost: Number.isFinite(parsedCost) ? parsedCost : null,
         created_by: userData?.user?.id ?? null,
       };
@@ -255,6 +267,26 @@ function VendorManagementPage() {
                 placeholder="Payment history"
               />
             </div>
+            <div>
+  <Label htmlFor="document">
+    Vendor Contract <span className="text-destructive">*</span>
+  </Label>
+
+  <Input
+    id="document"
+    type="file"
+    accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    required
+    onChange={(e) => {
+      const file = e.target.files?.[0] ?? null;
+      setDocument(file);
+    }}
+  />
+
+  <p className="mt-1 text-xs text-muted-foreground">
+    Accepted formats: PDF, DOC, DOCX
+  </p>
+</div>
             <div className="flex justify-end">
               <Button onClick={saveVendor} disabled={saving}>
                 <Save className="h-4 w-4 mr-1" />
