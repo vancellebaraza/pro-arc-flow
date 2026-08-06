@@ -79,7 +79,7 @@ const openService = (service: (typeof SERVICES)[number]) => {
                 Your trusted partner for repairs, renovations, and property improvement.
               </h1>
               <p className="mt-6 max-w-2xl text-base md:text-lg text-muted-foreground leading-relaxed">
-                Fusion Pro Limited delivers reliable repair, maintenance,renovation, and  home improvement services for home owners,landlords,businesses, and property managers. FRom small fixes to complete renovations, we handle every project with quality craftsmanship and attention to detail.
+                Fusion Pro Limited delivers reliable repair, maintenance,renovation, and  home improvement services for home owners,landlords,businesses, and property managers. From small fixes to complete renovations, we handle every project with quality craftsmanship and attention to detail.
                 </p>
               <div className="mt-10 flex flex-wrap gap-3">
                 <Link
