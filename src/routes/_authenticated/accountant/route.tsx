@@ -22,6 +22,7 @@ import {
   Receipt,
   Wallet,
   HandCoins,
+  ScrollText,
   LogOut,
   Menu,
 } from "lucide-react";
@@ -72,6 +73,11 @@ function AccountantLayout() {
       to: "/accountant/vendor-payments",
       label: "Vendor Payments",
       icon: HandCoins,
+    },
+    {
+      to: "/accountant/reports",
+      label: "Reports",
+      icon: ScrollText,
     },
     {
       to: "/accountant/analysis",

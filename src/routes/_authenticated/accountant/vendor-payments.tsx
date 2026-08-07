@@ -19,7 +19,7 @@ export const Route = createFileRoute("/_authenticated/accountant/vendor-payments
 });
 
 interface OpenBill {
-  id: String;
+  id: string;
   description: string;
   bill_number: string | null;
   amount: number;
@@ -151,14 +151,14 @@ function VendorPaymentsPage() {
       }
 
       const newTotal = recording.paid_so_far + amt;
-      const newStatus = newTotal >= recording.amount ? "paid" : "partially_paid";
+      const newStatus: "paid" | "partially_paid" = newTotal >= recording.amount ? "paid" : "partially_paid";
       await supabase.from("bills").update({ status: newStatus }).eq("id", recording.id);
 
       toast.success("Vendor payment recorded and posted to the ledger.");
       setRecording(null);
       await loadData();
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
+      const message: string = error instanceof Error ? error.message : `${error}`;
       toast.error(message);
     } finally {
       setSaving(false);
