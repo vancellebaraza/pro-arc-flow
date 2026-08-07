@@ -160,11 +160,11 @@ function AuthPage() {
     <div className="min-h-screen grid md:grid-cols-2 bg-background">
       <div className="hidden md:flex flex-col justify-between p-10 surface border-r">
         <Link to="/">
-          <Logo className="h-10 w-auto" />
+          <Logo className="h-29 w-auto" />
         </Link>
         <div>
           <h1 className="text-3xl font-semibold tracking-tight max-w-md leading-tight">
-            RealArc Estates property operations, unified.
+            Fusion Pro Limited property operations, unified.
           </h1>
           <p className="mt-3 text-muted-foreground max-w-md">
             Submit requests, run inspections, build quotations, and track every project from one
@@ -172,13 +172,13 @@ function AuthPage() {
           </p>
         </div>
         <p className="text-xs text-muted-foreground">
-          © {new Date().getFullYear()} RealArc Estates
+          © {new Date().getFullYear()} Fusion Pro Limited
         </p>
       </div>
       <div className="flex items-center justify-center p-6">
         <div className="w-full max-w-sm">
           <div className="md:hidden mb-6">
-            <Logo className="h-8 w-auto" />
+            <Logo className="h-29 w-auto" />
           </div>
           <Tabs defaultValue="signin">
             <TabsList className="grid grid-cols-2 w-full">

@@ -121,7 +121,7 @@ function AuthedLayout() {
   <aside className="hidden md:flex w-60 shrink-0 flex-col border-r surface">
     <div className="h-16 flex items-center px-5 border-b">
       <Link to="/">
-        <Logo className="h-7 w-auto" />
+        <Logo className="h-26 w-auto" />
       </Link>
     </div>
 

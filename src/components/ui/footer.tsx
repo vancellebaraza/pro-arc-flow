@@ -16,10 +16,10 @@ export default function Footer() {
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
           {/* Company */}
           <div>
-            <Logo className="h-10 w-auto" />
+            <Logo className="h-29 w-auto" />
 
             <p className="mt-5 text-sm leading-6 text-muted-foreground">
-              FusionPro streamlines property operations for RealArc Estates,
+              FusionPro streamlines property operations for Fusion Pro Limited,
               helping clients, engineers, and administrators manage every
               service request from inspection to completion.
             </p>
@@ -35,10 +35,14 @@ export default function Footer() {
                 <span>Nairobi, Kenya</span>
               </div>
 
-              <div className="flex items-center gap-3">
-                <Phone className="h-5 w-5 text-primary" />
-                <span>+254 700 123 456</span>
-              </div>
+<div className="flex items-start gap-3">
+  <Phone className="h-5 w-5 text-primary mt-1" />
+  <div className="flex flex-col">
+    <span>+254 700 123 456</span>
+    <span>+254 106 910 483</span>
+    <span>+254 100 298 453</span>
+  </div>
+</div>
 
               <div className="flex items-center gap-3">
                 <Mail className="h-5 w-5 text-primary" />
@@ -82,12 +86,16 @@ export default function Footer() {
             </h3>
 
             <p className="mt-5 text-sm text-muted-foreground">
-              Follow RealArc Estates for updates and property management news.
+              Follow Fusion Pro Limited for updates and property management news.
             </p>
 
             <div className="mt-6 flex gap-3">
               {[
+<<<<<<< HEAD
                 { icon: Facebook, href: "https://www.facebook.com/profile.php?id=61593030472174" },
+=======
+                { icon: Facebook, href: "https://web.facebook.com/profile.php?id=61593030472174" },
+>>>>>>> 9d2462f1dc5a3da91b56f130e8e97ccc1161f7df
                 { icon: Instagram, href: "https://www.instagram.com/fusionproltd?igsh=OW9kbDBxN2V6NDRs" },
                 { icon: Linkedin, href: "#" },
               ].map(({ icon: Icon, href }) => (
@@ -109,7 +117,7 @@ export default function Footer() {
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t pt-6 text-sm text-muted-foreground md:flex-row">
           <p>
-            © {new Date().getFullYear()} RealArc Estates. All rights reserved.
+            © {new Date().getFullYear()} Fusion Pro Limited. All rights reserved.
           </p>
 
           <div className="flex gap-6">

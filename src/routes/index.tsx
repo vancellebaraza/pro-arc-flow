@@ -3,6 +3,14 @@ import { SERVICES } from "@/lib/services";
 import { Logo } from "@/components/Logo";
 import { ArrowRight, ShieldCheck, ClipboardList, BarChart3 } from "lucide-react";
 import Footer from "@/components/ui/footer";
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -19,11 +27,21 @@ export const Route = createFileRoute("/")({
 });
 
 function Landing() {
+  const [selectedService, setSelectedService] = useState<
+  (typeof SERVICES)[number] | null
+>(null);
+
+const [open, setOpen] = useState(false);
+
+const openService = (service: (typeof SERVICES)[number]) => {
+  setSelectedService(service);
+  setOpen(true);
+};
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b bg-background/80 backdrop-blur sticky top-0 z-30">
         <div className="mx-auto max-w-6xl flex items-center justify-between px-6 h-16">
-          <Logo className="h-9 w-auto" />
+          <Logo className="h-29 w-auto" />
           <nav className="flex items-center gap-6 text-sm">
             <a href="#services" className="text-muted-foreground hover:text-foreground transition">
               Services
@@ -55,15 +73,14 @@ function Landing() {
           <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center">
             <div className="relative">
               <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                RealArc Estates · Operations
+                Fusion Pro limited · Repairs & Renovations 
               </p>
               <h1 className="mt-4 text-4xl md:text-6xl font-semibold tracking-tight leading-[1.05] max-w-3xl">
-                One system for every property service request, inspection, and report.
+                Your trusted partner for repairs, renovations, and property improvement.
               </h1>
               <p className="mt-6 max-w-2xl text-base md:text-lg text-muted-foreground leading-relaxed">
-                FusionPro coordinates clients, engineers, and admins across electrical, plumbing,
-                landscaping, painting, property management, and tank cleaning — from intake to completion.
-              </p>
+                Fusion Pro Limited delivers reliable repair, maintenance,renovation, and  home improvement services for home owners,landlords,businesses, and property managers. From small fixes to complete renovations, we handle every project with quality craftsmanship and attention to detail.
+                </p>
               <div className="mt-10 flex flex-wrap gap-3">
                 <Link
                   to="/auth"
@@ -96,10 +113,11 @@ function Landing() {
           </div>
           <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {SERVICES.map((s) => (
-              <article
-                key={s.key}
-                className="group overflow-hidden rounded-xl border bg-card transition hover:border-foreground/30 hover:-translate-y-0.5 hover:shadow-md"
-              >
+<article
+  key={s.key}
+  onClick={() => openService(s)}
+  className="group cursor-pointer overflow-hidden rounded-xl border bg-card transition hover:border-foreground/30 hover:-translate-y-1 hover:shadow-xl"
+>
                 <div className="relative aspect-[16/10] overflow-hidden">
                   <img
                     src={s.image}
@@ -131,7 +149,7 @@ function Landing() {
           <div className="md:col-span-1">
             <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">About</h2>
             <p className="mt-3 text-muted-foreground">
-              Built for RealArc Estates&apos; multi-trade operations team.
+              Built for Fusion Pro Limited &apos; multi-trade operations team.
             </p>
           </div>
           <div className="md:col-span-2 grid sm:grid-cols-3 gap-6">
@@ -161,6 +179,48 @@ function Landing() {
           </div>
         </div>
       </section>
+      <Dialog open={open} onOpenChange={setOpen}>
+  <DialogContent className="max-w-3xl p-0 overflow-hidden">
+    {selectedService && (
+      <>
+        <img
+          src={selectedService.image}
+          alt={selectedService.label}
+          className="h-72 w-full object-cover"
+        />
+
+        <div className="p-6">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">
+              {selectedService.label}
+            </DialogTitle>
+          </DialogHeader>
+
+          <p className="mt-4 text-muted-foreground leading-7">
+            {selectedService.desc}
+          </p>
+
+          {/* Optional extra details */}
+          <div className="mt-6 flex items-center gap-2">
+            <selectedService.icon className="h-5 w-5 text-primary" />
+            <span className="font-medium">
+              Fusion Pro Services
+            </span>
+          </div>
+
+          <div className="mt-8 flex justify-end">
+            <button
+              onClick={() => setOpen(false)}
+              className="rounded-md bg-primary px-5 py-2 text-primary-foreground hover:opacity-90"
+            >
+              ← Back
+            </button>
+          </div>
+        </div>
+      </>
+    )}
+  </DialogContent>
+</Dialog>
 
 <Footer />
     </div>
