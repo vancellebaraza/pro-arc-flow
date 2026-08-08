@@ -24,6 +24,7 @@ import {
   HandCoins,
   BookOpen,
   Banknote,
+  Upload,
   ScrollText,
   LogOut,
   Menu,
@@ -85,6 +86,11 @@ function AccountantLayout() {
       to: "/accountant/bank-accounts",
       label: "Bank Accounts",
       icon: Banknote,
+    },
+    {
+      to: "/accountant/bank-import",
+      label: "Import Statement",
+      icon: Upload,
     },
     {
       to: "/accountant/reports",
