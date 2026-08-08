@@ -35,6 +35,7 @@ import { Route as AuthenticatedAccountantPaymentsRouteImport } from './routes/_a
 import { Route as AuthenticatedAccountantInvoicesRouteImport } from './routes/_authenticated/accountant/invoices'
 import { Route as AuthenticatedAccountantCashbookRouteImport } from './routes/_authenticated/accountant/cashbook'
 import { Route as AuthenticatedAccountantBillsRouteImport } from './routes/_authenticated/accountant/bills'
+import { Route as AuthenticatedAccountantBankAccountsRouteImport } from './routes/_authenticated/accountant/bank-accounts'
 import { Route as AuthenticatedAccountantAnalysisRouteImport } from './routes/_authenticated/accountant/analysis'
 import { Route as AuthenticatedAccountantAccountsRouteImport } from './routes/_authenticated/accountant/accounts'
 import { Route as AuthenticatedMiniAdminEngineerIndexRouteImport } from './routes/_authenticated/mini-admin/Engineer/index'
@@ -203,6 +204,12 @@ const AuthenticatedAccountantBillsRoute =
     path: '/bills',
     getParentRoute: () => AuthenticatedAccountantRouteRoute,
   } as any)
+const AuthenticatedAccountantBankAccountsRoute =
+  AuthenticatedAccountantBankAccountsRouteImport.update({
+    id: '/bank-accounts',
+    path: '/bank-accounts',
+    getParentRoute: () => AuthenticatedAccountantRouteRoute,
+  } as any)
 const AuthenticatedAccountantAnalysisRoute =
   AuthenticatedAccountantAnalysisRouteImport.update({
     id: '/analysis',
@@ -342,6 +349,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/accountant/accounts': typeof AuthenticatedAccountantAccountsRoute
   '/accountant/analysis': typeof AuthenticatedAccountantAnalysisRoute
+  '/accountant/bank-accounts': typeof AuthenticatedAccountantBankAccountsRoute
   '/accountant/bills': typeof AuthenticatedAccountantBillsRoute
   '/accountant/cashbook': typeof AuthenticatedAccountantCashbookRoute
   '/accountant/invoices': typeof AuthenticatedAccountantInvoicesRoute
@@ -386,6 +394,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/accountant/accounts': typeof AuthenticatedAccountantAccountsRoute
   '/accountant/analysis': typeof AuthenticatedAccountantAnalysisRoute
+  '/accountant/bank-accounts': typeof AuthenticatedAccountantBankAccountsRoute
   '/accountant/bills': typeof AuthenticatedAccountantBillsRoute
   '/accountant/cashbook': typeof AuthenticatedAccountantCashbookRoute
   '/accountant/invoices': typeof AuthenticatedAccountantInvoicesRoute
@@ -436,6 +445,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/accountant/accounts': typeof AuthenticatedAccountantAccountsRoute
   '/_authenticated/accountant/analysis': typeof AuthenticatedAccountantAnalysisRoute
+  '/_authenticated/accountant/bank-accounts': typeof AuthenticatedAccountantBankAccountsRoute
   '/_authenticated/accountant/bills': typeof AuthenticatedAccountantBillsRoute
   '/_authenticated/accountant/cashbook': typeof AuthenticatedAccountantCashbookRoute
   '/_authenticated/accountant/invoices': typeof AuthenticatedAccountantInvoicesRoute
@@ -486,6 +496,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/accountant/accounts'
     | '/accountant/analysis'
+    | '/accountant/bank-accounts'
     | '/accountant/bills'
     | '/accountant/cashbook'
     | '/accountant/invoices'
@@ -530,6 +541,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/accountant/accounts'
     | '/accountant/analysis'
+    | '/accountant/bank-accounts'
     | '/accountant/bills'
     | '/accountant/cashbook'
     | '/accountant/invoices'
@@ -579,6 +591,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/accountant/accounts'
     | '/_authenticated/accountant/analysis'
+    | '/_authenticated/accountant/bank-accounts'
     | '/_authenticated/accountant/bills'
     | '/_authenticated/accountant/cashbook'
     | '/_authenticated/accountant/invoices'
@@ -807,6 +820,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAccountantBillsRouteImport
       parentRoute: typeof AuthenticatedAccountantRouteRoute
     }
+    '/_authenticated/accountant/bank-accounts': {
+      id: '/_authenticated/accountant/bank-accounts'
+      path: '/bank-accounts'
+      fullPath: '/accountant/bank-accounts'
+      preLoaderRoute: typeof AuthenticatedAccountantBankAccountsRouteImport
+      parentRoute: typeof AuthenticatedAccountantRouteRoute
+    }
     '/_authenticated/accountant/analysis': {
       id: '/_authenticated/accountant/analysis'
       path: '/analysis'
@@ -960,6 +980,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedAccountantRouteRouteChildren {
   AuthenticatedAccountantAccountsRoute: typeof AuthenticatedAccountantAccountsRoute
   AuthenticatedAccountantAnalysisRoute: typeof AuthenticatedAccountantAnalysisRoute
+  AuthenticatedAccountantBankAccountsRoute: typeof AuthenticatedAccountantBankAccountsRoute
   AuthenticatedAccountantBillsRoute: typeof AuthenticatedAccountantBillsRoute
   AuthenticatedAccountantCashbookRoute: typeof AuthenticatedAccountantCashbookRoute
   AuthenticatedAccountantInvoicesRoute: typeof AuthenticatedAccountantInvoicesRoute
@@ -973,6 +994,8 @@ const AuthenticatedAccountantRouteRouteChildren: AuthenticatedAccountantRouteRou
   {
     AuthenticatedAccountantAccountsRoute: AuthenticatedAccountantAccountsRoute,
     AuthenticatedAccountantAnalysisRoute: AuthenticatedAccountantAnalysisRoute,
+    AuthenticatedAccountantBankAccountsRoute:
+      AuthenticatedAccountantBankAccountsRoute,
     AuthenticatedAccountantBillsRoute: AuthenticatedAccountantBillsRoute,
     AuthenticatedAccountantCashbookRoute: AuthenticatedAccountantCashbookRoute,
     AuthenticatedAccountantInvoicesRoute: AuthenticatedAccountantInvoicesRoute,

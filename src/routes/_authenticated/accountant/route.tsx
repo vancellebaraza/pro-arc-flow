@@ -23,6 +23,7 @@ import {
   Wallet,
   HandCoins,
   BookOpen,
+  Banknote,
   ScrollText,
   LogOut,
   Menu,
@@ -79,6 +80,11 @@ function AccountantLayout() {
       to: "/accountant/cashbook",
       label: "Cashbook",
       icon: BookOpen,
+    },
+    {
+      to: "/accountant/bank-accounts",
+      label: "Bank Accounts",
+      icon: Banknote,
     },
     {
       to: "/accountant/reports",
