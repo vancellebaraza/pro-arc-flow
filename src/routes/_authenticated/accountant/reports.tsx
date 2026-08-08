@@ -18,13 +18,148 @@ interface AccountBalance {
   balance: number;
 }
 
+interface AgingRow {
+  id: string;
+  party: string;
+  dueDate: string | null;
+  remaining: number;
+  bucket: "current" | "1-30" | "31-60" | "61-90" | "90+";
+}
+
+function getAgingBucket(dueDate: string | null, today: string): AgingRow["bucket"] {
+  if (!dueDate || dueDate >= today) return "current";
+  const days = Math.floor((new Date(today).getTime() - new Date(dueDate).getTime()) / (1000 * 60 * 60 * 24));
+  if (days <= 30) return "1-30";
+  if (days <= 60) return "31-60";
+  if (days <= 90) return "61-90";
+  return "90+";
+}
+
 function ReportsPage() {
   const [balances, setBalances] = useState<AccountBalance[]>([]);
+  const [arAging, setArAging] = useState<AgingRow[]>([]);
+  const [apAging, setApAging] = useState<AgingRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [agingLoading, setAgingLoading] = useState(true);
 
   useEffect(() => {
     void loadBalances();
+    void loadAging();
   }, []);
+
+  async function loadAging() {
+    setAgingLoading(true);
+    const today = new Date().toISOString().slice(0, 10);
+
+    const { data: invoices, error: invError } = await supabase
+      .from("invoices")
+      .select("id,total,status,due_date,client_id")
+      .in("status", ["sent", "partially_paid"]);
+
+    if (invError) {
+      toast.error(invError.message);
+      setAgingLoading(false);
+      return;
+    }
+
+    const { data: paymentAllocs, error: allocError } = await supabase
+      .from("payment_allocations")
+      .select("invoice_id,amount_applied");
+
+    if (allocError) {
+      toast.error(allocError.message);
+      setAgingLoading(false);
+      return;
+    }
+
+    const clientIds = [...new Set((invoices ?? []).map((i) => i.client_id))];
+    const { data: profiles, error: profError } =
+      clientIds.length > 0
+        ? await supabase.from("profiles").select("id,full_name").in("id", clientIds)
+        : { data: [], error: null };
+
+    if (profError) {
+      toast.error(profError.message);
+      setAgingLoading(false);
+      return;
+    }
+
+    const clientNameMap = new Map((profiles ?? []).map((p) => [p.id, p.full_name ?? "Unnamed client"]));
+    const paidMap = new Map<string, number>();
+    for (const a of paymentAllocs ?? []) {
+      paidMap.set(a.invoice_id, (paidMap.get(a.invoice_id) ?? 0) + (Number(a.amount_applied) || 0));
+    }
+
+    const ar: AgingRow[] = (invoices ?? [])
+      .map((inv) => {
+        const remaining = (Number(inv.total) || 0) - (paidMap.get(inv.id) ?? 0);
+        return {
+          id: inv.id,
+          party: clientNameMap.get(inv.client_id) ?? "Unknown client",
+          dueDate: inv.due_date,
+          remaining,
+          bucket: getAgingBucket(inv.due_date, today),
+        };
+      })
+      .filter((r) => r.remaining > 0.01);
+
+    setArAging(ar);
+
+    const { data: bills, error: billError } = await supabase
+      .from("bills")
+      .select("id,amount,status,due_date,vendor_id")
+      .in("status", ["approved", "partially_paid"]);
+
+    if (billError) {
+      toast.error(billError.message);
+      setAgingLoading(false);
+      return;
+    }
+
+    const { data: vendorAllocs, error: vAllocError } = await supabase
+      .from("vendor_payment_allocations")
+      .select("bill_id,amount_applied");
+
+    if (vAllocError) {
+      toast.error(vAllocError.message);
+      setAgingLoading(false);
+      return;
+    }
+
+    const vendorIds = [...new Set((bills ?? []).map((b) => b.vendor_id))];
+    const { data: vendors, error: vendorError } =
+      vendorIds.length > 0
+        ? await supabase.from("vendors").select("id,name").in("id", vendorIds)
+        : { data: [], error: null };
+
+    if (vendorError) {
+      toast.error(vendorError.message);
+      setAgingLoading(false);
+      return;
+    }
+
+    const vendorNameMap = new Map((vendors ?? []).map((v) => [v.id, v.name]));
+    const vendorPaidMap = new Map<string, number>();
+    for (const a of vendorAllocs ?? []) {
+      vendorPaidMap.set(a.bill_id, (vendorPaidMap.get(a.bill_id) ?? 0) + (Number(a.amount_applied) || 0));
+    }
+
+    const ap: AgingRow[] = (bills ?? [])
+      .map((b) => {
+        const remaining = (Number(b.amount) || 0) - (vendorPaidMap.get(b.id) ?? 0);
+        return {
+          id: b.id,
+          party: vendorNameMap.get(b.vendor_id) ?? "Unknown vendor",
+          dueDate: b.due_date,
+          remaining,
+          bucket: getAgingBucket(b.due_date, today),
+        };
+      })
+      .filter((r) => r.remaining > 0.01);
+
+    setApAging(ap);
+    setAgingLoading(false);
+  }
 
   async function loadBalances() {
     setLoading(true);
@@ -123,6 +258,7 @@ function ReportsPage() {
             <TabsTrigger value="trial-balance">Trial Balance</TabsTrigger>
             <TabsTrigger value="pl">Profit &amp; Loss</TabsTrigger>
             <TabsTrigger value="balance-sheet">Balance Sheet</TabsTrigger>
+            <TabsTrigger value="aging">AR/AP Aging</TabsTrigger>
           </TabsList>
 
           <TabsContent value="trial-balance">
@@ -268,6 +404,122 @@ function ReportsPage() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="aging">
+            <div className="grid gap-6 md:grid-cols-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Accounts Receivable Aging</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {agingLoading ? (
+                    <p className="text-sm text-muted-foreground">Loading…</p>
+                  ) : arAging.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">No unpaid invoices.</p>
+                  ) : (
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b text-left text-muted-foreground">
+                          <th className="py-2">Client</th>
+                          <th className="py-2">Due Date</th>
+                          <th className="py-2">Bucket</th>
+                          <th className="py-2 text-right">Owed</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {arAging.map((row) => (
+                          <tr key={row.id} className="border-b">
+                            <td className="py-2">{row.party}</td>
+                            <td className="py-2">{row.dueDate ?? "—"}</td>
+                            <td className="py-2">
+                              <span
+                                className={
+                                  row.bucket === "current"
+                                    ? "text-muted-foreground"
+                                    : row.bucket === "90+"
+                                      ? "font-medium text-red-700"
+                                      : "text-amber-700"
+                                }
+                              >
+                                {row.bucket}
+                              </span>
+                            </td>
+                            <td className="py-2 text-right">{row.remaining.toFixed(2)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                      <tfoot>
+                        <tr className="font-semibold">
+                          <td colSpan={3} className="py-2">
+                            Total
+                          </td>
+                          <td className="py-2 text-right">
+                            {arAging.reduce((s, r) => s + r.remaining, 0).toFixed(2)}
+                          </td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Accounts Payable Aging</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {agingLoading ? (
+                    <p className="text-sm text-muted-foreground">Loading…</p>
+                  ) : apAging.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">No unpaid bills.</p>
+                  ) : (
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b text-left text-muted-foreground">
+                          <th className="py-2">Vendor</th>
+                          <th className="py-2">Due Date</th>
+                          <th className="py-2">Bucket</th>
+                          <th className="py-2 text-right">Owed</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {apAging.map((row) => (
+                          <tr key={row.id} className="border-b">
+                            <td className="py-2">{row.party}</td>
+                            <td className="py-2">{row.dueDate ?? "—"}</td>
+                            <td className="py-2">
+                              <span
+                                className={
+                                  row.bucket === "current"
+                                    ? "text-muted-foreground"
+                                    : row.bucket === "90+"
+                                      ? "font-medium text-red-700"
+                                      : "text-amber-700"
+                                }
+                              >
+                                {row.bucket}
+                              </span>
+                            </td>
+                            <td className="py-2 text-right">{row.remaining.toFixed(2)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                      <tfoot>
+                        <tr className="font-semibold">
+                          <td colSpan={3} className="py-2">
+                            Total
+                          </td>
+                          <td className="py-2 text-right">
+                            {apAging.reduce((s, r) => s + r.remaining, 0).toFixed(2)}
+                          </td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
       )}
