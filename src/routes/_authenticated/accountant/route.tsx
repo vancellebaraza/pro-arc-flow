@@ -22,6 +22,7 @@ import {
   Receipt,
   Wallet,
   HandCoins,
+  BookOpen,
   ScrollText,
   LogOut,
   Menu,
@@ -73,6 +74,11 @@ function AccountantLayout() {
       to: "/accountant/vendor-payments",
       label: "Vendor Payments",
       icon: HandCoins,
+    },
+    {
+      to: "/accountant/cashbook",
+      label: "Cashbook",
+      icon: BookOpen,
     },
     {
       to: "/accountant/reports",
