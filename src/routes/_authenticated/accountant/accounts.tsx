@@ -27,6 +27,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { toast } from "sonner";
+import { logAudit } from "@/lib/auditLog";
 
 export const Route = createFileRoute("/_authenticated/accountant/accounts")({
   component: AccountsPage,
@@ -144,13 +145,18 @@ function AccountsPage() {
     };
 
     try {
-      const request = editingAccount
-        ? (supabase as any).from("accounts").update(payload).eq("id", editingAccount.id)
-        : (supabase as any).from("accounts").insert(payload);
-
-      const { error } = await request;
-      if (error) {
-        throw error;
+      if (editingAccount) {
+        const { error } = await (supabase as any).from("accounts").update(payload).eq("id", editingAccount.id);
+        if (error) {
+          throw error;
+        }
+        await logAudit("accounts", editingAccount.id, "update", { ...editingAccount }, { ...editingAccount, ...payload });
+      } else {
+        const { data, error } = await (supabase as any).from("accounts").insert(payload).select().single();
+        if (error) {
+          throw error;
+        }
+        await logAudit("accounts", data.id, "insert", null, payload);
       }
 
       toast.success(editingAccount ? "Account updated" : "Account created");
