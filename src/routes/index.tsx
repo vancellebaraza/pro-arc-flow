@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 
 
+
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
@@ -25,6 +26,8 @@ export const Route = createFileRoute("/")({
   }),
   component: Landing,
 });
+
+
 
 function Landing() {
   const [selectedService, setSelectedService] = useState<
@@ -46,9 +49,14 @@ const openService = (service: (typeof SERVICES)[number]) => {
             <a href="#services" className="text-muted-foreground hover:text-foreground transition">
               Services
             </a>
-            <a href="#about" className="text-muted-foreground hover:text-foreground transition">
-              About
-            </a>
+            <Link
+             to="/about"
+             className="text-muted-foreground transition hover:text-foreground"
+            >
+            About
+            </Link>
+
+
             <Link
               to="/auth"
               className="inline-flex items-center gap-1 rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:opacity-90 transition"
@@ -144,7 +152,7 @@ const openService = (service: (typeof SERVICES)[number]) => {
         </div>
       </section>
 
-      <section id="about" className="border-t">
+      {/* <section id="about" className="border-t">
         <div className="mx-auto max-w-6xl px-6 py-20 grid md:grid-cols-3 gap-10">
           <div className="md:col-span-1">
             <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">About</h2>
@@ -178,7 +186,7 @@ const openService = (service: (typeof SERVICES)[number]) => {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
       <Dialog open={open} onOpenChange={setOpen}>
   <DialogContent className="max-w-3xl p-0 overflow-hidden">
     {selectedService && (
