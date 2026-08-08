@@ -55,7 +55,7 @@ function VendorPaymentsPage() {
     const { data: bills, error: billError } = await supabase
       .from("bills")
       .select("id,description,bill_number,amount,vendor_id,status")
-      .in("status", ["approved", "partially_paid"]);
+      .eq("status", "approved");
 
     if (billError) {
       toast.error(billError.message);
