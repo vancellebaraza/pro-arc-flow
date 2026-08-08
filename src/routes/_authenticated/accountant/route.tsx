@@ -25,6 +25,7 @@ import {
   BookOpen,
   Banknote,
   Upload,
+  CheckSquare,
   ScrollText,
   LogOut,
   Menu,
@@ -91,6 +92,11 @@ function AccountantLayout() {
       to: "/accountant/bank-import",
       label: "Import Statement",
       icon: Upload,
+    },
+    {
+      to: "/accountant/reconcile",
+      label: "Reconcile",
+      icon: CheckSquare,
     },
     {
       to: "/accountant/reports",
