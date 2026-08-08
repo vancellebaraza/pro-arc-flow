@@ -13,6 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { logAudit } from "@/lib/auditLog";
 
 export const Route = createFileRoute("/_authenticated/accountant/invoices")({
   component: InvoicesPage,
@@ -140,6 +141,17 @@ function InvoicesPage() {
         throw invoiceError ?? new Error("Could not create invoice.");
       }
 
+      await logAudit("invoices", invoiceData.id, "insert", null, {
+        quotation_id: creating.id,
+        client_id: creating.client_id,
+        invoice_number: invoiceNumber.trim(),
+        due_date: dueDate || null,
+        status: "draft",
+        subtotal: creating.subtotal + creating.labour,
+        vat_amount: creating.vat_amount,
+        total: creating.grand_total,
+      });
+
       const { data: quotationItems, error: itemsError } = await supabase
         .from("quotation_items")
         .select("description,unit,qty,unit_cost,amount,sort_order")
@@ -188,6 +200,8 @@ function InvoicesPage() {
       toast.error(error.message);
       return;
     }
+
+    await logAudit("invoices", invoiceId, "update", { status: "draft" }, { status: "sent" });
 
     toast.success("Invoice sent and posted to the ledger.");
     await loadData();
