@@ -9,6 +9,7 @@ import {
   Phone,
 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import { WhatsAppIcon } from "@/components/WhatsAppButton";
 
 export default function Footer() {
   return (
@@ -65,6 +66,18 @@ export default function Footer() {
       <Phone className="h-4 w-4 shrink-0 text-primary" />
 
       <span>+254 100 298 453</span>
+    </a>
+
+    {/* WhatsApp */}
+    <a
+      href="https://wa.me/254100298453"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex w-full items-center gap-3 rounded-xl bg-primary/10 px-4 py-3 text-sm font-medium text-foreground transition-all duration-300 hover:-translate-y-0.5 hover:bg-primary/20 hover:shadow-sm"
+    >
+      <WhatsAppIcon className="h-4 w-4 shrink-0 text-primary" />
+
+      <span>Chat on WhatsApp</span>
     </a>
 
     {/* Email */}
