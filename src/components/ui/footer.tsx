@@ -120,7 +120,7 @@ export default function Footer() {
             </h3>
 
             <p className="mt-6 text-sm leading-6 text-muted-foreground">
-              Follow Fusion Pro Limited for updates and property management
+              Follow FusionPro Limited for updates and property management
               news.
             </p>
 
@@ -149,7 +149,7 @@ export default function Footer() {
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-border/50 pt-6 text-sm text-muted-foreground md:flex-row">
 
           <p className="text-center md:text-left">
-            © {new Date().getFullYear()} Fusion Pro Limited. All rights reserved.
+            © {new Date().getFullYear()} FusionPro Limited. All rights reserved.
           </p>
           {/* Website Credit */} <p className="text-center"> Website created by{" "} <a href="#" target="_blank" rel="noopener noreferrer" className="font-medium text-foreground transition hover:text-primary" > Vancelle Baraza  </a> </p>
 

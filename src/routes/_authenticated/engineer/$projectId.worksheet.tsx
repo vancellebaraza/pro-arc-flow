@@ -255,7 +255,7 @@ function WorksheetPage() {
         Back to project
       </Link>
       <h1 className="mt-3 text-2xl md:text-3xl font-semibold tracking-tight">
-        Fusionpro Limited Worksheet
+        FusionPro Limited Worksheet
       </h1>
       <p className="text-muted-foreground mt-1">Document 2 — site assessment & sign-off.</p>
 

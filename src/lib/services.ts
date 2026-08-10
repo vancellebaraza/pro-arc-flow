@@ -151,7 +151,7 @@ export function statusColorClasses(status: string) {
 
 export const BANK_DETAILS = {
   bank: "KCB",
-  account_name: "Fusionpro Limited",
+  account_name: "FusionPro Limited",
   branch: "KCB Gigiri Square Branch",
   bank_code: "323",
   account_number: "1351118463",

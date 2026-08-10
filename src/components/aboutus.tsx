@@ -160,7 +160,7 @@ export default function AboutUs() {
   <div className="absolute inset-0">
     <img
       src={aboutHero}
-      alt="Fusion Pro property maintenance"
+      alt="FusionPro property maintenance"
       className="absolute inset-0 h-full w-full object-cover object-[center_30%]"
     />
 
@@ -173,7 +173,7 @@ export default function AboutUs() {
     <div className="max-w-4xl">
 
       <p className="text-sm font-semibold uppercase tracking-[0.2em] text-white/80">
-        About Fusion
+        About FusionPro
       </p>
 
       <h1 className="mt-5 text-4xl font-semibold tracking-tight text-white md:text-6xl">
@@ -181,7 +181,7 @@ export default function AboutUs() {
       </h1>
 
       <p className="mt-6 max-w-2xl text-base leading-7 text-white/80 md:text-lg">
-        Fusion focuses exclusively on keeping properties functional,
+        FusionPro focuses exclusively on keeping properties functional,
         safe, and well-maintained through reliable repairs and
         professional maintenance services.
       </p>
@@ -208,7 +208,7 @@ export default function AboutUs() {
               </h2>
 
               <p className="mt-5 max-w-xl leading-7 text-muted-foreground">
-                Fusion focuses exclusively on keeping properties functional,
+                FusionPro focuses exclusively on keeping properties functional,
                 safe, and well-maintained.
               </p>
             </div>
@@ -379,7 +379,7 @@ export default function AboutUs() {
 
             <div>
               <p className="leading-7 text-muted-foreground">
-                Fusion aims to become one of Kenya&apos;s most trusted names
+                FusionPro aims to become one of Kenya&apos;s most trusted names
                 in property repairs and maintenance — known for dependable
                 service, consistent quality, and doing the job right the
                 first time.
@@ -432,13 +432,13 @@ export default function AboutUs() {
         </div>
       </section>
 
-      {/* Why Choose Fusion */}
+      {/* Why Choose FusionPro */}
       <section>
         <div className="mx-auto max-w-7xl px-6 py-20 md:py-24">
 
           <div className="text-center">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">
-              Why Choose Fusion?
+              Why Choose FusionPro?
             </p>
 
             <h2 className="mt-4 text-3xl font-semibold tracking-tight md:text-4xl">
@@ -446,7 +446,7 @@ export default function AboutUs() {
             </h2>
 
             <p className="mx-auto mt-4 max-w-2xl leading-7 text-muted-foreground">
-              When repairs and maintenance matter, Fusion brings focused
+              When repairs and maintenance matter, FusionPro brings focused
               expertise and dependable service.
             </p>
           </div>
@@ -479,7 +479,7 @@ export default function AboutUs() {
         </div>
       </section>
 
-      {/* Fusion Keeps Properties Working */}
+      {/* FusionPro Keeps Properties Working */}
       <section className="bg-surface">
         <div className="mx-auto max-w-7xl px-6 py-20 md:py-24">
 
@@ -491,7 +491,7 @@ export default function AboutUs() {
               </p>
 
               <h2 className="mt-4 text-3xl font-semibold tracking-tight md:text-4xl">
-                Fusion Keeps Properties Working
+                FusionPro Keeps Properties Working
               </h2>
 
               <p className="mt-5 leading-7 text-muted-foreground">
@@ -540,7 +540,7 @@ export default function AboutUs() {
             </h2>
 
             <p className="mx-auto mt-4 max-w-2xl leading-7 text-primary-foreground/80">
-              Contact Fusion Pro Limited for reliable repairs and
+              Contact FusionPro Limited for reliable repairs and
               professional maintenance services.
             </p>
 

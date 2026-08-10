@@ -164,7 +164,7 @@ function AuthPage() {
         </Link>
         <div>
           <h1 className="text-3xl font-semibold tracking-tight max-w-md leading-tight">
-            Fusion Pro Limited property operations, unified.
+            FusionPro Limited property operations, unified.
           </h1>
           <p className="mt-3 text-muted-foreground max-w-md">
             Submit requests, run inspections, build quotations, and track every project from one
@@ -172,7 +172,7 @@ function AuthPage() {
           </p>
         </div>
         <p className="text-xs text-muted-foreground">
-          © {new Date().getFullYear()} Fusion Pro Limited
+          © {new Date().getFullYear()} FusionPro Limited
         </p>
       </div>
       <div className="flex items-center justify-center p-6">
