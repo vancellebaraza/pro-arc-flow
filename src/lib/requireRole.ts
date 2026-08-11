@@ -9,6 +9,7 @@ export function resolvePrimaryRole(roles: Array<string | null | undefined>): App
   if (normalizedRoles.includes("accountant")) return "accountant";
   if (normalizedRoles.includes("mini_admin")) return "mini_admin";
   if (normalizedRoles.includes("engineer")) return "engineer";
+  if (normalizedRoles.includes("project_view_admin")) return "project_view_admin";
   return "client";
 }
 
@@ -22,6 +23,8 @@ export function getRoleHomePath(role: AppRole): string {
       return "/mini-admin/Dashboard";
     case "engineer":
       return "/engineer";
+    case "project_view_admin":
+      return "/project-viewer";
     default:
       return "/client";
   }

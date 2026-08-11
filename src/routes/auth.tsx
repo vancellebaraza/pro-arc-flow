@@ -33,7 +33,9 @@ async function redirectToRoleHome(navigate: ReturnType<typeof useNavigate>) {
         ? "mini_admin"
         : roles.includes("engineer")
           ? "engineer"
-          : "client";
+          : roles.includes("project_view_admin")
+            ? "project_view_admin"
+            : "client";
 
   const destination =
     primaryRole === "admin"
@@ -44,7 +46,9 @@ async function redirectToRoleHome(navigate: ReturnType<typeof useNavigate>) {
           ? "/mini-admin/Dashboard"
           : primaryRole === "engineer"
             ? "/engineer"
-            : "/client";
+            : primaryRole === "project_view_admin"
+              ? "/project-viewer"
+              : "/client";
 
   navigate({ to: destination, replace: true });
 }
