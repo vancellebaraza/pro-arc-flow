@@ -1,0 +1,271 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { jsPDF } from "jspdf";
+import { useEffect, useState, useCallback } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { STATUS_LABEL, SERVICES } from "@/lib/services";
+import { toast } from "sonner";
+import { ArrowLeft, FileDown } from "lucide-react";
+import { generateQuotationPdf } from "@/lib/pdf";
+import ProjectProgress from "@/components/ProjectProgress";
+
+export const Route = createFileRoute("/_authenticated/project-viewer/$projectId")({
+  component: ProjectViewerDetail,
+});
+
+interface Project {
+  id: string;
+  title: string;
+  service: string;
+  status: string;
+  description: string | null;
+  location: string | null;
+  image_urls: string[];
+}
+interface Quotation {
+  id: string;
+  vat_rate: number;
+  subtotal: number;
+  vat_amount: number;
+  grand_total: number;
+  status: string;
+  notes: string | null;
+  created_at: string;
+}
+interface Item {
+  id: string;
+  type: "item" | "subtitle";
+  description: string;
+  unit?: string | null;
+  qty: number;
+  unit_cost: number;
+  amount: number;
+  sort_order: number;
+}
+interface Inspection {
+  id: string;
+  stage: string;
+  checklist: Array<{ item: string; pass: boolean; remark?: string }>;
+  remarks: string | null;
+  created_at: string;
+}
+
+function ProjectViewerDetail() {
+  const { projectId } = Route.useParams();
+  const [project, setProject] = useState<Project | null>(null);
+  const [quote, setQuote] = useState<Quotation | null>(null);
+  const [items, setItems] = useState<Item[]>([]);
+  const [inspections, setInspections] = useState<Inspection[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const load = useCallback(async () => {
+    const { data: p } = await supabase
+      .from("projects")
+      .select("id,title,service,status,description,location,image_urls")
+      .eq("id", projectId)
+      .maybeSingle();
+    setProject(p as Project | null);
+
+    const { data: q } = await supabase
+      .from("quotations")
+      .select("*")
+      .eq("project_id", projectId)
+      .order("created_at", { ascending: false })
+      .maybeSingle();
+    setQuote(q as Quotation | null);
+    if (q) {
+      const { data: it } = await supabase
+        .from("quotation_items")
+        .select("*")
+        .eq("quotation_id", q.id)
+        .order("sort_order");
+      setItems(
+        ((it ?? []) as Array<{
+          id: string;
+          description: string;
+          unit: string | null;
+          qty: number;
+          unit_cost: number;
+          amount: number;
+          sort_order: number;
+        }>).map((item) => ({
+          id: item.id,
+          type: "item" as const,
+          description: item.description,
+          unit: item.unit,
+          qty: Number(item.qty),
+          unit_cost: Number(item.unit_cost),
+          amount: Number(item.amount),
+          sort_order: item.sort_order,
+        })),
+      );
+    }
+
+    const { data: ins } = await supabase
+      .from("inspections")
+      .select("*")
+      .eq("project_id", projectId)
+      .order("created_at", { ascending: false });
+    setInspections((ins ?? []) as unknown as Inspection[]);
+    setLoading(false);
+  }, [projectId]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  async function downloadPdf() {
+    if (!quote || !project) return;
+    try {
+      const labour = items.reduce((sum, it) => sum + Number(it.amount), 0);
+      const doc = new jsPDF();
+      await generateQuotationPdf(doc, {
+        projectTitle: project.title,
+        service: SERVICES.find((s) => s.key === project.service)?.label ?? project.service,
+        location: project.location,
+        quoteNo: quote.id.slice(0, 8).toUpperCase(),
+        billTo: project.title,
+        date: new Date(quote.created_at).toLocaleDateString(),
+        items,
+        labour,
+        vatRate: Number(quote.vat_rate ?? 0),
+        vatAmount: Number(quote.vat_amount ?? 0),
+        subtotal: Number(quote.subtotal),
+        grandTotal: Number(quote.grand_total),
+        notes: quote.notes,
+      });
+      doc.save(`Quotation-${(quote.id.slice(0, 8).toUpperCase() || "draft").replace(/\W+/g, "_")}.pdf`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to generate PDF");
+    }
+  }
+
+  if (loading) return <div className="p-8 text-sm text-muted-foreground">Loading…</div>;
+  if (!project) return <div className="p-8 text-sm">Project not found, or not assigned to you.</div>;
+  const svc = SERVICES.find((s) => s.key === project.service);
+
+  return (
+    <div className="p-6 md:p-10 max-w-4xl mx-auto fade-in">
+      <Link
+        to="/project-viewer"
+        className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
+      >
+        <ArrowLeft className="h-4 w-4 mr-1" />
+        Back
+      </Link>
+      <div className="mt-4">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground uppercase tracking-wider">
+          <span>{svc?.label}</span>·<span>{STATUS_LABEL[project.status] ?? project.status}</span>
+        </div>
+        <h1 className="text-2xl md:text-3xl font-semibold tracking-tight mt-1">{project.title}</h1>
+        <p className="text-muted-foreground mt-1">{project.location}</p>
+      </div>
+
+      <ProjectProgress status={project.status} className="mt-6" />
+
+      {project.description && <p className="mt-6 text-sm leading-relaxed">{project.description}</p>}
+
+      {project.image_urls.length > 0 && (
+        <div className="mt-6 grid grid-cols-2 gap-3">
+          {project.image_urls.map((u, i) => (
+            
+              key={i}
+              href={u}
+              target="_blank"
+              rel="noreferrer"
+              className="block rounded-md overflow-hidden border bg-card"
+            >
+              <img src={u} alt={`attachment ${i + 1}`} className="w-full h-40 object-cover" />
+            </a>
+          ))}
+        </div>
+      )}
+
+      <section className="mt-10">
+        <h2 className="text-lg font-semibold tracking-tight">Inspection reports</h2>
+        {inspections.length === 0 ? (
+          <p className="text-sm text-muted-foreground mt-2">No inspections yet.</p>
+        ) : (
+          <ul className="mt-3 space-y-3">
+            {inspections.map((ins) => (
+              <li key={ins.id} className="rounded-lg border bg-card p-4">
+                <div className="flex justify-between text-sm">
+                  <span className="font-medium capitalize">{ins.stage} inspection</span>
+                  <span className="text-muted-foreground">
+                    {new Date(ins.created_at).toLocaleDateString()}
+                  </span>
+                </div>
+                {Array.isArray(ins.checklist) && ins.checklist.length > 0 && (
+                  <ul className="mt-3 text-sm space-y-1">
+                    {ins.checklist.map((c, i) => (
+                      <li key={i} className="flex items-center gap-2">
+                        <span className={c.pass ? "text-green-700" : "text-destructive"}>
+                          {c.pass ? "✓" : "✕"}
+                        </span>
+                        {c.item}
+                        {c.remark && <span className="text-muted-foreground"> — {c.remark}</span>}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {ins.remarks && <p className="mt-2 text-sm text-muted-foreground">{ins.remarks}</p>}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <section className="mt-10">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold tracking-tight">Quotation</h2>
+          {quote && (
+            <Button variant="outline" size="sm" onClick={downloadPdf}>
+              <FileDown className="h-4 w-4 mr-1" />
+              Download PDF
+            </Button>
+          )}
+        </div>
+        {!quote ? (
+          <p className="text-sm text-muted-foreground mt-2">No quotation yet.</p>
+        ) : (
+          <div className="mt-3 rounded-lg border bg-card overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-surface text-left">
+                <tr>
+                  <th className="p-3">Description</th>
+                  <th className="p-3 text-right">Qty</th>
+                  <th className="p-3 text-right">Unit</th>
+                  <th className="p-3 text-right">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map((it) => (
+                  <tr key={it.id} className="border-t">
+                    <td className="p-3">{it.description}</td>
+                    <td className="p-3 text-right">{it.qty}</td>
+                    <td className="p-3 text-right">{Number(it.unit_cost).toFixed(2)}</td>
+                    <td className="p-3 text-right">{Number(it.amount).toFixed(2)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div className="border-t p-4 text-sm space-y-1 flex flex-col items-end">
+              <div>
+                Subtotal: <strong>{Number(quote.subtotal).toFixed(2)}</strong>
+              </div>
+              <div>
+                VAT ({quote.vat_rate}%): <strong>{Number(quote.vat_amount).toFixed(2)}</strong>
+              </div>
+              <div className="text-base">
+                Grand total: <strong>{Number(quote.grand_total).toFixed(2)}</strong>
+              </div>
+            </div>
+            <div className="border-t p-3 text-xs text-muted-foreground text-right capitalize">
+              Status: {quote.status}
+            </div>
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}
