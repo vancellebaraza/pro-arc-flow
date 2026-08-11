@@ -142,13 +142,14 @@ function WorksheetPage() {
     try {
       const { data: userData } = await supabase.auth.getUser();
       if (!userData?.user) throw new Error("Not signed in");
-      const { error } = await supabase.from("project_vendor_assignments").insert({
+      const assignmentPayload = {
         project_id: projectId,
         vendor_id: selectedVendorId,
         vendor_amount: parseFloat(vendorAmount),
         assigned_by: userData.user.id,
         status: "pending_approval",
-      });
+      } as any;
+      const { error } = await supabase.from("project_vendor_assignments").insert(assignmentPayload);
       if (error) throw error;
       toast.success("Vendor assignment requested");
       setSelectedVendorId("");
