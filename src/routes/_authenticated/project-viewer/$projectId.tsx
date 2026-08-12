@@ -168,7 +168,7 @@ function ProjectViewerDetail() {
       {project.image_urls.length > 0 && (
         <div className="mt-6 grid grid-cols-2 gap-3">
           {project.image_urls.map((u, i) => (
-            
+              <a
               key={i}
               href={u}
               target="_blank"

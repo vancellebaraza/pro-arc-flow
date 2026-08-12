@@ -27,6 +27,7 @@ import {
   BarChart3,
   LogOut, 
   Menu ,
+  Eye,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/mini-admin")({
@@ -75,6 +76,11 @@ function MiniAdminLayout() {
     to: "/mini-admin/Admin/Clients",
     label: "Client Projects",
     icon: Users,
+  },
+  {
+    to: "/mini-admin/Admin/ProjectViewers",
+    label: "Project Viewers",
+    icon: Eye,
   },
   {
     to: "/mini-admin/Admin/analysis",

@@ -725,6 +725,38 @@ export type Database = {
           },
         ]
       }
+      project_view_admin_assignments: {
+        Row: {
+          assigned_by: string
+          created_at: string
+          id: string
+          project_id: string
+          viewer_id: string
+        }
+        Insert: {
+          assigned_by: string
+          created_at?: string
+          id?: string
+          project_id: string
+          viewer_id: string
+        }
+        Update: {
+          assigned_by?: string
+          created_at?: string
+          id?: string
+          project_id?: string
+          viewer_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_view_admin_assignments_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       projects: {
         Row: {
           archived: boolean
@@ -1290,7 +1322,13 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "client" | "engineer" | "admin" | "mini_admin" | "accountant"
+      app_role:
+        | "client"
+        | "engineer"
+        | "admin"
+        | "mini_admin"
+        | "accountant"
+        | "project_view_admin"
       project_status:
         | "requested"
         | "inspected"
@@ -1446,7 +1484,14 @@ export const Constants = {
   },
   public: {
     Enums: {
-      app_role: ["client", "engineer", "admin", "mini_admin", "accountant"],
+      app_role: [
+        "client",
+        "engineer",
+        "admin",
+        "mini_admin",
+        "accountant",
+        "project_view_admin",
+      ],
       project_status: [
         "requested",
         "inspected",
