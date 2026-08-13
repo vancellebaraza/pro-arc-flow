@@ -18,6 +18,15 @@ import {
   LayoutDashboard,
   Landmark,
   BarChart3,
+  FileText,
+  Receipt,
+  Wallet,
+  HandCoins,
+  BookOpen,
+  Banknote,
+  Upload,
+  CheckSquare,
+  ScrollText,
   LogOut,
   Menu,
 } from "lucide-react";
@@ -48,6 +57,51 @@ function AccountantLayout() {
       to: "/accountant/accounts",
       label: "Chart of Accounts",
       icon: Landmark,
+    },
+    {
+      to: "/accountant/invoices",
+      label: "Invoices",
+      icon: FileText,
+    },
+    {
+      to: "/accountant/bills",
+      label: "Bills",
+      icon: Receipt,
+    },
+    {
+      to: "/accountant/payments",
+      label: "Payments",
+      icon: Wallet,
+    },
+    {
+      to: "/accountant/vendor-payments",
+      label: "Vendor Payments",
+      icon: HandCoins,
+    },
+    {
+      to: "/accountant/cashbook",
+      label: "Cashbook",
+      icon: BookOpen,
+    },
+    {
+      to: "/accountant/bank-accounts",
+      label: "Bank Accounts",
+      icon: Banknote,
+    },
+    {
+      to: "/accountant/bank-import",
+      label: "Import Statement",
+      icon: Upload,
+    },
+    {
+      to: "/accountant/reconcile",
+      label: "Reconcile",
+      icon: CheckSquare,
+    },
+    {
+      to: "/accountant/reports",
+      label: "Reports",
+      icon: ScrollText,
     },
     {
       to: "/accountant/analysis",

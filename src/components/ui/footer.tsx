@@ -125,40 +125,21 @@ export default function Footer() {
             </p>
 
             <div className="mt-6 flex gap-3">
-
-              {/* Facebook */}
-              <a
-                href="https://web.facebook.com/profile.php?id=61593030472174"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Facebook"
-                className="rounded-xl bg-background p-2.5 text-muted-foreground shadow-sm transition-all duration-200 hover:-translate-y-1 hover:bg-accent hover:text-foreground hover:shadow-md"
-              >
-                <Facebook className="h-5 w-5" />
-              </a>
-
-              {/* Instagram */}
-              <a
-                href="https://www.instagram.com/fusionproltd?igsh=OW9kbDBxN2V6NDRs"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Instagram"
-                className="rounded-xl bg-background p-2.5 text-muted-foreground shadow-sm transition-all duration-200 hover:-translate-y-1 hover:bg-accent hover:text-foreground hover:shadow-md"
-              >
-                <Instagram className="h-5 w-5" />
-              </a>
-
-              {/* LinkedIn */}
-              <a
-                href="#"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="LinkedIn"
-                className="rounded-xl bg-background p-2.5 text-muted-foreground shadow-sm transition-all duration-200 hover:-translate-y-1 hover:bg-accent hover:text-foreground hover:shadow-md"
-              >
-                <Linkedin className="h-5 w-5" />
-              </a>
-
+              {[
+                { icon: Facebook, href: "https://www.facebook.com/profile.php?id=61593030472174" },
+                { icon: Instagram, href: "https://www.instagram.com/fusionproltd?igsh=OW9kbDBxN2V6NDRs" },
+                { icon: Linkedin, href: "#" },
+              ].map(({ icon: Icon, href }) => (
+                <a
+                  key={href}
+                  href={href}
+                  className="rounded-lg border border-border bg-card p-2 transition hover:bg-accent"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Icon className="h-5 w-5" />
+                </a>
+              ))}
             </div>
           </div>
 

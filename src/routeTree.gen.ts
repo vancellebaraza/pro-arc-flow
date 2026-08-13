@@ -30,6 +30,15 @@ import { Route as AuthenticatedClientProjectIdRouteImport } from './routes/_auth
 import { Route as AuthenticatedAdminVendorsRouteImport } from './routes/_authenticated/admin/vendors'
 import { Route as AuthenticatedAdminTodosRouteImport } from './routes/_authenticated/admin/todos'
 import { Route as AuthenticatedAdminAnalysisRouteImport } from './routes/_authenticated/admin/analysis'
+import { Route as AuthenticatedAccountantVendorPaymentsRouteImport } from './routes/_authenticated/accountant/vendor-payments'
+import { Route as AuthenticatedAccountantReportsRouteImport } from './routes/_authenticated/accountant/reports'
+import { Route as AuthenticatedAccountantReconcileRouteImport } from './routes/_authenticated/accountant/reconcile'
+import { Route as AuthenticatedAccountantPaymentsRouteImport } from './routes/_authenticated/accountant/payments'
+import { Route as AuthenticatedAccountantInvoicesRouteImport } from './routes/_authenticated/accountant/invoices'
+import { Route as AuthenticatedAccountantCashbookRouteImport } from './routes/_authenticated/accountant/cashbook'
+import { Route as AuthenticatedAccountantBillsRouteImport } from './routes/_authenticated/accountant/bills'
+import { Route as AuthenticatedAccountantBankImportRouteImport } from './routes/_authenticated/accountant/bank-import'
+import { Route as AuthenticatedAccountantBankAccountsRouteImport } from './routes/_authenticated/accountant/bank-accounts'
 import { Route as AuthenticatedAccountantAnalysisRouteImport } from './routes/_authenticated/accountant/analysis'
 import { Route as AuthenticatedAccountantAccountsRouteImport } from './routes/_authenticated/accountant/accounts'
 import { Route as AuthenticatedMiniAdminEngineerIndexRouteImport } from './routes/_authenticated/mini-admin/Engineer/index'
@@ -166,6 +175,60 @@ const AuthenticatedAdminAnalysisRoute =
     id: '/analysis',
     path: '/analysis',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAccountantVendorPaymentsRoute =
+  AuthenticatedAccountantVendorPaymentsRouteImport.update({
+    id: '/vendor-payments',
+    path: '/vendor-payments',
+    getParentRoute: () => AuthenticatedAccountantRouteRoute,
+  } as any)
+const AuthenticatedAccountantReportsRoute =
+  AuthenticatedAccountantReportsRouteImport.update({
+    id: '/reports',
+    path: '/reports',
+    getParentRoute: () => AuthenticatedAccountantRouteRoute,
+  } as any)
+const AuthenticatedAccountantReconcileRoute =
+  AuthenticatedAccountantReconcileRouteImport.update({
+    id: '/reconcile',
+    path: '/reconcile',
+    getParentRoute: () => AuthenticatedAccountantRouteRoute,
+  } as any)
+const AuthenticatedAccountantPaymentsRoute =
+  AuthenticatedAccountantPaymentsRouteImport.update({
+    id: '/payments',
+    path: '/payments',
+    getParentRoute: () => AuthenticatedAccountantRouteRoute,
+  } as any)
+const AuthenticatedAccountantInvoicesRoute =
+  AuthenticatedAccountantInvoicesRouteImport.update({
+    id: '/invoices',
+    path: '/invoices',
+    getParentRoute: () => AuthenticatedAccountantRouteRoute,
+  } as any)
+const AuthenticatedAccountantCashbookRoute =
+  AuthenticatedAccountantCashbookRouteImport.update({
+    id: '/cashbook',
+    path: '/cashbook',
+    getParentRoute: () => AuthenticatedAccountantRouteRoute,
+  } as any)
+const AuthenticatedAccountantBillsRoute =
+  AuthenticatedAccountantBillsRouteImport.update({
+    id: '/bills',
+    path: '/bills',
+    getParentRoute: () => AuthenticatedAccountantRouteRoute,
+  } as any)
+const AuthenticatedAccountantBankImportRoute =
+  AuthenticatedAccountantBankImportRouteImport.update({
+    id: '/bank-import',
+    path: '/bank-import',
+    getParentRoute: () => AuthenticatedAccountantRouteRoute,
+  } as any)
+const AuthenticatedAccountantBankAccountsRoute =
+  AuthenticatedAccountantBankAccountsRouteImport.update({
+    id: '/bank-accounts',
+    path: '/bank-accounts',
+    getParentRoute: () => AuthenticatedAccountantRouteRoute,
   } as any)
 const AuthenticatedAccountantAnalysisRoute =
   AuthenticatedAccountantAnalysisRouteImport.update({
@@ -307,6 +370,15 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/accountant/accounts': typeof AuthenticatedAccountantAccountsRoute
   '/accountant/analysis': typeof AuthenticatedAccountantAnalysisRoute
+  '/accountant/bank-accounts': typeof AuthenticatedAccountantBankAccountsRoute
+  '/accountant/bank-import': typeof AuthenticatedAccountantBankImportRoute
+  '/accountant/bills': typeof AuthenticatedAccountantBillsRoute
+  '/accountant/cashbook': typeof AuthenticatedAccountantCashbookRoute
+  '/accountant/invoices': typeof AuthenticatedAccountantInvoicesRoute
+  '/accountant/payments': typeof AuthenticatedAccountantPaymentsRoute
+  '/accountant/reconcile': typeof AuthenticatedAccountantReconcileRoute
+  '/accountant/reports': typeof AuthenticatedAccountantReportsRoute
+  '/accountant/vendor-payments': typeof AuthenticatedAccountantVendorPaymentsRoute
   '/admin/analysis': typeof AuthenticatedAdminAnalysisRoute
   '/admin/todos': typeof AuthenticatedAdminTodosRoute
   '/admin/vendors': typeof AuthenticatedAdminVendorsRoute
@@ -346,6 +418,15 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/accountant/accounts': typeof AuthenticatedAccountantAccountsRoute
   '/accountant/analysis': typeof AuthenticatedAccountantAnalysisRoute
+  '/accountant/bank-accounts': typeof AuthenticatedAccountantBankAccountsRoute
+  '/accountant/bank-import': typeof AuthenticatedAccountantBankImportRoute
+  '/accountant/bills': typeof AuthenticatedAccountantBillsRoute
+  '/accountant/cashbook': typeof AuthenticatedAccountantCashbookRoute
+  '/accountant/invoices': typeof AuthenticatedAccountantInvoicesRoute
+  '/accountant/payments': typeof AuthenticatedAccountantPaymentsRoute
+  '/accountant/reconcile': typeof AuthenticatedAccountantReconcileRoute
+  '/accountant/reports': typeof AuthenticatedAccountantReportsRoute
+  '/accountant/vendor-payments': typeof AuthenticatedAccountantVendorPaymentsRoute
   '/admin/analysis': typeof AuthenticatedAdminAnalysisRoute
   '/admin/todos': typeof AuthenticatedAdminTodosRoute
   '/admin/vendors': typeof AuthenticatedAdminVendorsRoute
@@ -391,6 +472,15 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/accountant/accounts': typeof AuthenticatedAccountantAccountsRoute
   '/_authenticated/accountant/analysis': typeof AuthenticatedAccountantAnalysisRoute
+  '/_authenticated/accountant/bank-accounts': typeof AuthenticatedAccountantBankAccountsRoute
+  '/_authenticated/accountant/bank-import': typeof AuthenticatedAccountantBankImportRoute
+  '/_authenticated/accountant/bills': typeof AuthenticatedAccountantBillsRoute
+  '/_authenticated/accountant/cashbook': typeof AuthenticatedAccountantCashbookRoute
+  '/_authenticated/accountant/invoices': typeof AuthenticatedAccountantInvoicesRoute
+  '/_authenticated/accountant/payments': typeof AuthenticatedAccountantPaymentsRoute
+  '/_authenticated/accountant/reconcile': typeof AuthenticatedAccountantReconcileRoute
+  '/_authenticated/accountant/reports': typeof AuthenticatedAccountantReportsRoute
+  '/_authenticated/accountant/vendor-payments': typeof AuthenticatedAccountantVendorPaymentsRoute
   '/_authenticated/admin/analysis': typeof AuthenticatedAdminAnalysisRoute
   '/_authenticated/admin/todos': typeof AuthenticatedAdminTodosRoute
   '/_authenticated/admin/vendors': typeof AuthenticatedAdminVendorsRoute
@@ -436,6 +526,15 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/accountant/accounts'
     | '/accountant/analysis'
+    | '/accountant/bank-accounts'
+    | '/accountant/bank-import'
+    | '/accountant/bills'
+    | '/accountant/cashbook'
+    | '/accountant/invoices'
+    | '/accountant/payments'
+    | '/accountant/reconcile'
+    | '/accountant/reports'
+    | '/accountant/vendor-payments'
     | '/admin/analysis'
     | '/admin/todos'
     | '/admin/vendors'
@@ -475,6 +574,15 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/accountant/accounts'
     | '/accountant/analysis'
+    | '/accountant/bank-accounts'
+    | '/accountant/bank-import'
+    | '/accountant/bills'
+    | '/accountant/cashbook'
+    | '/accountant/invoices'
+    | '/accountant/payments'
+    | '/accountant/reconcile'
+    | '/accountant/reports'
+    | '/accountant/vendor-payments'
     | '/admin/analysis'
     | '/admin/todos'
     | '/admin/vendors'
@@ -519,6 +627,15 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/accountant/accounts'
     | '/_authenticated/accountant/analysis'
+    | '/_authenticated/accountant/bank-accounts'
+    | '/_authenticated/accountant/bank-import'
+    | '/_authenticated/accountant/bills'
+    | '/_authenticated/accountant/cashbook'
+    | '/_authenticated/accountant/invoices'
+    | '/_authenticated/accountant/payments'
+    | '/_authenticated/accountant/reconcile'
+    | '/_authenticated/accountant/reports'
+    | '/_authenticated/accountant/vendor-payments'
     | '/_authenticated/admin/analysis'
     | '/_authenticated/admin/todos'
     | '/_authenticated/admin/vendors'
@@ -707,6 +824,69 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAnalysisRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/accountant/vendor-payments': {
+      id: '/_authenticated/accountant/vendor-payments'
+      path: '/vendor-payments'
+      fullPath: '/accountant/vendor-payments'
+      preLoaderRoute: typeof AuthenticatedAccountantVendorPaymentsRouteImport
+      parentRoute: typeof AuthenticatedAccountantRouteRoute
+    }
+    '/_authenticated/accountant/reports': {
+      id: '/_authenticated/accountant/reports'
+      path: '/reports'
+      fullPath: '/accountant/reports'
+      preLoaderRoute: typeof AuthenticatedAccountantReportsRouteImport
+      parentRoute: typeof AuthenticatedAccountantRouteRoute
+    }
+    '/_authenticated/accountant/reconcile': {
+      id: '/_authenticated/accountant/reconcile'
+      path: '/reconcile'
+      fullPath: '/accountant/reconcile'
+      preLoaderRoute: typeof AuthenticatedAccountantReconcileRouteImport
+      parentRoute: typeof AuthenticatedAccountantRouteRoute
+    }
+    '/_authenticated/accountant/payments': {
+      id: '/_authenticated/accountant/payments'
+      path: '/payments'
+      fullPath: '/accountant/payments'
+      preLoaderRoute: typeof AuthenticatedAccountantPaymentsRouteImport
+      parentRoute: typeof AuthenticatedAccountantRouteRoute
+    }
+    '/_authenticated/accountant/invoices': {
+      id: '/_authenticated/accountant/invoices'
+      path: '/invoices'
+      fullPath: '/accountant/invoices'
+      preLoaderRoute: typeof AuthenticatedAccountantInvoicesRouteImport
+      parentRoute: typeof AuthenticatedAccountantRouteRoute
+    }
+    '/_authenticated/accountant/cashbook': {
+      id: '/_authenticated/accountant/cashbook'
+      path: '/cashbook'
+      fullPath: '/accountant/cashbook'
+      preLoaderRoute: typeof AuthenticatedAccountantCashbookRouteImport
+      parentRoute: typeof AuthenticatedAccountantRouteRoute
+    }
+    '/_authenticated/accountant/bills': {
+      id: '/_authenticated/accountant/bills'
+      path: '/bills'
+      fullPath: '/accountant/bills'
+      preLoaderRoute: typeof AuthenticatedAccountantBillsRouteImport
+      parentRoute: typeof AuthenticatedAccountantRouteRoute
+    }
+    '/_authenticated/accountant/bank-import': {
+      id: '/_authenticated/accountant/bank-import'
+      path: '/bank-import'
+      fullPath: '/accountant/bank-import'
+      preLoaderRoute: typeof AuthenticatedAccountantBankImportRouteImport
+      parentRoute: typeof AuthenticatedAccountantRouteRoute
+    }
+    '/_authenticated/accountant/bank-accounts': {
+      id: '/_authenticated/accountant/bank-accounts'
+      path: '/bank-accounts'
+      fullPath: '/accountant/bank-accounts'
+      preLoaderRoute: typeof AuthenticatedAccountantBankAccountsRouteImport
+      parentRoute: typeof AuthenticatedAccountantRouteRoute
+    }
     '/_authenticated/accountant/analysis': {
       id: '/_authenticated/accountant/analysis'
       path: '/analysis'
@@ -860,6 +1040,15 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedAccountantRouteRouteChildren {
   AuthenticatedAccountantAccountsRoute: typeof AuthenticatedAccountantAccountsRoute
   AuthenticatedAccountantAnalysisRoute: typeof AuthenticatedAccountantAnalysisRoute
+  AuthenticatedAccountantBankAccountsRoute: typeof AuthenticatedAccountantBankAccountsRoute
+  AuthenticatedAccountantBankImportRoute: typeof AuthenticatedAccountantBankImportRoute
+  AuthenticatedAccountantBillsRoute: typeof AuthenticatedAccountantBillsRoute
+  AuthenticatedAccountantCashbookRoute: typeof AuthenticatedAccountantCashbookRoute
+  AuthenticatedAccountantInvoicesRoute: typeof AuthenticatedAccountantInvoicesRoute
+  AuthenticatedAccountantPaymentsRoute: typeof AuthenticatedAccountantPaymentsRoute
+  AuthenticatedAccountantReconcileRoute: typeof AuthenticatedAccountantReconcileRoute
+  AuthenticatedAccountantReportsRoute: typeof AuthenticatedAccountantReportsRoute
+  AuthenticatedAccountantVendorPaymentsRoute: typeof AuthenticatedAccountantVendorPaymentsRoute
   AuthenticatedAccountantIndexRoute: typeof AuthenticatedAccountantIndexRoute
 }
 
@@ -867,6 +1056,19 @@ const AuthenticatedAccountantRouteRouteChildren: AuthenticatedAccountantRouteRou
   {
     AuthenticatedAccountantAccountsRoute: AuthenticatedAccountantAccountsRoute,
     AuthenticatedAccountantAnalysisRoute: AuthenticatedAccountantAnalysisRoute,
+    AuthenticatedAccountantBankAccountsRoute:
+      AuthenticatedAccountantBankAccountsRoute,
+    AuthenticatedAccountantBankImportRoute:
+      AuthenticatedAccountantBankImportRoute,
+    AuthenticatedAccountantBillsRoute: AuthenticatedAccountantBillsRoute,
+    AuthenticatedAccountantCashbookRoute: AuthenticatedAccountantCashbookRoute,
+    AuthenticatedAccountantInvoicesRoute: AuthenticatedAccountantInvoicesRoute,
+    AuthenticatedAccountantPaymentsRoute: AuthenticatedAccountantPaymentsRoute,
+    AuthenticatedAccountantReconcileRoute:
+      AuthenticatedAccountantReconcileRoute,
+    AuthenticatedAccountantReportsRoute: AuthenticatedAccountantReportsRoute,
+    AuthenticatedAccountantVendorPaymentsRoute:
+      AuthenticatedAccountantVendorPaymentsRoute,
     AuthenticatedAccountantIndexRoute: AuthenticatedAccountantIndexRoute,
   }
 
