@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import ApproveEvidenceDialog from "@/components/ApproveEvidenceDialog";
 import {
   Dialog,
   DialogContent,
@@ -565,10 +566,7 @@ function AdminHome() {
                     Total: {Number(q.grand_total).toFixed(2)}
                   </div>
                 </div>
-                <Button size="sm" onClick={() => approveQuote(q.id, q.project_id)}>
-                  <Check className="h-4 w-4 mr-1" />
-                  Approve
-                </Button>
+                <ApproveEvidenceDialog quotationId={q.id} projectId={q.project_id} onApproved={load} />
               </li>
             ))}
           </ul>

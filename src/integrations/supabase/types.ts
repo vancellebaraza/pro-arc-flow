@@ -866,6 +866,10 @@ export type Database = {
       }
       quotations: {
         Row: {
+          approval_evidence_note: string | null
+          approval_evidence_url: string | null
+          approved_at: string | null
+          approved_by: string | null
           created_at: string
           engineer_id: string
           grand_total: number
@@ -883,6 +887,10 @@ export type Database = {
           vat_rate: number
         }
         Insert: {
+          approval_evidence_note?: string | null
+          approval_evidence_url?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
           created_at?: string
           engineer_id: string
           grand_total?: number
@@ -900,6 +908,10 @@ export type Database = {
           vat_rate?: number
         }
         Update: {
+          approval_evidence_note?: string | null
+          approval_evidence_url?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
           created_at?: string
           engineer_id?: string
           grand_total?: number
