@@ -18,6 +18,7 @@ import { Logo } from "@/components/Logo";
 import { ArrowRight } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import aboutHero from "../assets/hero1.jpeg";
+import WhatsAppButton from "./WhatsAppButton2";
 
 export default function AboutUs() {
   const approach = [
@@ -572,7 +573,7 @@ export default function AboutUs() {
         </div>
       </section>
       <Footer />
-
+      <WhatsAppButton />
     </main>
   );
 }
