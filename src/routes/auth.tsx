@@ -11,6 +11,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { ensureFixedAccounts } from "@/lib/setup.functions";
+import WhatsAppButton from "@/components/WhatsAppButton2";
+
 
 async function redirectToRoleHome(navigate: ReturnType<typeof useNavigate>) {
   const { data: userData } = await supabase.auth.getUser();
@@ -268,6 +270,7 @@ function AuthPage() {
           </p>
         </div>
       </div>
+    <WhatsAppButton />
     </div>
   );
 }

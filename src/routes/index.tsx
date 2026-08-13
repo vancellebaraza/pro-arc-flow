@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import WhatsAppButton from "@/components/WhatsAppButton2";
 
 
 
@@ -231,6 +232,8 @@ const openService = (service: (typeof SERVICES)[number]) => {
 </Dialog>
 
 <Footer />
+
+<WhatsAppButton />
     </div>
   );
 }
