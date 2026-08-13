@@ -12,6 +12,7 @@ import {
   Users,
   Wrench,
   Zap,
+  Menu,
 } from "lucide-react";
 import Footer from "@/components/ui/footer";
 import { Logo } from "@/components/Logo";
@@ -19,6 +20,12 @@ import { ArrowRight } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import aboutHero from "../assets/hero1.jpeg";
 import WhatsAppButton from "./WhatsAppButton2";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function AboutUs() {
   const approach = [
@@ -127,34 +134,82 @@ export default function AboutUs() {
 
   return (
     <main className="bg-background">
+<header className="sticky top-0 z-30 border-b bg-background/80 backdrop-blur">
+  <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
 
-      <header className="border-b bg-background/80 backdrop-blur sticky top-0 z-30">
-        <div className="mx-auto max-w-6xl flex items-center justify-between px-6 h-16">
-          <Logo className="h-29 w-auto" />
-          <nav className="flex items-center gap-6 text-sm">
-            {/* <a href="#services" className="text-muted-foreground hover:text-foreground transition">
-              Services
-            </a> */}
-            <Link to="/" className="text-muted-foreground transition hover:text-foreground">
-              Home
-            </Link>
-            <Link
-             to="/about"
-             className="text-muted-foreground transition hover:text-foreground"
-            >
+    {/* Logo */}
+    <Link to="/" className="flex items-center">
+      <Logo className="h-14 w-auto sm:h-16" />
+    </Link>
+
+    {/* Desktop Navigation */}
+    <nav className="hidden items-center gap-5 text-sm md:flex lg:gap-6">
+      <Link
+        to="/"
+        className="text-muted-foreground transition hover:text-foreground"
+      >
+        Home
+      </Link>
+
+      <Link
+        to="/about"
+        className="text-muted-foreground transition hover:text-foreground"
+      >
+        About
+      </Link>
+
+      <Link
+        to="/auth"
+        className="inline-flex items-center gap-1 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+      >
+        Sign in
+        <ArrowRight className="h-4 w-4" />
+      </Link>
+    </nav>
+
+    {/* Mobile Navigation */}
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          type="button"
+          aria-label="Open navigation menu"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-border bg-background transition hover:bg-accent md:hidden"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent
+        align="end"
+        sideOffset={8}
+        className="w-52"
+      >
+        <DropdownMenuItem asChild>
+          <Link to="/" className="w-full cursor-pointer">
+            Home
+          </Link>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem asChild>
+          <Link to="/about" className="w-full cursor-pointer">
             About
-            </Link>
+          </Link>
+        </DropdownMenuItem>
 
+        <DropdownMenuItem asChild>
+          <Link
+            to="/auth"
+            className="flex w-full cursor-pointer items-center justify-between"
+          >
+            Sign in
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
 
-            <Link
-              to="/auth"
-              className="inline-flex items-center gap-1 rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:opacity-90 transition"
-            >
-              Sign in <ArrowRight className="h-4 w-4" />
-            </Link>
-          </nav>
-        </div>
-      </header>
+  </div>
+</header>
 {/* Hero */}
 <section className="relative overflow-hidden border-b">
   {/* Background Image */}
