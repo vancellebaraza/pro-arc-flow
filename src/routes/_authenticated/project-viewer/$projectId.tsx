@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { STATUS_LABEL, SERVICES } from "@/lib/services";
 import { toast } from "sonner";
 import { ArrowLeft, FileDown } from "lucide-react";
-import { generateQuotationPdf } from "@/lib/pdf";
+import { generateQuotationPdf, generateWorksheetPdf } from "@/lib/pdf";
 import ProjectProgress from "@/components/ProjectProgress";
 
 export const Route = createFileRoute("/_authenticated/project-viewer/$projectId")({
@@ -114,6 +114,35 @@ function ProjectViewerDetail() {
     load();
   }, [load]);
 
+  async function downloadWorksheet() {
+    const { data: ws, error } = await supabase
+      .from("worksheets")
+      .select("*")
+      .eq("project_id", projectId)
+      .order("created_at", { ascending: false })
+      .maybeSingle();
+    if (error) return toast.error(error.message);
+    try {
+      const doc = new jsPDF();
+      await generateWorksheetPdf(doc, {
+        clientName: ws.client_name ?? "",
+        jobNo: ws.job_no ?? "",
+        jobLocation: ws.job_location ?? "",
+        jobDate: ws.job_date ?? "",
+        jobType: ws.job_type ?? "",
+        technician: ws.technician ?? "",
+        personInCharge: ws.person_in_charge ?? "",
+        jobDescription: ws.job_description ?? "",
+        observations: (ws.observations as any) ?? [],
+        imagesBefore: (ws.images_before as any) ?? [],
+        signatures: (ws.signatures as any) ?? {},
+      });
+      doc.save(`Worksheet-${(ws.job_no || "job").replace(/\W+/g, "_")}.pdf`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to generate PDF");
+    }
+  }
+
   async function downloadPdf() {
     if (!quote || !project) return;
     try {
@@ -146,13 +175,19 @@ function ProjectViewerDetail() {
 
   return (
     <div className="p-6 md:p-10 max-w-4xl mx-auto fade-in">
-      <Link
-        to="/project-viewer"
-        className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft className="h-4 w-4 mr-1" />
-        Back
-      </Link>
+      <div className="flex items-center justify-between">
+        <Link
+          to="/project-viewer"
+          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="h-4 w-4 mr-1" />
+          Back
+        </Link>
+        <Button variant="outline" size="sm" onClick={downloadWorksheet}>
+          <FileDown className="h-4 w-4 mr-1" />
+          Download Job Worksheet
+        </Button>
+      </div>
       <div className="mt-4">
         <div className="flex items-center gap-2 text-xs text-muted-foreground uppercase tracking-wider">
           <span>{svc?.label}</span>·<span>{STATUS_LABEL[project.status] ?? project.status}</span>
