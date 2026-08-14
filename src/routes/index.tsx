@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SERVICES } from "@/lib/services";
 import { Logo } from "@/components/Logo";
-import { ArrowRight, ShieldCheck, ClipboardList, BarChart3 } from "lucide-react";
+import { ArrowRight, Menu,ShieldCheck, ClipboardList, BarChart3 } from "lucide-react";
 import Footer from "@/components/ui/footer";
 import { useState } from "react";
 import {
@@ -10,6 +10,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import WhatsAppButton from "@/components/WhatsAppButton2";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 
 
@@ -42,30 +50,80 @@ const openService = (service: (typeof SERVICES)[number]) => {
 };
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="border-b bg-background/80 backdrop-blur sticky top-0 z-30">
-        <div className="mx-auto max-w-6xl flex items-center justify-between px-6 h-16">
-          <Logo className="h-29 w-auto" />
-          <nav className="flex items-center gap-6 text-sm">
-            <a href="#services" className="text-muted-foreground hover:text-foreground transition">
+<header className="sticky top-0 z-30 border-b bg-background/80 backdrop-blur">
+  <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
+
+    {/* Logo */}
+    <Link to="/" className="flex items-center">
+      <Logo className="h-16 w-auto sm:h-20" />
+    </Link>
+
+    {/* Desktop Navigation */}
+    <nav className="hidden items-center gap-6 text-sm md:flex">
+      <a
+        href="#services"
+        className="text-muted-foreground transition hover:text-foreground"
+      >
+        Services
+      </a>
+
+      <Link
+        to="/about"
+        className="text-muted-foreground transition hover:text-foreground"
+      >
+        About
+      </Link>
+
+      <Link
+        to="/auth"
+        className="inline-flex items-center gap-1 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+      >
+        Sign in
+        <ArrowRight className="h-4 w-4" />
+      </Link>
+    </nav>
+
+    {/* Mobile Navigation */}
+    <div className="md:hidden">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Open navigation menu"
+          >
+            <Menu className="h-6 w-6" />
+          </Button>
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent align="end" className="w-48">
+          <DropdownMenuItem asChild>
+            <a href="#services" className="w-full">
               Services
             </a>
-            <Link
-             to="/about"
-             className="text-muted-foreground transition hover:text-foreground"
-            >
-            About
+          </DropdownMenuItem>
+
+          <DropdownMenuItem asChild>
+            <Link to="/about" className="w-full">
+              About
             </Link>
+          </DropdownMenuItem>
 
-
+          <DropdownMenuItem asChild>
             <Link
               to="/auth"
-              className="inline-flex items-center gap-1 rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:opacity-90 transition"
+              className="flex w-full items-center justify-between"
             >
-              Sign in <ArrowRight className="h-4 w-4" />
+              Sign in
+              <ArrowRight className="h-4 w-4" />
             </Link>
-          </nav>
-        </div>
-      </header>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+
+  </div>
+</header>
 
       <section className="relative overflow-hidden bg-white fade-in">
         <div className="pointer-events-none absolute inset-0">
@@ -231,6 +289,8 @@ const openService = (service: (typeof SERVICES)[number]) => {
 </Dialog>
 
 <Footer />
+
+<WhatsAppButton />
     </div>
   );
 }
