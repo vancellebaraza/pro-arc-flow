@@ -21,6 +21,8 @@ interface Row {
   quotedAmt: number | null;
   paidByClient: number;
   amountDue: number | null;
+  vendorAssignmentId: string | null;
+  vendorId: string | null;
   vendorName: string | null;
   vendorQuoted: number | null;
   variance: number | null;
@@ -40,6 +42,19 @@ export default function WorkDataSheet() {
   const [editTitle, setEditTitle] = useState("");
   const [editService, setEditService] = useState<ServiceKey | "">("");
   const [savingEdit, setSavingEdit] = useState(false);
+  const [vendorOptions, setVendorOptions] = useState<{ id: string; name: string }[]>([]);
+  const [vendorRow, setVendorRow] = useState<Row | null>(null);
+  const [vendorPickId, setVendorPickId] = useState("");
+  const [vendorQuotedInput, setVendorQuotedInput] = useState("");
+  const [vendorPayableInput, setVendorPayableInput] = useState("");
+  const [vendorPaidInput, setVendorPaidInput] = useState("");
+  const [savingVendor, setSavingVendor] = useState(false);
+
+  useEffect(() => {
+    supabase.from("vendors").select("id,name").order("name").then(({ data }) => {
+      setVendorOptions((data ?? []) as { id: string; name: string }[]);
+    });
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -79,7 +94,7 @@ export default function WorkDataSheet() {
     const { data: vendorAssignments } = projectIds.length
       ? await supabase
           .from("project_vendor_assignments")
-          .select("project_id,cost,amount_payable,amount_paid,status,created_at,vendors(name)")
+          .select("id,project_id,vendor_id,cost,amount_payable,amount_paid,status,created_at,vendors(name)")
           .in("project_id", projectIds)
       : { data: [] as any[] };
 
@@ -112,6 +127,8 @@ export default function WorkDataSheet() {
       const amountDue = quotedAmt != null ? Number((quotedAmt - paidByClient).toFixed(2)) : null;
 
       const va = vendorByProject[p.id];
+      const vendorAssignmentId = va?.id ?? null;
+      const vendorId = va?.vendor_id ?? null;
       const vendorName = va?.vendors?.name ?? null;
       const vendorQuoted = va?.cost != null ? Number(va.cost) : null;
       const amountPayable = va?.amount_payable != null ? Number(va.amount_payable) : vendorQuoted;
@@ -132,6 +149,8 @@ export default function WorkDataSheet() {
         quotedAmt,
         paidByClient,
         amountDue,
+        vendorAssignmentId,
+        vendorId,
         vendorName,
         vendorQuoted,
         variance,
@@ -194,6 +213,59 @@ export default function WorkDataSheet() {
       .eq("id", r.id);
     if (error) return toast.error(error.message);
     toast.success("Schedule updated");
+    load();
+  }
+
+  function openVendorDialog(r: Row) {
+    setVendorRow(r);
+    setVendorPickId(r.vendorId ?? "");
+    setVendorQuotedInput(r.vendorQuoted != null ? String(r.vendorQuoted) : "");
+    setVendorPayableInput(r.amountPayable != null ? String(r.amountPayable) : "");
+    setVendorPaidInput(String(r.paidToVendor ?? 0));
+  }
+
+  async function saveVendor() {
+    if (!vendorRow) return;
+    const quoted = parseFloat(vendorQuotedInput);
+    if (!vendorRow.vendorAssignmentId && !vendorPickId) {
+      toast.error("Select a vendor");
+      return;
+    }
+    if (Number.isNaN(quoted)) {
+      toast.error("Enter the amount quoted by the vendor");
+      return;
+    }
+    const payable = vendorPayableInput.trim() === "" ? quoted : parseFloat(vendorPayableInput);
+    const paid = vendorPaidInput.trim() === "" ? 0 : parseFloat(vendorPaidInput);
+    setSavingVendor(true);
+    if (vendorRow.vendorAssignmentId) {
+      const { error } = await supabase
+        .from("project_vendor_assignments")
+        .update({ cost: quoted, amount_payable: payable, amount_paid: paid })
+        .eq("id", vendorRow.vendorAssignmentId);
+      setSavingVendor(false);
+      if (error) return toast.error(error.message);
+    } else {
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData?.user) {
+        setSavingVendor(false);
+        toast.error("Not signed in");
+        return;
+      }
+      const { error } = await supabase.from("project_vendor_assignments").insert({
+        project_id: vendorRow.id,
+        vendor_id: vendorPickId,
+        cost: quoted,
+        amount_payable: payable,
+        amount_paid: paid,
+        assigned_by: userData.user.id,
+        status: "approved",
+      });
+      setSavingVendor(false);
+      if (error) return toast.error(error.message);
+    }
+    toast.success("Vendor cost saved");
+    setVendorRow(null);
     load();
   }
 
@@ -306,6 +378,9 @@ export default function WorkDataSheet() {
                   </td>
                   <td className="p-2 border">
                     <div className="flex items-center gap-1">
+                      <Button size="sm" variant="ghost" onClick={() => openVendorDialog(r)} title="Vendor cost">
+                        <span className="text-xs font-semibold">KES</span>
+                      </Button>
                       <Button size="sm" variant="ghost" onClick={() => openEdit(r)}>
                         <Pencil className="h-4 w-4" />
                       </Button>
@@ -346,6 +421,46 @@ export default function WorkDataSheet() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditingId(null)} disabled={savingEdit}>Cancel</Button>
             <Button onClick={saveEdit} disabled={savingEdit}>Save</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={!!vendorRow} onOpenChange={(open) => !open && setVendorRow(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Vendor cost — {vendorRow?.title}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            {!vendorRow?.vendorAssignmentId && (
+              <div>
+                <label className="text-xs text-muted-foreground">Vendor</label>
+                <select
+                  value={vendorPickId}
+                  onChange={(e) => setVendorPickId(e.target.value)}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                >
+                  <option value="">Select vendor</option>
+                  {vendorOptions.map((v) => (
+                    <option key={v.id} value={v.id}>{v.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+            <div>
+              <label className="text-xs text-muted-foreground">Amount quoted by vendor</label>
+              <Input type="number" value={vendorQuotedInput} onChange={(e) => setVendorQuotedInput(e.target.value)} />
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground">Amount payable (final agreed amount)</label>
+              <Input type="number" value={vendorPayableInput} onChange={(e) => setVendorPayableInput(e.target.value)} placeholder="Same as quoted if blank" />
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground">Amount already paid to vendor</label>
+              <Input type="number" value={vendorPaidInput} onChange={(e) => setVendorPaidInput(e.target.value)} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setVendorRow(null)} disabled={savingVendor}>Cancel</Button>
+            <Button onClick={saveVendor} disabled={savingVendor}>Save</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

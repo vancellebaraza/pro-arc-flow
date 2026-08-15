@@ -20,6 +20,8 @@ export default function ProjectProgress({ status, className = "" }: Props) {
 
   const activeIndex = Math.max(0, STAGES.findIndex((s) => s.key === status));
   const pct = STAGES.length > 1 ? (activeIndex / (STAGES.length - 1)) * 100 : 0;
+  const isCompleted = status === "completed";
+  const fillColor = isCompleted ? "#16a34a" : "var(--brand)";
 
   useEffect(() => {
     const t = setTimeout(() => setMounted(true), 40);
@@ -57,7 +59,7 @@ export default function ProjectProgress({ status, className = "" }: Props) {
         <div
           className="absolute left-4 top-1/2 h-1 -translate-y-1/2 rounded-full transition-all"
           style={{
-            background: "var(--brand)",
+            background: fillColor,
             width: mounted ? `${pct}%` : "0%",
             transitionDuration: "560ms",
           }}
@@ -72,9 +74,9 @@ export default function ProjectProgress({ status, className = "" }: Props) {
                   style={
                     done
                       ? {
-                          background: "var(--brand)",
-                          color: "var(--brand-foreground)",
-                          borderColor: "var(--brand)",
+                          background: fillColor,
+                          color: "white",
+                          borderColor: fillColor,
                         }
                       : {
                           background: "var(--color-surface)",
