@@ -8,12 +8,13 @@ import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/PasswordInput";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Loader2, UserPlus, Eye } from "lucide-react";
+import { Loader2, UserPlus, Eye, Trash2 } from "lucide-react";
 import {
   createProjectViewAdmin,
   listProjectViewers,
   assignProjectToViewer,
   unassignProjectFromViewer,
+  deleteProjectViewer,
 } from "@/lib/project-viewer.functions";
 
 export const Route = createFileRoute(
@@ -39,6 +40,7 @@ function ProjectViewersPage() {
   const listViewers = useServerFn(listProjectViewers);
   const assignProject = useServerFn(assignProjectToViewer);
   const unassignProject = useServerFn(unassignProjectFromViewer);
+  const deleteViewer = useServerFn(deleteProjectViewer);
 
   const [projects, setProjects] = useState<ProjectOption[]>([]);
   const [viewers, setViewers] = useState<Viewer[]>([]);
@@ -129,6 +131,18 @@ function ProjectViewersPage() {
     }
   }
 
+  async function handleDeleteViewer(v: Viewer) {
+    if (!window.confirm(`Delete viewer account "${v.full_name || v.email}"? This cannot be undone.`)) return;
+    try {
+      await deleteViewer({ data: { viewer_id: v.id } });
+      toast.success("Viewer account deleted");
+      await loadAll();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      toast.error(`Could not delete: ${msg}`);
+    }
+  }
+
   return (
     <div className="p-6 md:p-10 max-w-4xl mx-auto fade-in">
       <div>
@@ -207,9 +221,21 @@ function ProjectViewersPage() {
               const assignedIds = new Set(v.projects.map((p) => p.id));
               return (
                 <li key={v.id} className="rounded-lg border bg-card p-4">
-                  <div className="font-medium">{v.full_name || v.email}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {v.email} {v.phone && `· ${v.phone}`}
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <div className="font-medium">{v.full_name || v.email}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {v.email} {v.phone && `· ${v.phone}`}
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="text-destructive hover:text-destructive"
+                      onClick={() => handleDeleteViewer(v)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                   <div className="mt-3 text-sm">
                     <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">

@@ -103,6 +103,19 @@ export const unassignProjectFromViewer = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+export const deleteProjectViewer = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ viewer_id: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertCallerIsMiniAdminOrAdmin(supabase, userId);
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.auth.admin.deleteUser(data.viewer_id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
 export const listProjectViewers = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
