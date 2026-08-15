@@ -682,6 +682,8 @@ export type Database = {
       }
       project_vendor_assignments: {
         Row: {
+          amount_paid: number
+          amount_payable: number | null
           assigned_by: string
           cost: number
           created_at: string
@@ -691,6 +693,8 @@ export type Database = {
           vendor_id: string
         }
         Insert: {
+          amount_paid?: number
+          amount_payable?: number | null
           assigned_by: string
           cost?: number
           created_at?: string
@@ -700,6 +704,8 @@ export type Database = {
           vendor_id: string
         }
         Update: {
+          amount_paid?: number
+          amount_payable?: number | null
           assigned_by?: string
           cost?: number
           created_at?: string
@@ -776,6 +782,7 @@ export type Database = {
           status: Database["public"]["Enums"]["project_status"]
           title: string
           updated_at: string
+          work_comment: string | null
         }
         Insert: {
           archived?: boolean
@@ -795,6 +802,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["project_status"]
           title: string
           updated_at?: string
+          work_comment?: string | null
         }
         Update: {
           archived?: boolean
@@ -814,6 +822,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["project_status"]
           title?: string
           updated_at?: string
+          work_comment?: string | null
         }
         Relationships: []
       }

@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import WorkDataSheet from "@/components/WorkDataSheet";
 import ApproveEvidenceDialog from "@/components/ApproveEvidenceDialog";
 import {
   Dialog,
@@ -631,145 +632,7 @@ function AdminHome() {
           </div>
         </section>
       )}
-
-      <section className="mt-8">
-        <div className="flex items-end justify-between gap-3 flex-wrap mb-3">
-          <h2 className="text-lg font-semibold tracking-tight">Work Data Sheet</h2>
-          <div className="flex flex-wrap items-end gap-2">
-            <div className="space-y-1">
-              <label className="text-xs text-muted-foreground">Service</label>
-              <select
-                value={serviceFilter}
-                onChange={(event) => setServiceFilter(event.target.value)}
-                className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              >
-                <option value="all">All services</option>
-                {SERVICES.map((service) => (
-                  <option key={service.key} value={service.key}>
-                    {service.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs text-muted-foreground">Completion Status</label>
-              <select
-                value={completionFilter}
-                onChange={(event) =>
-                  setCompletionFilter(event.target.value as "all" | "completed" | "not_completed")
-                }
-                className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              >
-                <option value="all">All</option>
-                <option value="completed">Completed</option>
-                <option value="not_completed">Not completed</option>
-              </select>
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs text-muted-foreground">Payment Status</label>
-              <select
-                value={paymentFilter}
-                onChange={(event) =>
-                  setPaymentFilter(event.target.value as "all" | "paid" | "partial" | "unpaid")
-                }
-                className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              >
-                <option value="all">All</option>
-                <option value="paid">Paid</option>
-                <option value="partial">Partial</option>
-                <option value="unpaid">Unpaid</option>
-              </select>
-            </div>
-            <Input
-              placeholder="Search…"
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              className="max-w-xs"
-            />
-          </div>
-        </div>
-        <div className="rounded-xl border bg-card overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-surface text-left">
-              <tr>
-                <th className="p-3">Job #</th>
-                <th className="p-3">Title</th>
-                <th className="p-3">Client</th>
-                <th className="p-3">Engineer</th>
-                <th className="p-3">Service</th>
-                <th className="p-3">Quoted Amount</th>
-                <th className="p-3">Vendor Cost</th>
-                <th className="p-3">Gross Margin</th>
-                <th className="p-3">Gross %</th>
-                <th className="p-3">Payment Status</th>
-                <th className="p-3">Completion Status</th>
-                <th className="p-3">Location</th>
-                <th className="p-3">Scheduled</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((r) => {
-                const grossAmount =
-                  r.quoted_amount != null ? r.quoted_amount - r.vendor_cost : null;
-                const grossPercent = r.quoted_amount
-                  ? `${(((r.quoted_amount - r.vendor_cost) / r.quoted_amount) * 100).toFixed(1)}%`
-                  : "—";
-                return (
-                  <tr key={r.id} className="border-t">
-                    <td className="p-3 font-medium">{r.job_number ?? "—"}</td>
-                    <td className="p-3 font-medium">{r.title}</td>
-                    <td className="p-3">{r.client_name ?? "—"}</td>
-                    <td className="p-3">{r.engineer_name ?? "—"}</td>
-                    <td className="p-3">
-                      {SERVICES.find((s) => s.key === r.service)?.label ?? r.service}
-                    </td>
-                    <td className="p-3">
-                      {r.quoted_amount != null ? r.quoted_amount.toFixed(2) : "—"}
-                    </td>
-                    <td className="p-3">{r.vendor_cost.toFixed(2)}</td>
-                    <td className="p-3">{grossAmount != null ? grossAmount.toFixed(2) : "—"}</td>
-                    <td className="p-3">{grossPercent}</td>
-                    <td className="p-3">{r.payment_status ?? "unpaid"}</td>
-                    <td className="p-3">{STATUS_LABEL[r.status] ?? r.status}</td>
-                    <td className="p-3 text-muted-foreground">{r.location ?? "—"}</td>
-                    <td className="p-3">{renderScheduleDisplay(r.scheduled_date, r.scheduled_end_date)}</td>
-                    <td className="p-3 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        {canManage && (
-                          <Button size="sm" variant="ghost" onClick={() => openEditDialog(r)}>
-                            Edit
-                          </Button>
-                        )}
-                        <DeleteProjectDialog
-                          projectId={r.id}
-                          projectTitle={r.title}
-                          onDeleted={() => handleDeleted(r.id)}
-                        >
-                          <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive">
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </DeleteProjectDialog>
-                        <Button size="sm" variant="ghost" onClick={() => schedule(r)}>
-                          <Calendar className="h-4 w-4 mr-1" />
-                          Schedule
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-              {filtered.length === 0 && (
-                <tr>
-                  <td colSpan={14} className="p-6 text-center text-sm text-muted-foreground">
-                    No projects.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </section>
+      <WorkDataSheet />
     </div>
   );
 }

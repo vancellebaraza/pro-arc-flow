@@ -145,7 +145,7 @@ function WorksheetPage() {
       const assignmentPayload = {
         project_id: projectId,
         vendor_id: selectedVendorId,
-        vendor_amount: parseFloat(vendorAmount),
+        cost: parseFloat(vendorAmount),
         assigned_by: userData.user.id,
         status: "pending_approval",
       } as any;

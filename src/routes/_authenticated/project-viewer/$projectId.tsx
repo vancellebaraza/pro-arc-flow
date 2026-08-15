@@ -122,6 +122,7 @@ function ProjectViewerDetail() {
       .order("created_at", { ascending: false })
       .maybeSingle();
     if (error) return toast.error(error.message);
+    if (!ws) return toast.error("No job worksheet has been created for this project yet");
     try {
       const doc = new jsPDF();
       await generateWorksheetPdf(doc, {
