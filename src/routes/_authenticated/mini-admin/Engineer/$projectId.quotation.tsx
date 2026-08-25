@@ -67,6 +67,13 @@ function QuotationPage() {
       setProjectLocation(p.location ?? "");
       setProjectService(p.service);
     }
+    const { data: settings } = await supabase
+      .from("company_settings")
+      .select("vat_rate")
+      .eq("id", true)
+      .maybeSingle();
+    const defaultVatRate = Number(settings?.vat_rate ?? 16);
+
     const { data: q } = await supabase
       .from("quotations")
       .select("*")
@@ -78,7 +85,7 @@ function QuotationPage() {
       setStatus(q.status);
       setNotes(q.notes ?? "");
       setLabour(Number(q.labour ?? 0));
-      setVatRate(Number(q.vat_rate ?? 16));
+      setVatRate(Number(q.vat_rate ?? defaultVatRate));
       setQuoteNo(q.quote_no ?? "");
       const meta = (q.meta ?? {}) as {
         bill_to?: string;
@@ -122,6 +129,7 @@ function QuotationPage() {
         );
     } else {
       setQuoteNo(`Q-${Date.now().toString().slice(-6)}`);
+      setVatRate(defaultVatRate);
     }
   }, [projectId]);
   useEffect(() => {

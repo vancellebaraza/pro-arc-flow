@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import WorkDataSheet from "@/components/WorkDataSheet";
 import ApproveEvidenceDialog from "@/components/ApproveEvidenceDialog";
+import QuotationDetailsDialog from "@/components/QuotationDetailsDialog";
 import {
   Dialog,
   DialogContent,
@@ -567,7 +568,10 @@ function AdminHome() {
                     Total: {Number(q.grand_total).toFixed(2)}
                   </div>
                 </div>
-                <ApproveEvidenceDialog quotationId={q.id} projectId={q.project_id} onApproved={load} />
+                <div className="flex items-center gap-2 shrink-0">
+                  <QuotationDetailsDialog quotationId={q.id} projectTitle={q.project?.title} />
+                  <ApproveEvidenceDialog quotationId={q.id} projectId={q.project_id} onApproved={load} />
+                </div>
               </li>
             ))}
           </ul>

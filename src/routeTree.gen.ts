@@ -27,6 +27,7 @@ import { Route as AuthenticatedClientIndexRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedAccountantIndexRouteImport } from './routes/_authenticated/accountant/index'
 import { Route as AuthenticatedProjectViewerProjectIdRouteImport } from './routes/_authenticated/project-viewer/$projectId'
+import { Route as AuthenticatedEngineerTodosRouteImport } from './routes/_authenticated/engineer/todos'
 import { Route as AuthenticatedEngineerProjectIdRouteImport } from './routes/_authenticated/engineer/$projectId'
 import { Route as AuthenticatedClientNewRouteImport } from './routes/_authenticated/client/new'
 import { Route as AuthenticatedClientProjectIdRouteImport } from './routes/_authenticated/client/$projectId'
@@ -34,6 +35,7 @@ import { Route as AuthenticatedAdminVendorsRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminTodosRouteImport } from './routes/_authenticated/admin/todos'
 import { Route as AuthenticatedAdminAnalysisRouteImport } from './routes/_authenticated/admin/analysis'
 import { Route as AuthenticatedAccountantVendorPaymentsRouteImport } from './routes/_authenticated/accountant/vendor-payments'
+import { Route as AuthenticatedAccountantSettingsRouteImport } from './routes/_authenticated/accountant/settings'
 import { Route as AuthenticatedAccountantReportsRouteImport } from './routes/_authenticated/accountant/reports'
 import { Route as AuthenticatedAccountantReconcileRouteImport } from './routes/_authenticated/accountant/reconcile'
 import { Route as AuthenticatedAccountantPaymentsRouteImport } from './routes/_authenticated/accountant/payments'
@@ -164,6 +166,12 @@ const AuthenticatedProjectViewerProjectIdRoute =
     path: '/$projectId',
     getParentRoute: () => AuthenticatedProjectViewerRouteRoute,
   } as any)
+const AuthenticatedEngineerTodosRoute =
+  AuthenticatedEngineerTodosRouteImport.update({
+    id: '/todos',
+    path: '/todos',
+    getParentRoute: () => AuthenticatedEngineerRouteRoute,
+  } as any)
 const AuthenticatedEngineerProjectIdRoute =
   AuthenticatedEngineerProjectIdRouteImport.update({
     id: '/$projectId',
@@ -202,6 +210,12 @@ const AuthenticatedAccountantVendorPaymentsRoute =
   AuthenticatedAccountantVendorPaymentsRouteImport.update({
     id: '/vendor-payments',
     path: '/vendor-payments',
+    getParentRoute: () => AuthenticatedAccountantRouteRoute,
+  } as any)
+const AuthenticatedAccountantSettingsRoute =
+  AuthenticatedAccountantSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
     getParentRoute: () => AuthenticatedAccountantRouteRoute,
   } as any)
 const AuthenticatedAccountantReportsRoute =
@@ -407,6 +421,7 @@ export interface FileRoutesByFullPath {
   '/accountant/payments': typeof AuthenticatedAccountantPaymentsRoute
   '/accountant/reconcile': typeof AuthenticatedAccountantReconcileRoute
   '/accountant/reports': typeof AuthenticatedAccountantReportsRoute
+  '/accountant/settings': typeof AuthenticatedAccountantSettingsRoute
   '/accountant/vendor-payments': typeof AuthenticatedAccountantVendorPaymentsRoute
   '/admin/analysis': typeof AuthenticatedAdminAnalysisRoute
   '/admin/todos': typeof AuthenticatedAdminTodosRoute
@@ -414,6 +429,7 @@ export interface FileRoutesByFullPath {
   '/client/$projectId': typeof AuthenticatedClientProjectIdRoute
   '/client/new': typeof AuthenticatedClientNewRoute
   '/engineer/$projectId': typeof AuthenticatedEngineerProjectIdRouteWithChildren
+  '/engineer/todos': typeof AuthenticatedEngineerTodosRoute
   '/project-viewer/$projectId': typeof AuthenticatedProjectViewerProjectIdRoute
   '/accountant/': typeof AuthenticatedAccountantIndexRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -458,6 +474,7 @@ export interface FileRoutesByTo {
   '/accountant/payments': typeof AuthenticatedAccountantPaymentsRoute
   '/accountant/reconcile': typeof AuthenticatedAccountantReconcileRoute
   '/accountant/reports': typeof AuthenticatedAccountantReportsRoute
+  '/accountant/settings': typeof AuthenticatedAccountantSettingsRoute
   '/accountant/vendor-payments': typeof AuthenticatedAccountantVendorPaymentsRoute
   '/admin/analysis': typeof AuthenticatedAdminAnalysisRoute
   '/admin/todos': typeof AuthenticatedAdminTodosRoute
@@ -465,6 +482,7 @@ export interface FileRoutesByTo {
   '/client/$projectId': typeof AuthenticatedClientProjectIdRoute
   '/client/new': typeof AuthenticatedClientNewRoute
   '/engineer/$projectId': typeof AuthenticatedEngineerProjectIdRouteWithChildren
+  '/engineer/todos': typeof AuthenticatedEngineerTodosRoute
   '/project-viewer/$projectId': typeof AuthenticatedProjectViewerProjectIdRoute
   '/accountant': typeof AuthenticatedAccountantIndexRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -516,6 +534,7 @@ export interface FileRoutesById {
   '/_authenticated/accountant/payments': typeof AuthenticatedAccountantPaymentsRoute
   '/_authenticated/accountant/reconcile': typeof AuthenticatedAccountantReconcileRoute
   '/_authenticated/accountant/reports': typeof AuthenticatedAccountantReportsRoute
+  '/_authenticated/accountant/settings': typeof AuthenticatedAccountantSettingsRoute
   '/_authenticated/accountant/vendor-payments': typeof AuthenticatedAccountantVendorPaymentsRoute
   '/_authenticated/admin/analysis': typeof AuthenticatedAdminAnalysisRoute
   '/_authenticated/admin/todos': typeof AuthenticatedAdminTodosRoute
@@ -523,6 +542,7 @@ export interface FileRoutesById {
   '/_authenticated/client/$projectId': typeof AuthenticatedClientProjectIdRoute
   '/_authenticated/client/new': typeof AuthenticatedClientNewRoute
   '/_authenticated/engineer/$projectId': typeof AuthenticatedEngineerProjectIdRouteWithChildren
+  '/_authenticated/engineer/todos': typeof AuthenticatedEngineerTodosRoute
   '/_authenticated/project-viewer/$projectId': typeof AuthenticatedProjectViewerProjectIdRoute
   '/_authenticated/accountant/': typeof AuthenticatedAccountantIndexRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -574,6 +594,7 @@ export interface FileRouteTypes {
     | '/accountant/payments'
     | '/accountant/reconcile'
     | '/accountant/reports'
+    | '/accountant/settings'
     | '/accountant/vendor-payments'
     | '/admin/analysis'
     | '/admin/todos'
@@ -581,6 +602,7 @@ export interface FileRouteTypes {
     | '/client/$projectId'
     | '/client/new'
     | '/engineer/$projectId'
+    | '/engineer/todos'
     | '/project-viewer/$projectId'
     | '/accountant/'
     | '/admin/'
@@ -625,6 +647,7 @@ export interface FileRouteTypes {
     | '/accountant/payments'
     | '/accountant/reconcile'
     | '/accountant/reports'
+    | '/accountant/settings'
     | '/accountant/vendor-payments'
     | '/admin/analysis'
     | '/admin/todos'
@@ -632,6 +655,7 @@ export interface FileRouteTypes {
     | '/client/$projectId'
     | '/client/new'
     | '/engineer/$projectId'
+    | '/engineer/todos'
     | '/project-viewer/$projectId'
     | '/accountant'
     | '/admin'
@@ -682,6 +706,7 @@ export interface FileRouteTypes {
     | '/_authenticated/accountant/payments'
     | '/_authenticated/accountant/reconcile'
     | '/_authenticated/accountant/reports'
+    | '/_authenticated/accountant/settings'
     | '/_authenticated/accountant/vendor-payments'
     | '/_authenticated/admin/analysis'
     | '/_authenticated/admin/todos'
@@ -689,6 +714,7 @@ export interface FileRouteTypes {
     | '/_authenticated/client/$projectId'
     | '/_authenticated/client/new'
     | '/_authenticated/engineer/$projectId'
+    | '/_authenticated/engineer/todos'
     | '/_authenticated/project-viewer/$projectId'
     | '/_authenticated/accountant/'
     | '/_authenticated/admin/'
@@ -853,6 +879,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProjectViewerProjectIdRouteImport
       parentRoute: typeof AuthenticatedProjectViewerRouteRoute
     }
+    '/_authenticated/engineer/todos': {
+      id: '/_authenticated/engineer/todos'
+      path: '/todos'
+      fullPath: '/engineer/todos'
+      preLoaderRoute: typeof AuthenticatedEngineerTodosRouteImport
+      parentRoute: typeof AuthenticatedEngineerRouteRoute
+    }
     '/_authenticated/engineer/$projectId': {
       id: '/_authenticated/engineer/$projectId'
       path: '/$projectId'
@@ -900,6 +933,13 @@ declare module '@tanstack/react-router' {
       path: '/vendor-payments'
       fullPath: '/accountant/vendor-payments'
       preLoaderRoute: typeof AuthenticatedAccountantVendorPaymentsRouteImport
+      parentRoute: typeof AuthenticatedAccountantRouteRoute
+    }
+    '/_authenticated/accountant/settings': {
+      id: '/_authenticated/accountant/settings'
+      path: '/settings'
+      fullPath: '/accountant/settings'
+      preLoaderRoute: typeof AuthenticatedAccountantSettingsRouteImport
       parentRoute: typeof AuthenticatedAccountantRouteRoute
     }
     '/_authenticated/accountant/reports': {
@@ -1126,6 +1166,7 @@ interface AuthenticatedAccountantRouteRouteChildren {
   AuthenticatedAccountantPaymentsRoute: typeof AuthenticatedAccountantPaymentsRoute
   AuthenticatedAccountantReconcileRoute: typeof AuthenticatedAccountantReconcileRoute
   AuthenticatedAccountantReportsRoute: typeof AuthenticatedAccountantReportsRoute
+  AuthenticatedAccountantSettingsRoute: typeof AuthenticatedAccountantSettingsRoute
   AuthenticatedAccountantVendorPaymentsRoute: typeof AuthenticatedAccountantVendorPaymentsRoute
   AuthenticatedAccountantIndexRoute: typeof AuthenticatedAccountantIndexRoute
 }
@@ -1145,6 +1186,7 @@ const AuthenticatedAccountantRouteRouteChildren: AuthenticatedAccountantRouteRou
     AuthenticatedAccountantReconcileRoute:
       AuthenticatedAccountantReconcileRoute,
     AuthenticatedAccountantReportsRoute: AuthenticatedAccountantReportsRoute,
+    AuthenticatedAccountantSettingsRoute: AuthenticatedAccountantSettingsRoute,
     AuthenticatedAccountantVendorPaymentsRoute:
       AuthenticatedAccountantVendorPaymentsRoute,
     AuthenticatedAccountantIndexRoute: AuthenticatedAccountantIndexRoute,
@@ -1222,6 +1264,7 @@ const AuthenticatedEngineerProjectIdRouteWithChildren =
 
 interface AuthenticatedEngineerRouteRouteChildren {
   AuthenticatedEngineerProjectIdRoute: typeof AuthenticatedEngineerProjectIdRouteWithChildren
+  AuthenticatedEngineerTodosRoute: typeof AuthenticatedEngineerTodosRoute
   AuthenticatedEngineerIndexRoute: typeof AuthenticatedEngineerIndexRoute
 }
 
@@ -1229,6 +1272,7 @@ const AuthenticatedEngineerRouteRouteChildren: AuthenticatedEngineerRouteRouteCh
   {
     AuthenticatedEngineerProjectIdRoute:
       AuthenticatedEngineerProjectIdRouteWithChildren,
+    AuthenticatedEngineerTodosRoute: AuthenticatedEngineerTodosRoute,
     AuthenticatedEngineerIndexRoute: AuthenticatedEngineerIndexRoute,
   }
 

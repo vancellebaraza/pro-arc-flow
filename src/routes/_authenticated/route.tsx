@@ -109,7 +109,10 @@ function AuthedLayout() {
         : primaryRole === "mini_admin"
           ? [{ to: "/mini-admin", label: "Mini Admin", icon: ShieldCheck }]
           : primaryRole === "engineer"
-            ? [{ to: "/engineer", label: "Engineer", icon: Wrench }]
+            ? [
+                { to: "/engineer", label: "Engineer", icon: Wrench },
+                { to: "/engineer/todos", label: "To Do List", icon: Calendar },
+              ]
             : [
                 { to: "/client", label: "My projects", icon: LayoutDashboard },
                 { to: "/client/new", label: "New request", icon: ClipboardPlus },

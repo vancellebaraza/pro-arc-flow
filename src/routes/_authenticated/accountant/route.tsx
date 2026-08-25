@@ -29,6 +29,7 @@ import {
   ScrollText,
   LogOut,
   Menu,
+  Settings,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/accountant")({
@@ -107,6 +108,11 @@ function AccountantLayout() {
       to: "/accountant/analysis",
       label: "Analysis",
       icon: BarChart3,
+    },
+    {
+      to: "/accountant/settings",
+      label: "Settings",
+      icon: Settings,
     },
   ];
 

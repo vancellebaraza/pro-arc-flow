@@ -20,8 +20,7 @@ export default function ProjectProgress({ status, className = "" }: Props) {
 
   const activeIndex = Math.max(0, STAGES.findIndex((s) => s.key === status));
   const pct = STAGES.length > 1 ? (activeIndex / (STAGES.length - 1)) * 100 : 0;
-  const isCompleted = status === "completed";
-  const fillColor = isCompleted ? "#16a34a" : "var(--brand)";
+  const fillColor = "#16a34a";
 
   useEffect(() => {
     const t = setTimeout(() => setMounted(true), 40);

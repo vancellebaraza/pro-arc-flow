@@ -24,11 +24,12 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "FusionPro — RealArc Estates Operations" },
+      { title: "FusionPro — Property Operations Platform" },
+      { name: "author", content: "Vancelle Baraza" },
       {
         name: "description",
         content:
-          "Property service operations for RealArc Estates: electrical, plumbing, landscaping, painting, property management, tank cleaning.",
+          "FusionPro property service operations platform by Vancelle Baraza: electrical, plumbing, landscaping, painting, property management, tank cleaning.",
       },
     ],
   }),

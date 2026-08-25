@@ -227,7 +227,7 @@ export default function WorkDataSheet() {
   async function saveVendor() {
     if (!vendorRow) return;
     const quoted = parseFloat(vendorQuotedInput);
-    if (!vendorRow.vendorAssignmentId && !vendorPickId) {
+    if (!vendorPickId) {
       toast.error("Select a vendor");
       return;
     }
@@ -241,7 +241,7 @@ export default function WorkDataSheet() {
     if (vendorRow.vendorAssignmentId) {
       const { error } = await supabase
         .from("project_vendor_assignments")
-        .update({ cost: quoted, amount_payable: payable, amount_paid: paid })
+        .update({ vendor_id: vendorPickId, cost: quoted, amount_payable: payable, amount_paid: paid })
         .eq("id", vendorRow.vendorAssignmentId);
       setSavingVendor(false);
       if (error) return toast.error(error.message);
@@ -430,21 +430,19 @@ export default function WorkDataSheet() {
             <DialogTitle>Vendor cost — {vendorRow?.title}</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
-            {!vendorRow?.vendorAssignmentId && (
-              <div>
-                <label className="text-xs text-muted-foreground">Vendor</label>
-                <select
-                  value={vendorPickId}
-                  onChange={(e) => setVendorPickId(e.target.value)}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                >
-                  <option value="">Select vendor</option>
-                  {vendorOptions.map((v) => (
-                    <option key={v.id} value={v.id}>{v.name}</option>
-                  ))}
-                </select>
-              </div>
-            )}
+            <div>
+              <label className="text-xs text-muted-foreground">Vendor</label>
+              <select
+                value={vendorPickId}
+                onChange={(e) => setVendorPickId(e.target.value)}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              >
+                <option value="">Select vendor</option>
+                {vendorOptions.map((v) => (
+                  <option key={v.id} value={v.id}>{v.name}</option>
+                ))}
+              </select>
+            </div>
             <div>
               <label className="text-xs text-muted-foreground">Amount quoted by vendor</label>
               <Input type="number" value={vendorQuotedInput} onChange={(e) => setVendorQuotedInput(e.target.value)} />

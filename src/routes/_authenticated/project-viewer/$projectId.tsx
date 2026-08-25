@@ -50,12 +50,28 @@ interface Inspection {
   created_at: string;
 }
 
+interface Worksheet {
+  id: string;
+  job_no: string | null;
+  job_location: string | null;
+  job_date: string | null;
+  job_type: string | null;
+  technician: string | null;
+  person_in_charge: string | null;
+  job_description: string | null;
+  observations: Array<{ observation: string; action: string }> | null;
+  images_before: string[] | null;
+  signatures: { technician_name?: string; supervisor_name?: string; client_name?: string } | null;
+  created_at: string;
+}
+
 function ProjectViewerDetail() {
   const { projectId } = Route.useParams();
   const [project, setProject] = useState<Project | null>(null);
   const [quote, setQuote] = useState<Quotation | null>(null);
   const [items, setItems] = useState<Item[]>([]);
   const [inspections, setInspections] = useState<Inspection[]>([]);
+  const [worksheet, setWorksheet] = useState<Worksheet | null>(null);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
@@ -107,6 +123,15 @@ function ProjectViewerDetail() {
       .eq("project_id", projectId)
       .order("created_at", { ascending: false });
     setInspections((ins ?? []) as unknown as Inspection[]);
+
+    const { data: ws } = await supabase
+      .from("worksheets")
+      .select("*")
+      .eq("project_id", projectId)
+      .order("created_at", { ascending: false })
+      .maybeSingle();
+    setWorksheet(ws as unknown as Worksheet | null);
+
     setLoading(false);
   }, [projectId]);
 
@@ -184,10 +209,6 @@ function ProjectViewerDetail() {
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back
         </Link>
-        <Button variant="outline" size="sm" onClick={downloadWorksheet}>
-          <FileDown className="h-4 w-4 mr-1" />
-          Download Job Worksheet
-        </Button>
       </div>
       <div className="mt-4">
         <div className="flex items-center gap-2 text-xs text-muted-foreground uppercase tracking-wider">
@@ -248,6 +269,114 @@ function ProjectViewerDetail() {
               </li>
             ))}
           </ul>
+        )}
+      </section>
+
+      <section className="mt-10">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold tracking-tight">Job worksheet / report</h2>
+          {worksheet && (
+            <Button variant="outline" size="sm" onClick={downloadWorksheet}>
+              <FileDown className="h-4 w-4 mr-1" />
+              Download PDF
+            </Button>
+          )}
+        </div>
+        {!worksheet ? (
+          <p className="text-sm text-muted-foreground mt-2">No job worksheet has been created yet.</p>
+        ) : (
+          <div className="mt-3 rounded-lg border bg-card p-4 space-y-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
+              <div>
+                <div className="text-xs text-muted-foreground">Job no.</div>
+                <div>{worksheet.job_no || "—"}</div>
+              </div>
+              <div>
+                <div className="text-xs text-muted-foreground">Job date</div>
+                <div>{worksheet.job_date || "—"}</div>
+              </div>
+              <div>
+                <div className="text-xs text-muted-foreground">Job type</div>
+                <div>{worksheet.job_type || "—"}</div>
+              </div>
+              <div>
+                <div className="text-xs text-muted-foreground">Technician</div>
+                <div>{worksheet.technician || "—"}</div>
+              </div>
+              <div>
+                <div className="text-xs text-muted-foreground">Person in charge</div>
+                <div>{worksheet.person_in_charge || "—"}</div>
+              </div>
+              <div>
+                <div className="text-xs text-muted-foreground">Location</div>
+                <div>{worksheet.job_location || "—"}</div>
+              </div>
+            </div>
+
+            {worksheet.job_description && (
+              <div>
+                <div className="text-xs text-muted-foreground mb-1">Description</div>
+                <p className="text-sm leading-relaxed">{worksheet.job_description}</p>
+              </div>
+            )}
+
+            {Array.isArray(worksheet.observations) && worksheet.observations.some((o) => o.observation) && (
+              <div>
+                <div className="text-xs text-muted-foreground mb-2">Observations & actions taken</div>
+                <ul className="text-sm space-y-2">
+                  {worksheet.observations
+                    .filter((o) => o.observation)
+                    .map((o, i) => (
+                      <li key={i} className="rounded-md border bg-surface p-3">
+                        <div>{o.observation}</div>
+                        {o.action && (
+                          <div className="text-muted-foreground mt-1">Action: {o.action}</div>
+                        )}
+                      </li>
+                    ))}
+                </ul>
+              </div>
+            )}
+
+            {Array.isArray(worksheet.images_before) && worksheet.images_before.length > 0 && (
+              <div>
+                <div className="text-xs text-muted-foreground mb-2">Photos</div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {worksheet.images_before.map((u, i) => (
+                    <a
+                      key={i}
+                      href={u}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="block rounded-md overflow-hidden border bg-card"
+                    >
+                      <img src={u} alt={`worksheet photo ${i + 1}`} className="w-full h-32 object-cover" />
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {worksheet.signatures &&
+              (worksheet.signatures.technician_name ||
+                worksheet.signatures.supervisor_name ||
+                worksheet.signatures.client_name) && (
+                <div className="grid grid-cols-3 gap-3 text-sm border-t pt-3">
+                  <div>
+                    <div className="text-xs text-muted-foreground">Technician</div>
+                    <div>{worksheet.signatures.technician_name || "—"}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground">Supervisor</div>
+                    <div>{worksheet.signatures.supervisor_name || "—"}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground">Client</div>
+                    <div>{worksheet.signatures.client_name || "—"}</div>
+                  </div>
+                </div>
+              )}
+          </div>
         )}
       </section>
 

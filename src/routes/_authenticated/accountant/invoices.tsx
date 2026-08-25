@@ -45,7 +45,6 @@ function InvoicesPage() {
   const [invoices, setInvoices] = useState<InvoiceRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState<ApprovableQuotation | null>(null);
-  const [invoiceNumber, setInvoiceNumber] = useState("");
   const [dueDate, setDueDate] = useState("");
   const [saving, setSaving] = useState(false);
 
@@ -104,27 +103,30 @@ function InvoicesPage() {
 
   function openCreateDialog(quotation: ApprovableQuotation) {
     setCreating(quotation);
-    setInvoiceNumber(`INV-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`);
     setDueDate("");
   }
 
   async function handleCreateInvoice() {
     if (!creating) return;
-    if (!invoiceNumber.trim()) {
-      toast.error("Invoice number is required.");
-      return;
-    }
 
     setSaving(true);
     try {
       const { data: userData } = await supabase.auth.getUser();
+
+      const { data: generatedNumber, error: numberError } = await supabase.rpc(
+        "next_invoice_number",
+      );
+
+      if (numberError || !generatedNumber) {
+        throw numberError ?? new Error("Could not generate invoice number.");
+      }
 
       const { data: invoiceData, error: invoiceError } = await supabase
         .from("invoices")
         .insert({
           quotation_id: creating.id,
           client_id: creating.client_id,
-          invoice_number: invoiceNumber.trim(),
+          invoice_number: generatedNumber,
           due_date: dueDate || null,
           status: "draft",
           // Fold labour into subtotal so subtotal + vat_amount always equals total —
@@ -144,7 +146,7 @@ function InvoicesPage() {
       await logAudit("invoices", invoiceData.id, "insert", null, {
         quotation_id: creating.id,
         client_id: creating.client_id,
-        invoice_number: invoiceNumber.trim(),
+        invoice_number: generatedNumber,
         due_date: dueDate || null,
         status: "draft",
         subtotal: creating.subtotal + creating.labour,
@@ -296,14 +298,9 @@ function InvoicesPage() {
           </DialogHeader>
 
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="invoiceNumber">Invoice number</Label>
-              <Input
-                id="invoiceNumber"
-                value={invoiceNumber}
-                onChange={(e) => setInvoiceNumber(e.target.value)}
-              />
-            </div>
+            <p className="text-sm text-muted-foreground">
+              Invoice number is assigned automatically from Settings when you save.
+            </p>
             <div className="space-y-2">
               <Label htmlFor="dueDate">Due date (optional)</Label>
               <Input

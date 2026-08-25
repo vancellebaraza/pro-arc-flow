@@ -72,25 +72,26 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "FusionPro — RealArc Estates Operations" },
+      { title: "FusionPro — Property Operations Platform" },
+      { name: "author", content: "Vancelle Baraza" },
       {
         name: "description",
         content:
-          "FusionPro: enterprise property service operations for RealArc Estates — requests, inspections, quotations, scheduling, reporting.",
+          "FusionPro: enterprise property service operations platform — requests, inspections, quotations, scheduling, reporting. Created by Vancelle Baraza.",
       },
-      { property: "og:title", content: "FusionPro — RealArc Estates Operations" },
+      { property: "og:title", content: "FusionPro — Property Operations Platform" },
       {
         property: "og:description",
         content:
-          "FusionPro: enterprise property service operations for RealArc Estates — requests, inspections, quotations, scheduling, reporting.",
+          "FusionPro: enterprise property service operations platform — requests, inspections, quotations, scheduling, reporting. Created by Vancelle Baraza.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:title", content: "FusionPro — RealArc Estates Operations" },
+      { name: "twitter:title", content: "FusionPro — Property Operations Platform" },
       {
         name: "twitter:description",
         content:
-          "FusionPro: enterprise property service operations for RealArc Estates — requests, inspections, quotations, scheduling, reporting.",
+          "FusionPro: enterprise property service operations platform — requests, inspections, quotations, scheduling, reporting. Created by Vancelle Baraza.",
       },
       {
         property: "og:image",

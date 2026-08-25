@@ -277,6 +277,42 @@ export type Database = {
           },
         ]
       }
+      company_settings: {
+        Row: {
+          currency_code: string
+          fiscal_year_start_month: number
+          id: boolean
+          invoice_next_number: number
+          invoice_number_padding: number
+          invoice_prefix: string
+          updated_at: string
+          updated_by: string | null
+          vat_rate: number
+        }
+        Insert: {
+          currency_code?: string
+          fiscal_year_start_month?: number
+          id?: boolean
+          invoice_next_number?: number
+          invoice_number_padding?: number
+          invoice_prefix?: string
+          updated_at?: string
+          updated_by?: string | null
+          vat_rate?: number
+        }
+        Update: {
+          currency_code?: string
+          fiscal_year_start_month?: number
+          id?: boolean
+          invoice_next_number?: number
+          invoice_number_padding?: number
+          invoice_prefix?: string
+          updated_at?: string
+          updated_by?: string | null
+          vat_rate?: number
+        }
+        Relationships: []
+      }
       inspections: {
         Row: {
           checklist: Json
@@ -1341,6 +1377,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      next_invoice_number: { Args: never; Returns: string }
     }
     Enums: {
       app_role:
