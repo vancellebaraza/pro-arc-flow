@@ -23,10 +23,12 @@ import {
   Wallet,
   HandCoins,
   BookOpen,
+  Library,
   Banknote,
   Upload,
   CheckSquare,
   ScrollText,
+  History,
   LogOut,
   Menu,
   Settings,
@@ -105,9 +107,19 @@ function AccountantLayout() {
       icon: ScrollText,
     },
     {
+      to: "/accountant/journal",
+      label: "Journal",
+      icon: Library,
+    },
+    {
       to: "/accountant/analysis",
       label: "Analysis",
       icon: BarChart3,
+    },
+    {
+      to: "/accountant/audit-log",
+      label: "Audit Log",
+      icon: History,
     },
     {
       to: "/accountant/settings",
