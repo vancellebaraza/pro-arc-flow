@@ -9,72 +9,72 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AboutRouteImport } from './routes/about'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
-import { Route as AuthenticatedProjectViewerRouteRouteImport } from './routes/_authenticated/project-viewer/route'
-import { Route as AuthenticatedMiniAdminRouteRouteImport } from './routes/_authenticated/mini-admin/route'
-import { Route as AuthenticatedEngineerRouteRouteImport } from './routes/_authenticated/engineer/route'
-import { Route as AuthenticatedClientRouteRouteImport } from './routes/_authenticated/client/route'
-import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAccountantRouteRouteImport } from './routes/_authenticated/accountant/route'
-import { Route as AuthenticatedProjectViewerIndexRouteImport } from './routes/_authenticated/project-viewer/index'
-import { Route as AuthenticatedEngineerIndexRouteImport } from './routes/_authenticated/engineer/index'
-import { Route as AuthenticatedClientIndexRouteImport } from './routes/_authenticated/client/index'
-import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
+import { Route as AuthenticatedClientRouteRouteImport } from './routes/_authenticated/client/route'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedEngineerRouteRouteImport } from './routes/_authenticated/engineer/route'
+import { Route as AuthenticatedMiniAdminRouteRouteImport } from './routes/_authenticated/mini-admin/route'
+import { Route as AuthenticatedProjectViewerRouteRouteImport } from './routes/_authenticated/project-viewer/route'
 import { Route as AuthenticatedAccountantIndexRouteImport } from './routes/_authenticated/accountant/index'
-import { Route as AuthenticatedProjectViewerProjectIdRouteImport } from './routes/_authenticated/project-viewer/$projectId'
-import { Route as AuthenticatedEngineerTodosRouteImport } from './routes/_authenticated/engineer/todos'
-import { Route as AuthenticatedEngineerProjectIdRouteImport } from './routes/_authenticated/engineer/$projectId'
-import { Route as AuthenticatedClientNewRouteImport } from './routes/_authenticated/client/new'
-import { Route as AuthenticatedClientProjectIdRouteImport } from './routes/_authenticated/client/$projectId'
-import { Route as AuthenticatedAdminVendorsRouteImport } from './routes/_authenticated/admin/vendors'
-import { Route as AuthenticatedAdminTodosRouteImport } from './routes/_authenticated/admin/todos'
-import { Route as AuthenticatedAdminAnalysisRouteImport } from './routes/_authenticated/admin/analysis'
-import { Route as AuthenticatedAccountantVendorPaymentsRouteImport } from './routes/_authenticated/accountant/vendor-payments'
-import { Route as AuthenticatedAccountantSettingsRouteImport } from './routes/_authenticated/accountant/settings'
-import { Route as AuthenticatedAccountantReportsRouteImport } from './routes/_authenticated/accountant/reports'
-import { Route as AuthenticatedAccountantReconcileRouteImport } from './routes/_authenticated/accountant/reconcile'
-import { Route as AuthenticatedAccountantPaymentsRouteImport } from './routes/_authenticated/accountant/payments'
-import { Route as AuthenticatedAccountantInvoicesRouteImport } from './routes/_authenticated/accountant/invoices'
-import { Route as AuthenticatedAccountantCashbookRouteImport } from './routes/_authenticated/accountant/cashbook'
-import { Route as AuthenticatedAccountantBillsRouteImport } from './routes/_authenticated/accountant/bills'
-import { Route as AuthenticatedAccountantBankImportRouteImport } from './routes/_authenticated/accountant/bank-import'
-import { Route as AuthenticatedAccountantBankAccountsRouteImport } from './routes/_authenticated/accountant/bank-accounts'
-import { Route as AuthenticatedAccountantAnalysisRouteImport } from './routes/_authenticated/accountant/analysis'
 import { Route as AuthenticatedAccountantAccountsRouteImport } from './routes/_authenticated/accountant/accounts'
-import { Route as AuthenticatedMiniAdminEngineerIndexRouteImport } from './routes/_authenticated/mini-admin/Engineer/index'
-import { Route as AuthenticatedMiniAdminDashboardIndexRouteImport } from './routes/_authenticated/mini-admin/Dashboard/index'
-import { Route as AuthenticatedMiniAdminTodoTodoRouteImport } from './routes/_authenticated/mini-admin/Todo/todo'
-import { Route as AuthenticatedMiniAdminEngineerProjectIdRouteImport } from './routes/_authenticated/mini-admin/Engineer/$projectId'
-import { Route as AuthenticatedMiniAdminAdminVendorsRouteImport } from './routes/_authenticated/mini-admin/Admin/vendors'
-import { Route as AuthenticatedMiniAdminAdminAnalysisRouteImport } from './routes/_authenticated/mini-admin/Admin/analysis'
-import { Route as AuthenticatedEngineerProjectIdWorksheetRouteImport } from './routes/_authenticated/engineer/$projectId.worksheet'
-import { Route as AuthenticatedEngineerProjectIdQuotationRouteImport } from './routes/_authenticated/engineer/$projectId.quotation'
-import { Route as AuthenticatedEngineerProjectIdMessagesRouteImport } from './routes/_authenticated/engineer/$projectId.messages'
-import { Route as AuthenticatedEngineerProjectIdInspectionRouteImport } from './routes/_authenticated/engineer/$projectId.inspection'
+import { Route as AuthenticatedAccountantAnalysisRouteImport } from './routes/_authenticated/accountant/analysis'
+import { Route as AuthenticatedAccountantBankAccountsRouteImport } from './routes/_authenticated/accountant/bank-accounts'
+import { Route as AuthenticatedAccountantBankImportRouteImport } from './routes/_authenticated/accountant/bank-import'
+import { Route as AuthenticatedAccountantBillsRouteImport } from './routes/_authenticated/accountant/bills'
+import { Route as AuthenticatedAccountantCashbookRouteImport } from './routes/_authenticated/accountant/cashbook'
+import { Route as AuthenticatedAccountantInvoicesRouteImport } from './routes/_authenticated/accountant/invoices'
+import { Route as AuthenticatedAccountantJournalRouteImport } from './routes/_authenticated/accountant/journal'
+import { Route as AuthenticatedAccountantPaymentsRouteImport } from './routes/_authenticated/accountant/payments'
+import { Route as AuthenticatedAccountantReconcileRouteImport } from './routes/_authenticated/accountant/reconcile'
+import { Route as AuthenticatedAccountantReportsRouteImport } from './routes/_authenticated/accountant/reports'
+import { Route as AuthenticatedAccountantSettingsRouteImport } from './routes/_authenticated/accountant/settings'
+import { Route as AuthenticatedAccountantVendorPaymentsRouteImport } from './routes/_authenticated/accountant/vendor-payments'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as AuthenticatedAdminAnalysisRouteImport } from './routes/_authenticated/admin/analysis'
+import { Route as AuthenticatedAdminTodosRouteImport } from './routes/_authenticated/admin/todos'
+import { Route as AuthenticatedAdminVendorsRouteImport } from './routes/_authenticated/admin/vendors'
+import { Route as AuthenticatedClientIndexRouteImport } from './routes/_authenticated/client/index'
+import { Route as AuthenticatedClientProjectIdRouteImport } from './routes/_authenticated/client/$projectId'
+import { Route as AuthenticatedClientNewRouteImport } from './routes/_authenticated/client/new'
+import { Route as AuthenticatedEngineerIndexRouteImport } from './routes/_authenticated/engineer/index'
+import { Route as AuthenticatedEngineerProjectIdRouteImport } from './routes/_authenticated/engineer/$projectId'
+import { Route as AuthenticatedEngineerTodosRouteImport } from './routes/_authenticated/engineer/todos'
+import { Route as AuthenticatedProjectViewerIndexRouteImport } from './routes/_authenticated/project-viewer/index'
+import { Route as AuthenticatedProjectViewerProjectIdRouteImport } from './routes/_authenticated/project-viewer/$projectId'
 import { Route as AuthenticatedEngineerProjectIdCompareRouteImport } from './routes/_authenticated/engineer/$projectId.compare'
-import { Route as AuthenticatedMiniAdminAdminProjectViewersIndexRouteImport } from './routes/_authenticated/mini-admin/Admin/ProjectViewers/index'
+import { Route as AuthenticatedEngineerProjectIdInspectionRouteImport } from './routes/_authenticated/engineer/$projectId.inspection'
+import { Route as AuthenticatedEngineerProjectIdMessagesRouteImport } from './routes/_authenticated/engineer/$projectId.messages'
+import { Route as AuthenticatedEngineerProjectIdQuotationRouteImport } from './routes/_authenticated/engineer/$projectId.quotation'
+import { Route as AuthenticatedEngineerProjectIdWorksheetRouteImport } from './routes/_authenticated/engineer/$projectId.worksheet'
+import { Route as AuthenticatedMiniAdminAdminAnalysisRouteImport } from './routes/_authenticated/mini-admin/Admin/analysis'
+import { Route as AuthenticatedMiniAdminAdminVendorsRouteImport } from './routes/_authenticated/mini-admin/Admin/vendors'
+import { Route as AuthenticatedMiniAdminDashboardIndexRouteImport } from './routes/_authenticated/mini-admin/Dashboard/index'
+import { Route as AuthenticatedMiniAdminEngineerIndexRouteImport } from './routes/_authenticated/mini-admin/Engineer/index'
+import { Route as AuthenticatedMiniAdminEngineerProjectIdRouteImport } from './routes/_authenticated/mini-admin/Engineer/$projectId'
+import { Route as AuthenticatedMiniAdminTodoTodoRouteImport } from './routes/_authenticated/mini-admin/Todo/todo'
 import { Route as AuthenticatedMiniAdminAdminClientsIndexRouteImport } from './routes/_authenticated/mini-admin/Admin/Clients/index'
-import { Route as AuthenticatedMiniAdminEngineerProjectIdWorksheetRouteImport } from './routes/_authenticated/mini-admin/Engineer/$projectId.worksheet'
-import { Route as AuthenticatedMiniAdminEngineerProjectIdQuotationRouteImport } from './routes/_authenticated/mini-admin/Engineer/$projectId.quotation'
-import { Route as AuthenticatedMiniAdminEngineerProjectIdMessagesRouteImport } from './routes/_authenticated/mini-admin/Engineer/$projectId.messages'
-import { Route as AuthenticatedMiniAdminEngineerProjectIdInspectionRouteImport } from './routes/_authenticated/mini-admin/Engineer/$projectId.inspection'
-import { Route as AuthenticatedMiniAdminEngineerProjectIdCompareRouteImport } from './routes/_authenticated/mini-admin/Engineer/$projectId.compare'
-import { Route as AuthenticatedMiniAdminAdminClientsNewRouteImport } from './routes/_authenticated/mini-admin/Admin/Clients/new'
 import { Route as AuthenticatedMiniAdminAdminClientsProjectIdRouteImport } from './routes/_authenticated/mini-admin/Admin/Clients/$projectId'
+import { Route as AuthenticatedMiniAdminAdminClientsNewRouteImport } from './routes/_authenticated/mini-admin/Admin/Clients/new'
+import { Route as AuthenticatedMiniAdminAdminProjectViewersIndexRouteImport } from './routes/_authenticated/mini-admin/Admin/ProjectViewers/index'
+import { Route as AuthenticatedMiniAdminEngineerProjectIdCompareRouteImport } from './routes/_authenticated/mini-admin/Engineer/$projectId.compare'
+import { Route as AuthenticatedMiniAdminEngineerProjectIdInspectionRouteImport } from './routes/_authenticated/mini-admin/Engineer/$projectId.inspection'
+import { Route as AuthenticatedMiniAdminEngineerProjectIdMessagesRouteImport } from './routes/_authenticated/mini-admin/Engineer/$projectId.messages'
+import { Route as AuthenticatedMiniAdminEngineerProjectIdQuotationRouteImport } from './routes/_authenticated/mini-admin/Engineer/$projectId.quotation'
+import { Route as AuthenticatedMiniAdminEngineerProjectIdWorksheetRouteImport } from './routes/_authenticated/mini-admin/Engineer/$projectId.worksheet'
 
-const ResetPasswordRoute = ResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -82,24 +82,42 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
-  id: '/_authenticated',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAccountantRouteRoute =
+  AuthenticatedAccountantRouteRouteImport.update({
+    id: '/accountant',
+    path: '/accountant',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedClientRouteRoute =
+  AuthenticatedClientRouteRouteImport.update({
+    id: '/client',
+    path: '/client',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedProjectViewerRouteRoute =
-  AuthenticatedProjectViewerRouteRouteImport.update({
-    id: '/project-viewer',
-    path: '/project-viewer',
+const AuthenticatedEngineerRouteRoute =
+  AuthenticatedEngineerRouteRouteImport.update({
+    id: '/engineer',
+    path: '/engineer',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedMiniAdminRouteRoute =
@@ -108,168 +126,16 @@ const AuthenticatedMiniAdminRouteRoute =
     path: '/mini-admin',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedEngineerRouteRoute =
-  AuthenticatedEngineerRouteRouteImport.update({
-    id: '/engineer',
-    path: '/engineer',
+const AuthenticatedProjectViewerRouteRoute =
+  AuthenticatedProjectViewerRouteRouteImport.update({
+    id: '/project-viewer',
+    path: '/project-viewer',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedClientRouteRoute =
-  AuthenticatedClientRouteRouteImport.update({
-    id: '/client',
-    path: '/client',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedAccountantRouteRoute =
-  AuthenticatedAccountantRouteRouteImport.update({
-    id: '/accountant',
-    path: '/accountant',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedProjectViewerIndexRoute =
-  AuthenticatedProjectViewerIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => AuthenticatedProjectViewerRouteRoute,
-  } as any)
-const AuthenticatedEngineerIndexRoute =
-  AuthenticatedEngineerIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => AuthenticatedEngineerRouteRoute,
-  } as any)
-const AuthenticatedClientIndexRoute =
-  AuthenticatedClientIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => AuthenticatedClientRouteRoute,
-  } as any)
-const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AuthenticatedAdminRouteRoute,
-} as any)
 const AuthenticatedAccountantIndexRoute =
   AuthenticatedAccountantIndexRouteImport.update({
     id: '/',
     path: '/',
-    getParentRoute: () => AuthenticatedAccountantRouteRoute,
-  } as any)
-const AuthenticatedProjectViewerProjectIdRoute =
-  AuthenticatedProjectViewerProjectIdRouteImport.update({
-    id: '/$projectId',
-    path: '/$projectId',
-    getParentRoute: () => AuthenticatedProjectViewerRouteRoute,
-  } as any)
-const AuthenticatedEngineerTodosRoute =
-  AuthenticatedEngineerTodosRouteImport.update({
-    id: '/todos',
-    path: '/todos',
-    getParentRoute: () => AuthenticatedEngineerRouteRoute,
-  } as any)
-const AuthenticatedEngineerProjectIdRoute =
-  AuthenticatedEngineerProjectIdRouteImport.update({
-    id: '/$projectId',
-    path: '/$projectId',
-    getParentRoute: () => AuthenticatedEngineerRouteRoute,
-  } as any)
-const AuthenticatedClientNewRoute = AuthenticatedClientNewRouteImport.update({
-  id: '/new',
-  path: '/new',
-  getParentRoute: () => AuthenticatedClientRouteRoute,
-} as any)
-const AuthenticatedClientProjectIdRoute =
-  AuthenticatedClientProjectIdRouteImport.update({
-    id: '/$projectId',
-    path: '/$projectId',
-    getParentRoute: () => AuthenticatedClientRouteRoute,
-  } as any)
-const AuthenticatedAdminVendorsRoute =
-  AuthenticatedAdminVendorsRouteImport.update({
-    id: '/vendors',
-    path: '/vendors',
-    getParentRoute: () => AuthenticatedAdminRouteRoute,
-  } as any)
-const AuthenticatedAdminTodosRoute = AuthenticatedAdminTodosRouteImport.update({
-  id: '/todos',
-  path: '/todos',
-  getParentRoute: () => AuthenticatedAdminRouteRoute,
-} as any)
-const AuthenticatedAdminAnalysisRoute =
-  AuthenticatedAdminAnalysisRouteImport.update({
-    id: '/analysis',
-    path: '/analysis',
-    getParentRoute: () => AuthenticatedAdminRouteRoute,
-  } as any)
-const AuthenticatedAccountantVendorPaymentsRoute =
-  AuthenticatedAccountantVendorPaymentsRouteImport.update({
-    id: '/vendor-payments',
-    path: '/vendor-payments',
-    getParentRoute: () => AuthenticatedAccountantRouteRoute,
-  } as any)
-const AuthenticatedAccountantSettingsRoute =
-  AuthenticatedAccountantSettingsRouteImport.update({
-    id: '/settings',
-    path: '/settings',
-    getParentRoute: () => AuthenticatedAccountantRouteRoute,
-  } as any)
-const AuthenticatedAccountantReportsRoute =
-  AuthenticatedAccountantReportsRouteImport.update({
-    id: '/reports',
-    path: '/reports',
-    getParentRoute: () => AuthenticatedAccountantRouteRoute,
-  } as any)
-const AuthenticatedAccountantReconcileRoute =
-  AuthenticatedAccountantReconcileRouteImport.update({
-    id: '/reconcile',
-    path: '/reconcile',
-    getParentRoute: () => AuthenticatedAccountantRouteRoute,
-  } as any)
-const AuthenticatedAccountantPaymentsRoute =
-  AuthenticatedAccountantPaymentsRouteImport.update({
-    id: '/payments',
-    path: '/payments',
-    getParentRoute: () => AuthenticatedAccountantRouteRoute,
-  } as any)
-const AuthenticatedAccountantInvoicesRoute =
-  AuthenticatedAccountantInvoicesRouteImport.update({
-    id: '/invoices',
-    path: '/invoices',
-    getParentRoute: () => AuthenticatedAccountantRouteRoute,
-  } as any)
-const AuthenticatedAccountantCashbookRoute =
-  AuthenticatedAccountantCashbookRouteImport.update({
-    id: '/cashbook',
-    path: '/cashbook',
-    getParentRoute: () => AuthenticatedAccountantRouteRoute,
-  } as any)
-const AuthenticatedAccountantBillsRoute =
-  AuthenticatedAccountantBillsRouteImport.update({
-    id: '/bills',
-    path: '/bills',
-    getParentRoute: () => AuthenticatedAccountantRouteRoute,
-  } as any)
-const AuthenticatedAccountantBankImportRoute =
-  AuthenticatedAccountantBankImportRouteImport.update({
-    id: '/bank-import',
-    path: '/bank-import',
-    getParentRoute: () => AuthenticatedAccountantRouteRoute,
-  } as any)
-const AuthenticatedAccountantBankAccountsRoute =
-  AuthenticatedAccountantBankAccountsRouteImport.update({
-    id: '/bank-accounts',
-    path: '/bank-accounts',
-    getParentRoute: () => AuthenticatedAccountantRouteRoute,
-  } as any)
-const AuthenticatedAccountantAnalysisRoute =
-  AuthenticatedAccountantAnalysisRouteImport.update({
-    id: '/analysis',
-    path: '/analysis',
     getParentRoute: () => AuthenticatedAccountantRouteRoute,
   } as any)
 const AuthenticatedAccountantAccountsRoute =
@@ -278,58 +144,151 @@ const AuthenticatedAccountantAccountsRoute =
     path: '/accounts',
     getParentRoute: () => AuthenticatedAccountantRouteRoute,
   } as any)
-const AuthenticatedMiniAdminEngineerIndexRoute =
-  AuthenticatedMiniAdminEngineerIndexRouteImport.update({
-    id: '/Engineer/',
-    path: '/Engineer/',
-    getParentRoute: () => AuthenticatedMiniAdminRouteRoute,
+const AuthenticatedAccountantAnalysisRoute =
+  AuthenticatedAccountantAnalysisRouteImport.update({
+    id: '/analysis',
+    path: '/analysis',
+    getParentRoute: () => AuthenticatedAccountantRouteRoute,
   } as any)
-const AuthenticatedMiniAdminDashboardIndexRoute =
-  AuthenticatedMiniAdminDashboardIndexRouteImport.update({
-    id: '/Dashboard/',
-    path: '/Dashboard/',
-    getParentRoute: () => AuthenticatedMiniAdminRouteRoute,
+const AuthenticatedAccountantBankAccountsRoute =
+  AuthenticatedAccountantBankAccountsRouteImport.update({
+    id: '/bank-accounts',
+    path: '/bank-accounts',
+    getParentRoute: () => AuthenticatedAccountantRouteRoute,
   } as any)
-const AuthenticatedMiniAdminTodoTodoRoute =
-  AuthenticatedMiniAdminTodoTodoRouteImport.update({
-    id: '/Todo/todo',
-    path: '/Todo/todo',
-    getParentRoute: () => AuthenticatedMiniAdminRouteRoute,
+const AuthenticatedAccountantBankImportRoute =
+  AuthenticatedAccountantBankImportRouteImport.update({
+    id: '/bank-import',
+    path: '/bank-import',
+    getParentRoute: () => AuthenticatedAccountantRouteRoute,
   } as any)
-const AuthenticatedMiniAdminEngineerProjectIdRoute =
-  AuthenticatedMiniAdminEngineerProjectIdRouteImport.update({
-    id: '/Engineer/$projectId',
-    path: '/Engineer/$projectId',
-    getParentRoute: () => AuthenticatedMiniAdminRouteRoute,
+const AuthenticatedAccountantBillsRoute =
+  AuthenticatedAccountantBillsRouteImport.update({
+    id: '/bills',
+    path: '/bills',
+    getParentRoute: () => AuthenticatedAccountantRouteRoute,
   } as any)
-const AuthenticatedMiniAdminAdminVendorsRoute =
-  AuthenticatedMiniAdminAdminVendorsRouteImport.update({
-    id: '/Admin/vendors',
-    path: '/Admin/vendors',
-    getParentRoute: () => AuthenticatedMiniAdminRouteRoute,
+const AuthenticatedAccountantCashbookRoute =
+  AuthenticatedAccountantCashbookRouteImport.update({
+    id: '/cashbook',
+    path: '/cashbook',
+    getParentRoute: () => AuthenticatedAccountantRouteRoute,
   } as any)
-const AuthenticatedMiniAdminAdminAnalysisRoute =
-  AuthenticatedMiniAdminAdminAnalysisRouteImport.update({
-    id: '/Admin/analysis',
-    path: '/Admin/analysis',
-    getParentRoute: () => AuthenticatedMiniAdminRouteRoute,
+const AuthenticatedAccountantInvoicesRoute =
+  AuthenticatedAccountantInvoicesRouteImport.update({
+    id: '/invoices',
+    path: '/invoices',
+    getParentRoute: () => AuthenticatedAccountantRouteRoute,
   } as any)
-const AuthenticatedEngineerProjectIdWorksheetRoute =
-  AuthenticatedEngineerProjectIdWorksheetRouteImport.update({
-    id: '/worksheet',
-    path: '/worksheet',
-    getParentRoute: () => AuthenticatedEngineerProjectIdRoute,
+const AuthenticatedAccountantJournalRoute =
+  AuthenticatedAccountantJournalRouteImport.update({
+    id: '/journal',
+    path: '/journal',
+    getParentRoute: () => AuthenticatedAccountantRouteRoute,
   } as any)
-const AuthenticatedEngineerProjectIdQuotationRoute =
-  AuthenticatedEngineerProjectIdQuotationRouteImport.update({
-    id: '/quotation',
-    path: '/quotation',
-    getParentRoute: () => AuthenticatedEngineerProjectIdRoute,
+const AuthenticatedAccountantPaymentsRoute =
+  AuthenticatedAccountantPaymentsRouteImport.update({
+    id: '/payments',
+    path: '/payments',
+    getParentRoute: () => AuthenticatedAccountantRouteRoute,
   } as any)
-const AuthenticatedEngineerProjectIdMessagesRoute =
-  AuthenticatedEngineerProjectIdMessagesRouteImport.update({
-    id: '/messages',
-    path: '/messages',
+const AuthenticatedAccountantReconcileRoute =
+  AuthenticatedAccountantReconcileRouteImport.update({
+    id: '/reconcile',
+    path: '/reconcile',
+    getParentRoute: () => AuthenticatedAccountantRouteRoute,
+  } as any)
+const AuthenticatedAccountantReportsRoute =
+  AuthenticatedAccountantReportsRouteImport.update({
+    id: '/reports',
+    path: '/reports',
+    getParentRoute: () => AuthenticatedAccountantRouteRoute,
+  } as any)
+const AuthenticatedAccountantSettingsRoute =
+  AuthenticatedAccountantSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedAccountantRouteRoute,
+  } as any)
+const AuthenticatedAccountantVendorPaymentsRoute =
+  AuthenticatedAccountantVendorPaymentsRouteImport.update({
+    id: '/vendor-payments',
+    path: '/vendor-payments',
+    getParentRoute: () => AuthenticatedAccountantRouteRoute,
+  } as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const AuthenticatedAdminAnalysisRoute =
+  AuthenticatedAdminAnalysisRouteImport.update({
+    id: '/analysis',
+    path: '/analysis',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminTodosRoute = AuthenticatedAdminTodosRouteImport.update({
+  id: '/todos',
+  path: '/todos',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const AuthenticatedAdminVendorsRoute =
+  AuthenticatedAdminVendorsRouteImport.update({
+    id: '/vendors',
+    path: '/vendors',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedClientIndexRoute =
+  AuthenticatedClientIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedClientRouteRoute,
+  } as any)
+const AuthenticatedClientProjectIdRoute =
+  AuthenticatedClientProjectIdRouteImport.update({
+    id: '/$projectId',
+    path: '/$projectId',
+    getParentRoute: () => AuthenticatedClientRouteRoute,
+  } as any)
+const AuthenticatedClientNewRoute = AuthenticatedClientNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => AuthenticatedClientRouteRoute,
+} as any)
+const AuthenticatedEngineerIndexRoute =
+  AuthenticatedEngineerIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedEngineerRouteRoute,
+  } as any)
+const AuthenticatedEngineerProjectIdRoute =
+  AuthenticatedEngineerProjectIdRouteImport.update({
+    id: '/$projectId',
+    path: '/$projectId',
+    getParentRoute: () => AuthenticatedEngineerRouteRoute,
+  } as any)
+const AuthenticatedEngineerTodosRoute =
+  AuthenticatedEngineerTodosRouteImport.update({
+    id: '/todos',
+    path: '/todos',
+    getParentRoute: () => AuthenticatedEngineerRouteRoute,
+  } as any)
+const AuthenticatedProjectViewerIndexRoute =
+  AuthenticatedProjectViewerIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedProjectViewerRouteRoute,
+  } as any)
+const AuthenticatedProjectViewerProjectIdRoute =
+  AuthenticatedProjectViewerProjectIdRouteImport.update({
+    id: '/$projectId',
+    path: '/$projectId',
+    getParentRoute: () => AuthenticatedProjectViewerRouteRoute,
+  } as any)
+const AuthenticatedEngineerProjectIdCompareRoute =
+  AuthenticatedEngineerProjectIdCompareRouteImport.update({
+    id: '/compare',
+    path: '/compare',
     getParentRoute: () => AuthenticatedEngineerProjectIdRoute,
   } as any)
 const AuthenticatedEngineerProjectIdInspectionRoute =
@@ -338,16 +297,58 @@ const AuthenticatedEngineerProjectIdInspectionRoute =
     path: '/inspection',
     getParentRoute: () => AuthenticatedEngineerProjectIdRoute,
   } as any)
-const AuthenticatedEngineerProjectIdCompareRoute =
-  AuthenticatedEngineerProjectIdCompareRouteImport.update({
-    id: '/compare',
-    path: '/compare',
+const AuthenticatedEngineerProjectIdMessagesRoute =
+  AuthenticatedEngineerProjectIdMessagesRouteImport.update({
+    id: '/messages',
+    path: '/messages',
     getParentRoute: () => AuthenticatedEngineerProjectIdRoute,
   } as any)
-const AuthenticatedMiniAdminAdminProjectViewersIndexRoute =
-  AuthenticatedMiniAdminAdminProjectViewersIndexRouteImport.update({
-    id: '/Admin/ProjectViewers/',
-    path: '/Admin/ProjectViewers/',
+const AuthenticatedEngineerProjectIdQuotationRoute =
+  AuthenticatedEngineerProjectIdQuotationRouteImport.update({
+    id: '/quotation',
+    path: '/quotation',
+    getParentRoute: () => AuthenticatedEngineerProjectIdRoute,
+  } as any)
+const AuthenticatedEngineerProjectIdWorksheetRoute =
+  AuthenticatedEngineerProjectIdWorksheetRouteImport.update({
+    id: '/worksheet',
+    path: '/worksheet',
+    getParentRoute: () => AuthenticatedEngineerProjectIdRoute,
+  } as any)
+const AuthenticatedMiniAdminAdminAnalysisRoute =
+  AuthenticatedMiniAdminAdminAnalysisRouteImport.update({
+    id: '/Admin/analysis',
+    path: '/Admin/analysis',
+    getParentRoute: () => AuthenticatedMiniAdminRouteRoute,
+  } as any)
+const AuthenticatedMiniAdminAdminVendorsRoute =
+  AuthenticatedMiniAdminAdminVendorsRouteImport.update({
+    id: '/Admin/vendors',
+    path: '/Admin/vendors',
+    getParentRoute: () => AuthenticatedMiniAdminRouteRoute,
+  } as any)
+const AuthenticatedMiniAdminDashboardIndexRoute =
+  AuthenticatedMiniAdminDashboardIndexRouteImport.update({
+    id: '/Dashboard/',
+    path: '/Dashboard/',
+    getParentRoute: () => AuthenticatedMiniAdminRouteRoute,
+  } as any)
+const AuthenticatedMiniAdminEngineerIndexRoute =
+  AuthenticatedMiniAdminEngineerIndexRouteImport.update({
+    id: '/Engineer/',
+    path: '/Engineer/',
+    getParentRoute: () => AuthenticatedMiniAdminRouteRoute,
+  } as any)
+const AuthenticatedMiniAdminEngineerProjectIdRoute =
+  AuthenticatedMiniAdminEngineerProjectIdRouteImport.update({
+    id: '/Engineer/$projectId',
+    path: '/Engineer/$projectId',
+    getParentRoute: () => AuthenticatedMiniAdminRouteRoute,
+  } as any)
+const AuthenticatedMiniAdminTodoTodoRoute =
+  AuthenticatedMiniAdminTodoTodoRouteImport.update({
+    id: '/Todo/todo',
+    path: '/Todo/todo',
     getParentRoute: () => AuthenticatedMiniAdminRouteRoute,
   } as any)
 const AuthenticatedMiniAdminAdminClientsIndexRoute =
@@ -356,22 +357,28 @@ const AuthenticatedMiniAdminAdminClientsIndexRoute =
     path: '/Admin/Clients/',
     getParentRoute: () => AuthenticatedMiniAdminRouteRoute,
   } as any)
-const AuthenticatedMiniAdminEngineerProjectIdWorksheetRoute =
-  AuthenticatedMiniAdminEngineerProjectIdWorksheetRouteImport.update({
-    id: '/worksheet',
-    path: '/worksheet',
-    getParentRoute: () => AuthenticatedMiniAdminEngineerProjectIdRoute,
+const AuthenticatedMiniAdminAdminClientsProjectIdRoute =
+  AuthenticatedMiniAdminAdminClientsProjectIdRouteImport.update({
+    id: '/Admin/Clients/$projectId',
+    path: '/Admin/Clients/$projectId',
+    getParentRoute: () => AuthenticatedMiniAdminRouteRoute,
   } as any)
-const AuthenticatedMiniAdminEngineerProjectIdQuotationRoute =
-  AuthenticatedMiniAdminEngineerProjectIdQuotationRouteImport.update({
-    id: '/quotation',
-    path: '/quotation',
-    getParentRoute: () => AuthenticatedMiniAdminEngineerProjectIdRoute,
+const AuthenticatedMiniAdminAdminClientsNewRoute =
+  AuthenticatedMiniAdminAdminClientsNewRouteImport.update({
+    id: '/Admin/Clients/new',
+    path: '/Admin/Clients/new',
+    getParentRoute: () => AuthenticatedMiniAdminRouteRoute,
   } as any)
-const AuthenticatedMiniAdminEngineerProjectIdMessagesRoute =
-  AuthenticatedMiniAdminEngineerProjectIdMessagesRouteImport.update({
-    id: '/messages',
-    path: '/messages',
+const AuthenticatedMiniAdminAdminProjectViewersIndexRoute =
+  AuthenticatedMiniAdminAdminProjectViewersIndexRouteImport.update({
+    id: '/Admin/ProjectViewers/',
+    path: '/Admin/ProjectViewers/',
+    getParentRoute: () => AuthenticatedMiniAdminRouteRoute,
+  } as any)
+const AuthenticatedMiniAdminEngineerProjectIdCompareRoute =
+  AuthenticatedMiniAdminEngineerProjectIdCompareRouteImport.update({
+    id: '/compare',
+    path: '/compare',
     getParentRoute: () => AuthenticatedMiniAdminEngineerProjectIdRoute,
   } as any)
 const AuthenticatedMiniAdminEngineerProjectIdInspectionRoute =
@@ -380,23 +387,23 @@ const AuthenticatedMiniAdminEngineerProjectIdInspectionRoute =
     path: '/inspection',
     getParentRoute: () => AuthenticatedMiniAdminEngineerProjectIdRoute,
   } as any)
-const AuthenticatedMiniAdminEngineerProjectIdCompareRoute =
-  AuthenticatedMiniAdminEngineerProjectIdCompareRouteImport.update({
-    id: '/compare',
-    path: '/compare',
+const AuthenticatedMiniAdminEngineerProjectIdMessagesRoute =
+  AuthenticatedMiniAdminEngineerProjectIdMessagesRouteImport.update({
+    id: '/messages',
+    path: '/messages',
     getParentRoute: () => AuthenticatedMiniAdminEngineerProjectIdRoute,
   } as any)
-const AuthenticatedMiniAdminAdminClientsNewRoute =
-  AuthenticatedMiniAdminAdminClientsNewRouteImport.update({
-    id: '/Admin/Clients/new',
-    path: '/Admin/Clients/new',
-    getParentRoute: () => AuthenticatedMiniAdminRouteRoute,
+const AuthenticatedMiniAdminEngineerProjectIdQuotationRoute =
+  AuthenticatedMiniAdminEngineerProjectIdQuotationRouteImport.update({
+    id: '/quotation',
+    path: '/quotation',
+    getParentRoute: () => AuthenticatedMiniAdminEngineerProjectIdRoute,
   } as any)
-const AuthenticatedMiniAdminAdminClientsProjectIdRoute =
-  AuthenticatedMiniAdminAdminClientsProjectIdRouteImport.update({
-    id: '/Admin/Clients/$projectId',
-    path: '/Admin/Clients/$projectId',
-    getParentRoute: () => AuthenticatedMiniAdminRouteRoute,
+const AuthenticatedMiniAdminEngineerProjectIdWorksheetRoute =
+  AuthenticatedMiniAdminEngineerProjectIdWorksheetRouteImport.update({
+    id: '/worksheet',
+    path: '/worksheet',
+    getParentRoute: () => AuthenticatedMiniAdminEngineerProjectIdRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -418,6 +425,7 @@ export interface FileRoutesByFullPath {
   '/accountant/bills': typeof AuthenticatedAccountantBillsRoute
   '/accountant/cashbook': typeof AuthenticatedAccountantCashbookRoute
   '/accountant/invoices': typeof AuthenticatedAccountantInvoicesRoute
+  '/accountant/journal': typeof AuthenticatedAccountantJournalRoute
   '/accountant/payments': typeof AuthenticatedAccountantPaymentsRoute
   '/accountant/reconcile': typeof AuthenticatedAccountantReconcileRoute
   '/accountant/reports': typeof AuthenticatedAccountantReportsRoute
@@ -471,6 +479,7 @@ export interface FileRoutesByTo {
   '/accountant/bills': typeof AuthenticatedAccountantBillsRoute
   '/accountant/cashbook': typeof AuthenticatedAccountantCashbookRoute
   '/accountant/invoices': typeof AuthenticatedAccountantInvoicesRoute
+  '/accountant/journal': typeof AuthenticatedAccountantJournalRoute
   '/accountant/payments': typeof AuthenticatedAccountantPaymentsRoute
   '/accountant/reconcile': typeof AuthenticatedAccountantReconcileRoute
   '/accountant/reports': typeof AuthenticatedAccountantReportsRoute
@@ -531,6 +540,7 @@ export interface FileRoutesById {
   '/_authenticated/accountant/bills': typeof AuthenticatedAccountantBillsRoute
   '/_authenticated/accountant/cashbook': typeof AuthenticatedAccountantCashbookRoute
   '/_authenticated/accountant/invoices': typeof AuthenticatedAccountantInvoicesRoute
+  '/_authenticated/accountant/journal': typeof AuthenticatedAccountantJournalRoute
   '/_authenticated/accountant/payments': typeof AuthenticatedAccountantPaymentsRoute
   '/_authenticated/accountant/reconcile': typeof AuthenticatedAccountantReconcileRoute
   '/_authenticated/accountant/reports': typeof AuthenticatedAccountantReportsRoute
@@ -591,6 +601,7 @@ export interface FileRouteTypes {
     | '/accountant/bills'
     | '/accountant/cashbook'
     | '/accountant/invoices'
+    | '/accountant/journal'
     | '/accountant/payments'
     | '/accountant/reconcile'
     | '/accountant/reports'
@@ -644,6 +655,7 @@ export interface FileRouteTypes {
     | '/accountant/bills'
     | '/accountant/cashbook'
     | '/accountant/invoices'
+    | '/accountant/journal'
     | '/accountant/payments'
     | '/accountant/reconcile'
     | '/accountant/reports'
@@ -703,6 +715,7 @@ export interface FileRouteTypes {
     | '/_authenticated/accountant/bills'
     | '/_authenticated/accountant/cashbook'
     | '/_authenticated/accountant/invoices'
+    | '/_authenticated/accountant/journal'
     | '/_authenticated/accountant/payments'
     | '/_authenticated/accountant/reconcile'
     | '/_authenticated/accountant/reports'
@@ -753,25 +766,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/reset-password': {
-      id: '/reset-password'
-      path: '/reset-password'
-      fullPath: '/reset-password'
-      preLoaderRoute: typeof ResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -781,46 +780,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/dashboard': {
-      id: '/_authenticated/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/project-viewer': {
-      id: '/_authenticated/project-viewer'
-      path: '/project-viewer'
-      fullPath: '/project-viewer'
-      preLoaderRoute: typeof AuthenticatedProjectViewerRouteRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/mini-admin': {
-      id: '/_authenticated/mini-admin'
-      path: '/mini-admin'
-      fullPath: '/mini-admin'
-      preLoaderRoute: typeof AuthenticatedMiniAdminRouteRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/engineer': {
-      id: '/_authenticated/engineer'
-      path: '/engineer'
-      fullPath: '/engineer'
-      preLoaderRoute: typeof AuthenticatedEngineerRouteRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/client': {
-      id: '/_authenticated/client'
-      path: '/client'
-      fullPath: '/client'
-      preLoaderRoute: typeof AuthenticatedClientRouteRouteImport
+    '/_authenticated/accountant': {
+      id: '/_authenticated/accountant'
+      path: '/accountant'
+      fullPath: '/accountant'
+      preLoaderRoute: typeof AuthenticatedAccountantRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin': {
@@ -830,179 +815,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/accountant': {
-      id: '/_authenticated/accountant'
-      path: '/accountant'
-      fullPath: '/accountant'
-      preLoaderRoute: typeof AuthenticatedAccountantRouteRouteImport
+    '/_authenticated/client': {
+      id: '/_authenticated/client'
+      path: '/client'
+      fullPath: '/client'
+      preLoaderRoute: typeof AuthenticatedClientRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/project-viewer/': {
-      id: '/_authenticated/project-viewer/'
-      path: '/'
-      fullPath: '/project-viewer/'
-      preLoaderRoute: typeof AuthenticatedProjectViewerIndexRouteImport
-      parentRoute: typeof AuthenticatedProjectViewerRouteRoute
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/engineer/': {
-      id: '/_authenticated/engineer/'
-      path: '/'
-      fullPath: '/engineer/'
-      preLoaderRoute: typeof AuthenticatedEngineerIndexRouteImport
-      parentRoute: typeof AuthenticatedEngineerRouteRoute
+    '/_authenticated/engineer': {
+      id: '/_authenticated/engineer'
+      path: '/engineer'
+      fullPath: '/engineer'
+      preLoaderRoute: typeof AuthenticatedEngineerRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/client/': {
-      id: '/_authenticated/client/'
-      path: '/'
-      fullPath: '/client/'
-      preLoaderRoute: typeof AuthenticatedClientIndexRouteImport
-      parentRoute: typeof AuthenticatedClientRouteRoute
+    '/_authenticated/mini-admin': {
+      id: '/_authenticated/mini-admin'
+      path: '/mini-admin'
+      fullPath: '/mini-admin'
+      preLoaderRoute: typeof AuthenticatedMiniAdminRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/admin/': {
-      id: '/_authenticated/admin/'
-      path: '/'
-      fullPath: '/admin/'
-      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
-      parentRoute: typeof AuthenticatedAdminRouteRoute
+    '/_authenticated/project-viewer': {
+      id: '/_authenticated/project-viewer'
+      path: '/project-viewer'
+      fullPath: '/project-viewer'
+      preLoaderRoute: typeof AuthenticatedProjectViewerRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/accountant/': {
       id: '/_authenticated/accountant/'
       path: '/'
       fullPath: '/accountant/'
       preLoaderRoute: typeof AuthenticatedAccountantIndexRouteImport
-      parentRoute: typeof AuthenticatedAccountantRouteRoute
-    }
-    '/_authenticated/project-viewer/$projectId': {
-      id: '/_authenticated/project-viewer/$projectId'
-      path: '/$projectId'
-      fullPath: '/project-viewer/$projectId'
-      preLoaderRoute: typeof AuthenticatedProjectViewerProjectIdRouteImport
-      parentRoute: typeof AuthenticatedProjectViewerRouteRoute
-    }
-    '/_authenticated/engineer/todos': {
-      id: '/_authenticated/engineer/todos'
-      path: '/todos'
-      fullPath: '/engineer/todos'
-      preLoaderRoute: typeof AuthenticatedEngineerTodosRouteImport
-      parentRoute: typeof AuthenticatedEngineerRouteRoute
-    }
-    '/_authenticated/engineer/$projectId': {
-      id: '/_authenticated/engineer/$projectId'
-      path: '/$projectId'
-      fullPath: '/engineer/$projectId'
-      preLoaderRoute: typeof AuthenticatedEngineerProjectIdRouteImport
-      parentRoute: typeof AuthenticatedEngineerRouteRoute
-    }
-    '/_authenticated/client/new': {
-      id: '/_authenticated/client/new'
-      path: '/new'
-      fullPath: '/client/new'
-      preLoaderRoute: typeof AuthenticatedClientNewRouteImport
-      parentRoute: typeof AuthenticatedClientRouteRoute
-    }
-    '/_authenticated/client/$projectId': {
-      id: '/_authenticated/client/$projectId'
-      path: '/$projectId'
-      fullPath: '/client/$projectId'
-      preLoaderRoute: typeof AuthenticatedClientProjectIdRouteImport
-      parentRoute: typeof AuthenticatedClientRouteRoute
-    }
-    '/_authenticated/admin/vendors': {
-      id: '/_authenticated/admin/vendors'
-      path: '/vendors'
-      fullPath: '/admin/vendors'
-      preLoaderRoute: typeof AuthenticatedAdminVendorsRouteImport
-      parentRoute: typeof AuthenticatedAdminRouteRoute
-    }
-    '/_authenticated/admin/todos': {
-      id: '/_authenticated/admin/todos'
-      path: '/todos'
-      fullPath: '/admin/todos'
-      preLoaderRoute: typeof AuthenticatedAdminTodosRouteImport
-      parentRoute: typeof AuthenticatedAdminRouteRoute
-    }
-    '/_authenticated/admin/analysis': {
-      id: '/_authenticated/admin/analysis'
-      path: '/analysis'
-      fullPath: '/admin/analysis'
-      preLoaderRoute: typeof AuthenticatedAdminAnalysisRouteImport
-      parentRoute: typeof AuthenticatedAdminRouteRoute
-    }
-    '/_authenticated/accountant/vendor-payments': {
-      id: '/_authenticated/accountant/vendor-payments'
-      path: '/vendor-payments'
-      fullPath: '/accountant/vendor-payments'
-      preLoaderRoute: typeof AuthenticatedAccountantVendorPaymentsRouteImport
-      parentRoute: typeof AuthenticatedAccountantRouteRoute
-    }
-    '/_authenticated/accountant/settings': {
-      id: '/_authenticated/accountant/settings'
-      path: '/settings'
-      fullPath: '/accountant/settings'
-      preLoaderRoute: typeof AuthenticatedAccountantSettingsRouteImport
-      parentRoute: typeof AuthenticatedAccountantRouteRoute
-    }
-    '/_authenticated/accountant/reports': {
-      id: '/_authenticated/accountant/reports'
-      path: '/reports'
-      fullPath: '/accountant/reports'
-      preLoaderRoute: typeof AuthenticatedAccountantReportsRouteImport
-      parentRoute: typeof AuthenticatedAccountantRouteRoute
-    }
-    '/_authenticated/accountant/reconcile': {
-      id: '/_authenticated/accountant/reconcile'
-      path: '/reconcile'
-      fullPath: '/accountant/reconcile'
-      preLoaderRoute: typeof AuthenticatedAccountantReconcileRouteImport
-      parentRoute: typeof AuthenticatedAccountantRouteRoute
-    }
-    '/_authenticated/accountant/payments': {
-      id: '/_authenticated/accountant/payments'
-      path: '/payments'
-      fullPath: '/accountant/payments'
-      preLoaderRoute: typeof AuthenticatedAccountantPaymentsRouteImport
-      parentRoute: typeof AuthenticatedAccountantRouteRoute
-    }
-    '/_authenticated/accountant/invoices': {
-      id: '/_authenticated/accountant/invoices'
-      path: '/invoices'
-      fullPath: '/accountant/invoices'
-      preLoaderRoute: typeof AuthenticatedAccountantInvoicesRouteImport
-      parentRoute: typeof AuthenticatedAccountantRouteRoute
-    }
-    '/_authenticated/accountant/cashbook': {
-      id: '/_authenticated/accountant/cashbook'
-      path: '/cashbook'
-      fullPath: '/accountant/cashbook'
-      preLoaderRoute: typeof AuthenticatedAccountantCashbookRouteImport
-      parentRoute: typeof AuthenticatedAccountantRouteRoute
-    }
-    '/_authenticated/accountant/bills': {
-      id: '/_authenticated/accountant/bills'
-      path: '/bills'
-      fullPath: '/accountant/bills'
-      preLoaderRoute: typeof AuthenticatedAccountantBillsRouteImport
-      parentRoute: typeof AuthenticatedAccountantRouteRoute
-    }
-    '/_authenticated/accountant/bank-import': {
-      id: '/_authenticated/accountant/bank-import'
-      path: '/bank-import'
-      fullPath: '/accountant/bank-import'
-      preLoaderRoute: typeof AuthenticatedAccountantBankImportRouteImport
-      parentRoute: typeof AuthenticatedAccountantRouteRoute
-    }
-    '/_authenticated/accountant/bank-accounts': {
-      id: '/_authenticated/accountant/bank-accounts'
-      path: '/bank-accounts'
-      fullPath: '/accountant/bank-accounts'
-      preLoaderRoute: typeof AuthenticatedAccountantBankAccountsRouteImport
-      parentRoute: typeof AuthenticatedAccountantRouteRoute
-    }
-    '/_authenticated/accountant/analysis': {
-      id: '/_authenticated/accountant/analysis'
-      path: '/analysis'
-      fullPath: '/accountant/analysis'
-      preLoaderRoute: typeof AuthenticatedAccountantAnalysisRouteImport
       parentRoute: typeof AuthenticatedAccountantRouteRoute
     }
     '/_authenticated/accountant/accounts': {
@@ -1012,67 +864,179 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAccountantAccountsRouteImport
       parentRoute: typeof AuthenticatedAccountantRouteRoute
     }
-    '/_authenticated/mini-admin/Engineer/': {
-      id: '/_authenticated/mini-admin/Engineer/'
-      path: '/Engineer'
-      fullPath: '/mini-admin/Engineer/'
-      preLoaderRoute: typeof AuthenticatedMiniAdminEngineerIndexRouteImport
-      parentRoute: typeof AuthenticatedMiniAdminRouteRoute
+    '/_authenticated/accountant/analysis': {
+      id: '/_authenticated/accountant/analysis'
+      path: '/analysis'
+      fullPath: '/accountant/analysis'
+      preLoaderRoute: typeof AuthenticatedAccountantAnalysisRouteImport
+      parentRoute: typeof AuthenticatedAccountantRouteRoute
     }
-    '/_authenticated/mini-admin/Dashboard/': {
-      id: '/_authenticated/mini-admin/Dashboard/'
-      path: '/Dashboard'
-      fullPath: '/mini-admin/Dashboard/'
-      preLoaderRoute: typeof AuthenticatedMiniAdminDashboardIndexRouteImport
-      parentRoute: typeof AuthenticatedMiniAdminRouteRoute
+    '/_authenticated/accountant/bank-accounts': {
+      id: '/_authenticated/accountant/bank-accounts'
+      path: '/bank-accounts'
+      fullPath: '/accountant/bank-accounts'
+      preLoaderRoute: typeof AuthenticatedAccountantBankAccountsRouteImport
+      parentRoute: typeof AuthenticatedAccountantRouteRoute
     }
-    '/_authenticated/mini-admin/Todo/todo': {
-      id: '/_authenticated/mini-admin/Todo/todo'
-      path: '/Todo/todo'
-      fullPath: '/mini-admin/Todo/todo'
-      preLoaderRoute: typeof AuthenticatedMiniAdminTodoTodoRouteImport
-      parentRoute: typeof AuthenticatedMiniAdminRouteRoute
+    '/_authenticated/accountant/bank-import': {
+      id: '/_authenticated/accountant/bank-import'
+      path: '/bank-import'
+      fullPath: '/accountant/bank-import'
+      preLoaderRoute: typeof AuthenticatedAccountantBankImportRouteImport
+      parentRoute: typeof AuthenticatedAccountantRouteRoute
     }
-    '/_authenticated/mini-admin/Engineer/$projectId': {
-      id: '/_authenticated/mini-admin/Engineer/$projectId'
-      path: '/Engineer/$projectId'
-      fullPath: '/mini-admin/Engineer/$projectId'
-      preLoaderRoute: typeof AuthenticatedMiniAdminEngineerProjectIdRouteImport
-      parentRoute: typeof AuthenticatedMiniAdminRouteRoute
+    '/_authenticated/accountant/bills': {
+      id: '/_authenticated/accountant/bills'
+      path: '/bills'
+      fullPath: '/accountant/bills'
+      preLoaderRoute: typeof AuthenticatedAccountantBillsRouteImport
+      parentRoute: typeof AuthenticatedAccountantRouteRoute
     }
-    '/_authenticated/mini-admin/Admin/vendors': {
-      id: '/_authenticated/mini-admin/Admin/vendors'
-      path: '/Admin/vendors'
-      fullPath: '/mini-admin/Admin/vendors'
-      preLoaderRoute: typeof AuthenticatedMiniAdminAdminVendorsRouteImport
-      parentRoute: typeof AuthenticatedMiniAdminRouteRoute
+    '/_authenticated/accountant/cashbook': {
+      id: '/_authenticated/accountant/cashbook'
+      path: '/cashbook'
+      fullPath: '/accountant/cashbook'
+      preLoaderRoute: typeof AuthenticatedAccountantCashbookRouteImport
+      parentRoute: typeof AuthenticatedAccountantRouteRoute
     }
-    '/_authenticated/mini-admin/Admin/analysis': {
-      id: '/_authenticated/mini-admin/Admin/analysis'
-      path: '/Admin/analysis'
-      fullPath: '/mini-admin/Admin/analysis'
-      preLoaderRoute: typeof AuthenticatedMiniAdminAdminAnalysisRouteImport
-      parentRoute: typeof AuthenticatedMiniAdminRouteRoute
+    '/_authenticated/accountant/invoices': {
+      id: '/_authenticated/accountant/invoices'
+      path: '/invoices'
+      fullPath: '/accountant/invoices'
+      preLoaderRoute: typeof AuthenticatedAccountantInvoicesRouteImport
+      parentRoute: typeof AuthenticatedAccountantRouteRoute
     }
-    '/_authenticated/engineer/$projectId/worksheet': {
-      id: '/_authenticated/engineer/$projectId/worksheet'
-      path: '/worksheet'
-      fullPath: '/engineer/$projectId/worksheet'
-      preLoaderRoute: typeof AuthenticatedEngineerProjectIdWorksheetRouteImport
-      parentRoute: typeof AuthenticatedEngineerProjectIdRoute
+    '/_authenticated/accountant/journal': {
+      id: '/_authenticated/accountant/journal'
+      path: '/journal'
+      fullPath: '/accountant/journal'
+      preLoaderRoute: typeof AuthenticatedAccountantJournalRouteImport
+      parentRoute: typeof AuthenticatedAccountantRouteRoute
     }
-    '/_authenticated/engineer/$projectId/quotation': {
-      id: '/_authenticated/engineer/$projectId/quotation'
-      path: '/quotation'
-      fullPath: '/engineer/$projectId/quotation'
-      preLoaderRoute: typeof AuthenticatedEngineerProjectIdQuotationRouteImport
-      parentRoute: typeof AuthenticatedEngineerProjectIdRoute
+    '/_authenticated/accountant/payments': {
+      id: '/_authenticated/accountant/payments'
+      path: '/payments'
+      fullPath: '/accountant/payments'
+      preLoaderRoute: typeof AuthenticatedAccountantPaymentsRouteImport
+      parentRoute: typeof AuthenticatedAccountantRouteRoute
     }
-    '/_authenticated/engineer/$projectId/messages': {
-      id: '/_authenticated/engineer/$projectId/messages'
-      path: '/messages'
-      fullPath: '/engineer/$projectId/messages'
-      preLoaderRoute: typeof AuthenticatedEngineerProjectIdMessagesRouteImport
+    '/_authenticated/accountant/reconcile': {
+      id: '/_authenticated/accountant/reconcile'
+      path: '/reconcile'
+      fullPath: '/accountant/reconcile'
+      preLoaderRoute: typeof AuthenticatedAccountantReconcileRouteImport
+      parentRoute: typeof AuthenticatedAccountantRouteRoute
+    }
+    '/_authenticated/accountant/reports': {
+      id: '/_authenticated/accountant/reports'
+      path: '/reports'
+      fullPath: '/accountant/reports'
+      preLoaderRoute: typeof AuthenticatedAccountantReportsRouteImport
+      parentRoute: typeof AuthenticatedAccountantRouteRoute
+    }
+    '/_authenticated/accountant/settings': {
+      id: '/_authenticated/accountant/settings'
+      path: '/settings'
+      fullPath: '/accountant/settings'
+      preLoaderRoute: typeof AuthenticatedAccountantSettingsRouteImport
+      parentRoute: typeof AuthenticatedAccountantRouteRoute
+    }
+    '/_authenticated/accountant/vendor-payments': {
+      id: '/_authenticated/accountant/vendor-payments'
+      path: '/vendor-payments'
+      fullPath: '/accountant/vendor-payments'
+      preLoaderRoute: typeof AuthenticatedAccountantVendorPaymentsRouteImport
+      parentRoute: typeof AuthenticatedAccountantRouteRoute
+    }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/analysis': {
+      id: '/_authenticated/admin/analysis'
+      path: '/analysis'
+      fullPath: '/admin/analysis'
+      preLoaderRoute: typeof AuthenticatedAdminAnalysisRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/todos': {
+      id: '/_authenticated/admin/todos'
+      path: '/todos'
+      fullPath: '/admin/todos'
+      preLoaderRoute: typeof AuthenticatedAdminTodosRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/vendors': {
+      id: '/_authenticated/admin/vendors'
+      path: '/vendors'
+      fullPath: '/admin/vendors'
+      preLoaderRoute: typeof AuthenticatedAdminVendorsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/client/': {
+      id: '/_authenticated/client/'
+      path: '/'
+      fullPath: '/client/'
+      preLoaderRoute: typeof AuthenticatedClientIndexRouteImport
+      parentRoute: typeof AuthenticatedClientRouteRoute
+    }
+    '/_authenticated/client/$projectId': {
+      id: '/_authenticated/client/$projectId'
+      path: '/$projectId'
+      fullPath: '/client/$projectId'
+      preLoaderRoute: typeof AuthenticatedClientProjectIdRouteImport
+      parentRoute: typeof AuthenticatedClientRouteRoute
+    }
+    '/_authenticated/client/new': {
+      id: '/_authenticated/client/new'
+      path: '/new'
+      fullPath: '/client/new'
+      preLoaderRoute: typeof AuthenticatedClientNewRouteImport
+      parentRoute: typeof AuthenticatedClientRouteRoute
+    }
+    '/_authenticated/engineer/': {
+      id: '/_authenticated/engineer/'
+      path: '/'
+      fullPath: '/engineer/'
+      preLoaderRoute: typeof AuthenticatedEngineerIndexRouteImport
+      parentRoute: typeof AuthenticatedEngineerRouteRoute
+    }
+    '/_authenticated/engineer/$projectId': {
+      id: '/_authenticated/engineer/$projectId'
+      path: '/$projectId'
+      fullPath: '/engineer/$projectId'
+      preLoaderRoute: typeof AuthenticatedEngineerProjectIdRouteImport
+      parentRoute: typeof AuthenticatedEngineerRouteRoute
+    }
+    '/_authenticated/engineer/todos': {
+      id: '/_authenticated/engineer/todos'
+      path: '/todos'
+      fullPath: '/engineer/todos'
+      preLoaderRoute: typeof AuthenticatedEngineerTodosRouteImport
+      parentRoute: typeof AuthenticatedEngineerRouteRoute
+    }
+    '/_authenticated/project-viewer/': {
+      id: '/_authenticated/project-viewer/'
+      path: '/'
+      fullPath: '/project-viewer/'
+      preLoaderRoute: typeof AuthenticatedProjectViewerIndexRouteImport
+      parentRoute: typeof AuthenticatedProjectViewerRouteRoute
+    }
+    '/_authenticated/project-viewer/$projectId': {
+      id: '/_authenticated/project-viewer/$projectId'
+      path: '/$projectId'
+      fullPath: '/project-viewer/$projectId'
+      preLoaderRoute: typeof AuthenticatedProjectViewerProjectIdRouteImport
+      parentRoute: typeof AuthenticatedProjectViewerRouteRoute
+    }
+    '/_authenticated/engineer/$projectId/compare': {
+      id: '/_authenticated/engineer/$projectId/compare'
+      path: '/compare'
+      fullPath: '/engineer/$projectId/compare'
+      preLoaderRoute: typeof AuthenticatedEngineerProjectIdCompareRouteImport
       parentRoute: typeof AuthenticatedEngineerProjectIdRoute
     }
     '/_authenticated/engineer/$projectId/inspection': {
@@ -1082,18 +1046,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEngineerProjectIdInspectionRouteImport
       parentRoute: typeof AuthenticatedEngineerProjectIdRoute
     }
-    '/_authenticated/engineer/$projectId/compare': {
-      id: '/_authenticated/engineer/$projectId/compare'
-      path: '/compare'
-      fullPath: '/engineer/$projectId/compare'
-      preLoaderRoute: typeof AuthenticatedEngineerProjectIdCompareRouteImport
+    '/_authenticated/engineer/$projectId/messages': {
+      id: '/_authenticated/engineer/$projectId/messages'
+      path: '/messages'
+      fullPath: '/engineer/$projectId/messages'
+      preLoaderRoute: typeof AuthenticatedEngineerProjectIdMessagesRouteImport
       parentRoute: typeof AuthenticatedEngineerProjectIdRoute
     }
-    '/_authenticated/mini-admin/Admin/ProjectViewers/': {
-      id: '/_authenticated/mini-admin/Admin/ProjectViewers/'
-      path: '/Admin/ProjectViewers'
-      fullPath: '/mini-admin/Admin/ProjectViewers/'
-      preLoaderRoute: typeof AuthenticatedMiniAdminAdminProjectViewersIndexRouteImport
+    '/_authenticated/engineer/$projectId/quotation': {
+      id: '/_authenticated/engineer/$projectId/quotation'
+      path: '/quotation'
+      fullPath: '/engineer/$projectId/quotation'
+      preLoaderRoute: typeof AuthenticatedEngineerProjectIdQuotationRouteImport
+      parentRoute: typeof AuthenticatedEngineerProjectIdRoute
+    }
+    '/_authenticated/engineer/$projectId/worksheet': {
+      id: '/_authenticated/engineer/$projectId/worksheet'
+      path: '/worksheet'
+      fullPath: '/engineer/$projectId/worksheet'
+      preLoaderRoute: typeof AuthenticatedEngineerProjectIdWorksheetRouteImport
+      parentRoute: typeof AuthenticatedEngineerProjectIdRoute
+    }
+    '/_authenticated/mini-admin/Admin/analysis': {
+      id: '/_authenticated/mini-admin/Admin/analysis'
+      path: '/Admin/analysis'
+      fullPath: '/mini-admin/Admin/analysis'
+      preLoaderRoute: typeof AuthenticatedMiniAdminAdminAnalysisRouteImport
+      parentRoute: typeof AuthenticatedMiniAdminRouteRoute
+    }
+    '/_authenticated/mini-admin/Admin/vendors': {
+      id: '/_authenticated/mini-admin/Admin/vendors'
+      path: '/Admin/vendors'
+      fullPath: '/mini-admin/Admin/vendors'
+      preLoaderRoute: typeof AuthenticatedMiniAdminAdminVendorsRouteImport
+      parentRoute: typeof AuthenticatedMiniAdminRouteRoute
+    }
+    '/_authenticated/mini-admin/Dashboard/': {
+      id: '/_authenticated/mini-admin/Dashboard/'
+      path: '/Dashboard'
+      fullPath: '/mini-admin/Dashboard/'
+      preLoaderRoute: typeof AuthenticatedMiniAdminDashboardIndexRouteImport
+      parentRoute: typeof AuthenticatedMiniAdminRouteRoute
+    }
+    '/_authenticated/mini-admin/Engineer/': {
+      id: '/_authenticated/mini-admin/Engineer/'
+      path: '/Engineer'
+      fullPath: '/mini-admin/Engineer/'
+      preLoaderRoute: typeof AuthenticatedMiniAdminEngineerIndexRouteImport
+      parentRoute: typeof AuthenticatedMiniAdminRouteRoute
+    }
+    '/_authenticated/mini-admin/Engineer/$projectId': {
+      id: '/_authenticated/mini-admin/Engineer/$projectId'
+      path: '/Engineer/$projectId'
+      fullPath: '/mini-admin/Engineer/$projectId'
+      preLoaderRoute: typeof AuthenticatedMiniAdminEngineerProjectIdRouteImport
+      parentRoute: typeof AuthenticatedMiniAdminRouteRoute
+    }
+    '/_authenticated/mini-admin/Todo/todo': {
+      id: '/_authenticated/mini-admin/Todo/todo'
+      path: '/Todo/todo'
+      fullPath: '/mini-admin/Todo/todo'
+      preLoaderRoute: typeof AuthenticatedMiniAdminTodoTodoRouteImport
       parentRoute: typeof AuthenticatedMiniAdminRouteRoute
     }
     '/_authenticated/mini-admin/Admin/Clients/': {
@@ -1103,25 +1116,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMiniAdminAdminClientsIndexRouteImport
       parentRoute: typeof AuthenticatedMiniAdminRouteRoute
     }
-    '/_authenticated/mini-admin/Engineer/$projectId/worksheet': {
-      id: '/_authenticated/mini-admin/Engineer/$projectId/worksheet'
-      path: '/worksheet'
-      fullPath: '/mini-admin/Engineer/$projectId/worksheet'
-      preLoaderRoute: typeof AuthenticatedMiniAdminEngineerProjectIdWorksheetRouteImport
-      parentRoute: typeof AuthenticatedMiniAdminEngineerProjectIdRoute
+    '/_authenticated/mini-admin/Admin/Clients/$projectId': {
+      id: '/_authenticated/mini-admin/Admin/Clients/$projectId'
+      path: '/Admin/Clients/$projectId'
+      fullPath: '/mini-admin/Admin/Clients/$projectId'
+      preLoaderRoute: typeof AuthenticatedMiniAdminAdminClientsProjectIdRouteImport
+      parentRoute: typeof AuthenticatedMiniAdminRouteRoute
     }
-    '/_authenticated/mini-admin/Engineer/$projectId/quotation': {
-      id: '/_authenticated/mini-admin/Engineer/$projectId/quotation'
-      path: '/quotation'
-      fullPath: '/mini-admin/Engineer/$projectId/quotation'
-      preLoaderRoute: typeof AuthenticatedMiniAdminEngineerProjectIdQuotationRouteImport
-      parentRoute: typeof AuthenticatedMiniAdminEngineerProjectIdRoute
+    '/_authenticated/mini-admin/Admin/Clients/new': {
+      id: '/_authenticated/mini-admin/Admin/Clients/new'
+      path: '/Admin/Clients/new'
+      fullPath: '/mini-admin/Admin/Clients/new'
+      preLoaderRoute: typeof AuthenticatedMiniAdminAdminClientsNewRouteImport
+      parentRoute: typeof AuthenticatedMiniAdminRouteRoute
     }
-    '/_authenticated/mini-admin/Engineer/$projectId/messages': {
-      id: '/_authenticated/mini-admin/Engineer/$projectId/messages'
-      path: '/messages'
-      fullPath: '/mini-admin/Engineer/$projectId/messages'
-      preLoaderRoute: typeof AuthenticatedMiniAdminEngineerProjectIdMessagesRouteImport
+    '/_authenticated/mini-admin/Admin/ProjectViewers/': {
+      id: '/_authenticated/mini-admin/Admin/ProjectViewers/'
+      path: '/Admin/ProjectViewers'
+      fullPath: '/mini-admin/Admin/ProjectViewers/'
+      preLoaderRoute: typeof AuthenticatedMiniAdminAdminProjectViewersIndexRouteImport
+      parentRoute: typeof AuthenticatedMiniAdminRouteRoute
+    }
+    '/_authenticated/mini-admin/Engineer/$projectId/compare': {
+      id: '/_authenticated/mini-admin/Engineer/$projectId/compare'
+      path: '/compare'
+      fullPath: '/mini-admin/Engineer/$projectId/compare'
+      preLoaderRoute: typeof AuthenticatedMiniAdminEngineerProjectIdCompareRouteImport
       parentRoute: typeof AuthenticatedMiniAdminEngineerProjectIdRoute
     }
     '/_authenticated/mini-admin/Engineer/$projectId/inspection': {
@@ -1131,26 +1151,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMiniAdminEngineerProjectIdInspectionRouteImport
       parentRoute: typeof AuthenticatedMiniAdminEngineerProjectIdRoute
     }
-    '/_authenticated/mini-admin/Engineer/$projectId/compare': {
-      id: '/_authenticated/mini-admin/Engineer/$projectId/compare'
-      path: '/compare'
-      fullPath: '/mini-admin/Engineer/$projectId/compare'
-      preLoaderRoute: typeof AuthenticatedMiniAdminEngineerProjectIdCompareRouteImport
+    '/_authenticated/mini-admin/Engineer/$projectId/messages': {
+      id: '/_authenticated/mini-admin/Engineer/$projectId/messages'
+      path: '/messages'
+      fullPath: '/mini-admin/Engineer/$projectId/messages'
+      preLoaderRoute: typeof AuthenticatedMiniAdminEngineerProjectIdMessagesRouteImport
       parentRoute: typeof AuthenticatedMiniAdminEngineerProjectIdRoute
     }
-    '/_authenticated/mini-admin/Admin/Clients/new': {
-      id: '/_authenticated/mini-admin/Admin/Clients/new'
-      path: '/Admin/Clients/new'
-      fullPath: '/mini-admin/Admin/Clients/new'
-      preLoaderRoute: typeof AuthenticatedMiniAdminAdminClientsNewRouteImport
-      parentRoute: typeof AuthenticatedMiniAdminRouteRoute
+    '/_authenticated/mini-admin/Engineer/$projectId/quotation': {
+      id: '/_authenticated/mini-admin/Engineer/$projectId/quotation'
+      path: '/quotation'
+      fullPath: '/mini-admin/Engineer/$projectId/quotation'
+      preLoaderRoute: typeof AuthenticatedMiniAdminEngineerProjectIdQuotationRouteImport
+      parentRoute: typeof AuthenticatedMiniAdminEngineerProjectIdRoute
     }
-    '/_authenticated/mini-admin/Admin/Clients/$projectId': {
-      id: '/_authenticated/mini-admin/Admin/Clients/$projectId'
-      path: '/Admin/Clients/$projectId'
-      fullPath: '/mini-admin/Admin/Clients/$projectId'
-      preLoaderRoute: typeof AuthenticatedMiniAdminAdminClientsProjectIdRouteImport
-      parentRoute: typeof AuthenticatedMiniAdminRouteRoute
+    '/_authenticated/mini-admin/Engineer/$projectId/worksheet': {
+      id: '/_authenticated/mini-admin/Engineer/$projectId/worksheet'
+      path: '/worksheet'
+      fullPath: '/mini-admin/Engineer/$projectId/worksheet'
+      preLoaderRoute: typeof AuthenticatedMiniAdminEngineerProjectIdWorksheetRouteImport
+      parentRoute: typeof AuthenticatedMiniAdminEngineerProjectIdRoute
     }
   }
 }
@@ -1163,6 +1183,7 @@ interface AuthenticatedAccountantRouteRouteChildren {
   AuthenticatedAccountantBillsRoute: typeof AuthenticatedAccountantBillsRoute
   AuthenticatedAccountantCashbookRoute: typeof AuthenticatedAccountantCashbookRoute
   AuthenticatedAccountantInvoicesRoute: typeof AuthenticatedAccountantInvoicesRoute
+  AuthenticatedAccountantJournalRoute: typeof AuthenticatedAccountantJournalRoute
   AuthenticatedAccountantPaymentsRoute: typeof AuthenticatedAccountantPaymentsRoute
   AuthenticatedAccountantReconcileRoute: typeof AuthenticatedAccountantReconcileRoute
   AuthenticatedAccountantReportsRoute: typeof AuthenticatedAccountantReportsRoute
@@ -1182,6 +1203,7 @@ const AuthenticatedAccountantRouteRouteChildren: AuthenticatedAccountantRouteRou
     AuthenticatedAccountantBillsRoute: AuthenticatedAccountantBillsRoute,
     AuthenticatedAccountantCashbookRoute: AuthenticatedAccountantCashbookRoute,
     AuthenticatedAccountantInvoicesRoute: AuthenticatedAccountantInvoicesRoute,
+    AuthenticatedAccountantJournalRoute: AuthenticatedAccountantJournalRoute,
     AuthenticatedAccountantPaymentsRoute: AuthenticatedAccountantPaymentsRoute,
     AuthenticatedAccountantReconcileRoute:
       AuthenticatedAccountantReconcileRoute,

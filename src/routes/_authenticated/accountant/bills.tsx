@@ -20,6 +20,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { logAudit } from "@/lib/auditLog";
 
 export const Route = createFileRoute("/_authenticated/accountant/bills")({
   component: BillsPage,
@@ -160,6 +161,12 @@ function BillsPage() {
       }
 
       toast.success("Bill created as draft.");
+      void logAudit("bills", crypto.randomUUID(), "insert", null, {
+        vendor_id: vendorId,
+        expense_account_id: expenseAccountId,
+        description: description.trim(),
+        amount: amountNum,
+      });
       setCreating(false);
       await loadData();
     } catch (error: unknown) {
@@ -182,6 +189,7 @@ function BillsPage() {
     }
 
     toast.success("Bill approved and posted to the ledger.");
+    void logAudit("bills", billId, "update", { status: "draft" }, { status: "approved" });
     await loadData();
   }
 

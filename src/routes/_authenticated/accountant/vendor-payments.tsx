@@ -13,6 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { logAudit } from "@/lib/auditLog";
 
 export const Route = createFileRoute("/_authenticated/accountant/vendor-payments")({
   component: VendorPaymentsPage,
@@ -155,6 +156,11 @@ function VendorPaymentsPage() {
       await supabase.from("bills").update({ status: newStatus }).eq("id", recording.id);
 
       toast.success("Vendor payment recorded and posted to the ledger.");
+      void logAudit("vendor_payments", paymentData.id, "insert", null, {
+        bill_id: recording.id,
+        amount: amt,
+        method: method.trim() || null,
+      });
       setRecording(null);
       await loadData();
     } catch (error: unknown) {

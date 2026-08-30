@@ -23,6 +23,7 @@ import {
   Wallet,
   HandCoins,
   BookOpen,
+  Library,
   Banknote,
   Upload,
   CheckSquare,
@@ -103,6 +104,11 @@ function AccountantLayout() {
       to: "/accountant/reports",
       label: "Reports",
       icon: ScrollText,
+    },
+    {
+      to: "/accountant/journal",
+      label: "Journal",
+      icon: Library,
     },
     {
       to: "/accountant/analysis",
