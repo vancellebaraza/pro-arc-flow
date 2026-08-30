@@ -28,6 +28,7 @@ import {
   Upload,
   CheckSquare,
   ScrollText,
+  History,
   LogOut,
   Menu,
   Settings,
@@ -114,6 +115,11 @@ function AccountantLayout() {
       to: "/accountant/analysis",
       label: "Analysis",
       icon: BarChart3,
+    },
+    {
+      to: "/accountant/audit-log",
+      label: "Audit Log",
+      icon: History,
     },
     {
       to: "/accountant/settings",
