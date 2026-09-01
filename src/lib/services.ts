@@ -156,4 +156,5 @@ export const BANK_DETAILS = {
   bank_code: "323",
   account_number: "1351118463",
   swift_code: "KCBLKENX",
+  paybill_number: "522522",
 };

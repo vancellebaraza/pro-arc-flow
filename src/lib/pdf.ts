@@ -319,6 +319,7 @@ theme: "grid",
     `Bank Code: ${BANK_DETAILS.bank_code}`,
     `Account No: ${BANK_DETAILS.account_number}`,
     `Swift Code: ${BANK_DETAILS.swift_code}`,
+    `KCB Paybill (Mobile): ${BANK_DETAILS.paybill_number}`,
   ];
   lines.forEach((l, i) => doc.text(l, 18 + (i % 2) * 95, fy + 14 + Math.floor(i / 2) * 6));
 
