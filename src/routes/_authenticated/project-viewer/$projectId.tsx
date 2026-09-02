@@ -48,6 +48,8 @@ interface Inspection {
   checklist: Array<{ item: string; pass: boolean; remark?: string }>;
   remarks: string | null;
   created_at: string;
+  image_urls: string[];
+  signatures: Record<string, string> | null;
 }
 
 interface Worksheet {
@@ -266,6 +268,24 @@ function ProjectViewerDetail() {
                   </ul>
                 )}
                 {ins.remarks && <p className="mt-2 text-sm text-muted-foreground">{ins.remarks}</p>}
+                {Array.isArray(ins.image_urls) && ins.image_urls.length > 0 && (
+                  <div className="mt-3 grid grid-cols-3 gap-2">
+                    {ins.image_urls.map((u, i) => (
+                      <a key={i} href={u} target="_blank" rel="noreferrer">
+                        <img
+                          src={u}
+                          alt={`Inspection photo ${i + 1}`}
+                          className="rounded border h-20 w-full object-cover"
+                        />
+                      </a>
+                    ))}
+                  </div>
+                )}
+                {ins.signatures && Object.keys(ins.signatures).length > 0 && (
+                  <div className="mt-3 text-xs text-muted-foreground">
+                    Signed by: {Object.entries(ins.signatures).map(([role, name]) => `${role}: ${name}`).join(", ")}
+                  </div>
+                )}
               </li>
             ))}
           </ul>
