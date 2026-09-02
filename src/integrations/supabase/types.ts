@@ -915,6 +915,8 @@ export type Database = {
           approval_evidence_url: string | null
           approved_at: string | null
           approved_by: string | null
+          client_approved: boolean
+          client_approved_at: string | null
           created_at: string
           engineer_id: string
           grand_total: number

@@ -121,7 +121,11 @@ function ProjectDetail() {
     if (project) {
       await supabase
         .from("projects")
-        .update({ status: status === "approved" ? "approved" : "rejected" })
+        .update(
+        status === "approved"
+          ? { status: "approved", client_approved: true, client_approved_at: new Date().toISOString() }
+          : { status: "rejected" },
+      )
         .eq("id", project.id);
     }
     toast.success(`Quotation ${status}`);
