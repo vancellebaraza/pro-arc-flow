@@ -9,8 +9,14 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import WhatsAppButton from "@/components/WhatsAppButton2";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -44,6 +50,39 @@ function Landing() {
 >(null);
 
 const [open, setOpen] = useState(false);
+  const [inquiryService, setInquiryService] = useState<{ key: string; label: string } | null>(null);
+  const [inquiryName, setInquiryName] = useState("");
+  const [inquiryEmail, setInquiryEmail] = useState("");
+  const [inquiryPhone, setInquiryPhone] = useState("");
+  const [inquiryMessage, setInquiryMessage] = useState("");
+  const [inquirySubmitting, setInquirySubmitting] = useState(false);
+
+  async function submitInquiry() {
+    if (!inquiryService) return;
+    if (!inquiryName.trim() || (!inquiryEmail.trim() && !inquiryPhone.trim())) {
+      toast.error("Please provide your name and at least an email or phone number.");
+      return;
+    }
+    setInquirySubmitting(true);
+    const { error } = await supabase.from("inquiries").insert({
+      service_key: inquiryService.key,
+      name: inquiryName.trim(),
+      email: inquiryEmail.trim() || null,
+      phone: inquiryPhone.trim() || null,
+      message: inquiryMessage.trim() || null,
+    });
+    setInquirySubmitting(false);
+    if (error) {
+      toast.error("Could not send your inquiry. Please try again.");
+      return;
+    }
+    toast.success("Thank you! We'll be in touch shortly.");
+    setInquiryService(null);
+    setInquiryName("");
+    setInquiryEmail("");
+    setInquiryPhone("");
+    setInquiryMessage("");
+  }
 
 const openService = (service: (typeof SERVICES)[number]) => {
   setSelectedService(service);
@@ -204,6 +243,20 @@ const openService = (service: (typeof SERVICES)[number]) => {
                 </div>
                 <div className="p-5">
                   <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
+                  <div className="mt-4 flex gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setInquiryService({ key: s.key, label: s.label });
+                      }}
+                    >
+                      Enquire Now
+                    </Button>
+                  </div>
                 </div>
               </article>
             ))}
@@ -286,6 +339,36 @@ const openService = (service: (typeof SERVICES)[number]) => {
         </div>
       </>
     )}
+  </DialogContent>
+</Dialog>
+
+<Dialog open={inquiryService !== null} onOpenChange={(o) => !o && setInquiryService(null)}>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>Enquire about {inquiryService?.label}</DialogTitle>
+      <DialogDescription>Tell us a bit about what you need and we'll get back to you.</DialogDescription>
+    </DialogHeader>
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="inquiry-name">Name</Label>
+        <Input id="inquiry-name" value={inquiryName} onChange={(e) => setInquiryName(e.target.value)} />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="inquiry-email">Email</Label>
+        <Input id="inquiry-email" type="email" value={inquiryEmail} onChange={(e) => setInquiryEmail(e.target.value)} />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="inquiry-phone">Phone</Label>
+        <Input id="inquiry-phone" value={inquiryPhone} onChange={(e) => setInquiryPhone(e.target.value)} />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="inquiry-message">Message (optional)</Label>
+        <Textarea id="inquiry-message" value={inquiryMessage} onChange={(e) => setInquiryMessage(e.target.value)} rows={3} />
+      </div>
+      <Button onClick={submitInquiry} disabled={inquirySubmitting} className="w-full">
+        {inquirySubmitting ? "Sending…" : "Send Enquiry"}
+      </Button>
+    </div>
   </DialogContent>
 </Dialog>
 
