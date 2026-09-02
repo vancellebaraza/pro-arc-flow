@@ -29,6 +29,7 @@ import {
   CheckSquare,
   ScrollText,
   History,
+  BookOpenCheck,
   LogOut,
   Menu,
   Settings,
@@ -105,6 +106,11 @@ function AccountantLayout() {
       to: "/accountant/reports",
       label: "Reports",
       icon: ScrollText,
+    },
+    {
+      to: "/accountant/account-ledger",
+      label: "Account Ledger",
+      icon: BookOpenCheck,
     },
     {
       to: "/accountant/journal",
