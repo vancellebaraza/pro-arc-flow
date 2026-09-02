@@ -22,6 +22,7 @@ import { Route as AuthenticatedEngineerRouteRouteImport } from './routes/_authen
 import { Route as AuthenticatedMiniAdminRouteRouteImport } from './routes/_authenticated/mini-admin/route'
 import { Route as AuthenticatedProjectViewerRouteRouteImport } from './routes/_authenticated/project-viewer/route'
 import { Route as AuthenticatedAccountantIndexRouteImport } from './routes/_authenticated/accountant/index'
+import { Route as AuthenticatedAccountantAccountLedgerRouteImport } from './routes/_authenticated/accountant/account-ledger'
 import { Route as AuthenticatedAccountantAccountsRouteImport } from './routes/_authenticated/accountant/accounts'
 import { Route as AuthenticatedAccountantAnalysisRouteImport } from './routes/_authenticated/accountant/analysis'
 import { Route as AuthenticatedAccountantAuditLogRouteImport } from './routes/_authenticated/accountant/audit-log'
@@ -137,6 +138,12 @@ const AuthenticatedAccountantIndexRoute =
   AuthenticatedAccountantIndexRouteImport.update({
     id: '/',
     path: '/',
+    getParentRoute: () => AuthenticatedAccountantRouteRoute,
+  } as any)
+const AuthenticatedAccountantAccountLedgerRoute =
+  AuthenticatedAccountantAccountLedgerRouteImport.update({
+    id: '/account-ledger',
+    path: '/account-ledger',
     getParentRoute: () => AuthenticatedAccountantRouteRoute,
   } as any)
 const AuthenticatedAccountantAccountsRoute =
@@ -425,6 +432,7 @@ export interface FileRoutesByFullPath {
   '/mini-admin': typeof AuthenticatedMiniAdminRouteRouteWithChildren
   '/project-viewer': typeof AuthenticatedProjectViewerRouteRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/accountant/account-ledger': typeof AuthenticatedAccountantAccountLedgerRoute
   '/accountant/accounts': typeof AuthenticatedAccountantAccountsRoute
   '/accountant/analysis': typeof AuthenticatedAccountantAnalysisRoute
   '/accountant/audit-log': typeof AuthenticatedAccountantAuditLogRoute
@@ -480,6 +488,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/mini-admin': typeof AuthenticatedMiniAdminRouteRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/accountant/account-ledger': typeof AuthenticatedAccountantAccountLedgerRoute
   '/accountant/accounts': typeof AuthenticatedAccountantAccountsRoute
   '/accountant/analysis': typeof AuthenticatedAccountantAnalysisRoute
   '/accountant/audit-log': typeof AuthenticatedAccountantAuditLogRoute
@@ -542,6 +551,7 @@ export interface FileRoutesById {
   '/_authenticated/mini-admin': typeof AuthenticatedMiniAdminRouteRouteWithChildren
   '/_authenticated/project-viewer': typeof AuthenticatedProjectViewerRouteRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/accountant/account-ledger': typeof AuthenticatedAccountantAccountLedgerRoute
   '/_authenticated/accountant/accounts': typeof AuthenticatedAccountantAccountsRoute
   '/_authenticated/accountant/analysis': typeof AuthenticatedAccountantAnalysisRoute
   '/_authenticated/accountant/audit-log': typeof AuthenticatedAccountantAuditLogRoute
@@ -604,6 +614,7 @@ export interface FileRouteTypes {
     | '/mini-admin'
     | '/project-viewer'
     | '/dashboard'
+    | '/accountant/account-ledger'
     | '/accountant/accounts'
     | '/accountant/analysis'
     | '/accountant/audit-log'
@@ -659,6 +670,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/mini-admin'
     | '/dashboard'
+    | '/accountant/account-ledger'
     | '/accountant/accounts'
     | '/accountant/analysis'
     | '/accountant/audit-log'
@@ -720,6 +732,7 @@ export interface FileRouteTypes {
     | '/_authenticated/mini-admin'
     | '/_authenticated/project-viewer'
     | '/_authenticated/dashboard'
+    | '/_authenticated/accountant/account-ledger'
     | '/_authenticated/accountant/accounts'
     | '/_authenticated/accountant/analysis'
     | '/_authenticated/accountant/audit-log'
@@ -868,6 +881,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/accountant/'
       preLoaderRoute: typeof AuthenticatedAccountantIndexRouteImport
+      parentRoute: typeof AuthenticatedAccountantRouteRoute
+    }
+    '/_authenticated/accountant/account-ledger': {
+      id: '/_authenticated/accountant/account-ledger'
+      path: '/account-ledger'
+      fullPath: '/accountant/account-ledger'
+      preLoaderRoute: typeof AuthenticatedAccountantAccountLedgerRouteImport
       parentRoute: typeof AuthenticatedAccountantRouteRoute
     }
     '/_authenticated/accountant/accounts': {
@@ -1196,6 +1216,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAccountantRouteRouteChildren {
+  AuthenticatedAccountantAccountLedgerRoute: typeof AuthenticatedAccountantAccountLedgerRoute
   AuthenticatedAccountantAccountsRoute: typeof AuthenticatedAccountantAccountsRoute
   AuthenticatedAccountantAnalysisRoute: typeof AuthenticatedAccountantAnalysisRoute
   AuthenticatedAccountantAuditLogRoute: typeof AuthenticatedAccountantAuditLogRoute
@@ -1215,6 +1236,8 @@ interface AuthenticatedAccountantRouteRouteChildren {
 
 const AuthenticatedAccountantRouteRouteChildren: AuthenticatedAccountantRouteRouteChildren =
   {
+    AuthenticatedAccountantAccountLedgerRoute:
+      AuthenticatedAccountantAccountLedgerRoute,
     AuthenticatedAccountantAccountsRoute: AuthenticatedAccountantAccountsRoute,
     AuthenticatedAccountantAnalysisRoute: AuthenticatedAccountantAnalysisRoute,
     AuthenticatedAccountantAuditLogRoute: AuthenticatedAccountantAuditLogRoute,
