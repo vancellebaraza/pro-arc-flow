@@ -1,4 +1,15 @@
-import { Zap, Droplets, Trees, Paintbrush, Camera,  HardHat, Shield,Sun, Hammer,Warehouse } from "lucide-react";
+import {
+  Zap,
+  Droplets,
+  Trees,
+  Paintbrush,
+  Camera,
+  HardHat,
+  Shield,
+  Sun,
+  Hammer,
+  Warehouse,
+} from "lucide-react";
 
 export type ServiceKey =
   | "electrical"
@@ -18,28 +29,29 @@ export const SERVICES: Array<{
   icon: typeof Zap;
   desc: string;
   image: string;
-}> = [  {
+}> = [
+  {
     key: "painting",
     label: "Painting",
     icon: Paintbrush,
     desc: "Interior and exterior painting, surface preparation,wall repairs,waterproofing,repainting and application of decorative and protective coatings.",
     image: "/images/svc-painting-2.png",
   },
-    {
+  {
     key: "electric_fence",
     label: "Electric Fence Installation",
     icon: Shield,
     desc: " Installation, maintenance, repair, and servicing of electric fencing systems, including energizers, HT cables, insulators, earth systems, and fence accessories.",
     image: "/electric.jpeg",
   },
-    {
+  {
     key: "cctv",
     label: "CCTV",
     icon: Camera,
     desc: "Installation, configuration, maintenance, repair, and upgrading of CCTV surveillance systems, cameras, NVRs, DVRs, monitors, and networking infrastructure.",
     image: "/cctv.jpeg",
   },
-    {
+  {
     key: "civil",
     label: "Civil Works",
     icon: HardHat,
@@ -53,14 +65,14 @@ export const SERVICES: Array<{
     desc: "Building improvement and refurbishment works, including repairs, tiling, ceilings, partitions, doors, windows, flooring, fittings, and general property upgrades.",
     image: "/renovations.jpeg",
   },
-    {
+  {
     key: "tank_cleaning",
     label: "Tank Cleaning",
     icon: Warehouse,
     desc: "Professional  cleaning and disinfection of water storage tanks, including removal of sludge,sediments,algae and other contaminants to maintain clean and safe water storage.",
     image: "/images/svc-tank-2.png",
   },
-    {
+  {
     key: "plumbing",
     label: "Plumbing",
     icon: Droplets,
@@ -88,9 +100,6 @@ export const SERVICES: Array<{
     desc: "Design, installation, and maintenance of lawns,gardens,trees,plants,irrigation systems,and other outdoor spaces.",
     image: "/landscaping.jpeg",
   },
-
-
-
 ];
 
 export const STATUS_LABEL: Record<string, string> = {
@@ -157,4 +166,5 @@ export const BANK_DETAILS = {
   account_number: "1351118463",
   swift_code: "KCBLKENX",
   paybill_number: "522522",
+  paybill_account_number: "1351118463",
 };

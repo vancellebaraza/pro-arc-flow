@@ -1,5 +1,5 @@
 import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
+import autoTable, { type CellHookData } from "jspdf-autotable";
 import { BANK_DETAILS } from "./services";
 
 const BRAND: [number, number, number] = [218, 31, 38];
@@ -53,7 +53,8 @@ async function urlToDataUrl(url?: string) {
   if (url.startsWith("data:image/")) return url;
 
   try {
-    const resolvedUrl = typeof window !== "undefined" ? new URL(url, window.location.href).href : url;
+    const resolvedUrl =
+      typeof window !== "undefined" ? new URL(url, window.location.href).href : url;
     const res = await fetch(resolvedUrl, { mode: "cors" });
     if (!res.ok) {
       console.error(`Failed to fetch image URL (${res.status}): ${resolvedUrl}`);
@@ -142,7 +143,8 @@ async function urlToCompressedDataUrl(url?: string): Promise<{ data: string; err
     if (url.startsWith("data:image/")) {
       raw = url;
     } else {
-      const resolvedUrl = typeof window !== "undefined" ? new URL(url, window.location.href).href : url;
+      const resolvedUrl =
+        typeof window !== "undefined" ? new URL(url, window.location.href).href : url;
       const res = await fetchWithRetry(resolvedUrl);
       const contentType = res.headers.get("content-type")?.toLowerCase() ?? "";
       if (!contentType.startsWith("image/")) throw new Error(`bad content-type: ${contentType}`);
@@ -159,7 +161,7 @@ async function urlToCompressedDataUrl(url?: string): Promise<{ data: string; err
 }
 
 async function header(doc: jsPDF, title: string, subtitle?: string) {
-    const pageWidth = doc.internal.pageSize.getWidth();
+  const pageWidth = doc.internal.pageSize.getWidth();
 
   doc.setDrawColor(BRAND[0], BRAND[1], BRAND[2]);
 
@@ -178,7 +180,6 @@ async function header(doc: jsPDF, title: string, subtitle?: string) {
     }
   } catch (err) {
     // Non-fatal — continue without logo
-    // eslint-disable-next-line no-console
     console.error("Header logo not added:", err);
   }
 
@@ -232,7 +233,7 @@ export interface QuotePdfInput {
   notes?: string | null;
 }
 
-export async function generateQuotationPdf(doc:jsPDF,q: QuotePdfInput) {
+export async function generateQuotationPdf(doc: jsPDF, q: QuotePdfInput) {
   // const doc = new jsPDF();
   await header(doc, "QUOTATION", `No: ${q.quoteNo || "DRAFT"}  •  ${q.date}`);
 
@@ -250,53 +251,63 @@ export async function generateQuotationPdf(doc:jsPDF,q: QuotePdfInput) {
     startY: y + 20,
     head: [["Description / Detail", "Unit", "Quantity", "Unit Cost (KES)", "Amount (KES)"]],
     body: q.items.map((i) => {
-  if (i.type === "subtitle") {
-    return [
-      {
-        content: i.description,
-        colSpan: 5,
-        styles: {
-          // fillColor: [235, 235, 235],
-          textColor: [30, 30, 30],
-          fontStyle: "bold",
-          halign: "center",
-          valign: "middle",
-          fontSize: 10,
-        },
-      },
-    ];
-  }
+      if (i.type === "subtitle") {
+        return [
+          {
+            content: i.description,
+            colSpan: 5,
+            styles: {
+              // fillColor: [235, 235, 235],
+              textColor: [30, 30, 30],
+              fontStyle: "bold",
+              halign: "center",
+              valign: "middle",
+              fontSize: 10,
+            },
+          },
+        ];
+      }
 
-  return [
-    i.description,
-    i.unit ?? "",
-    String(i.qty),
-    i.unit_cost.toFixed(2),
-    i.amount.toFixed(2),
-  ];
-}),
-theme: "grid",
+      return [
+        i.description,
+        i.unit ?? "",
+        String(i.qty),
+        i.unit_cost.toFixed(2),
+        i.amount.toFixed(2),
+      ];
+    }),
+    theme: "grid",
 
-    styles: { fontSize: 9, cellPadding: 3, lineColor: [220, 220, 220], lineWidth: 0.2, valign: "middle" },
+    styles: {
+      fontSize: 9,
+      cellPadding: 3,
+      lineColor: [220, 220, 220],
+      lineWidth: 0.2,
+      valign: "middle",
+    },
 
     headStyles: { fillColor: BRAND, textColor: 255, fontStyle: "bold", halign: "center" },
-    columnStyles: { 0: { cellWidth: 82 }, 1: { cellWidth: 22, halign: "center" }, 2: { cellWidth: 24, halign: "right" }, 3: { cellWidth: 32, halign: "right" }, 4: { cellWidth: 30, halign: "right" } },
-      alternateRowStyles: {
-    fillColor: [252, 252, 252],
-  },
+    columnStyles: {
+      0: { cellWidth: 82 },
+      1: { cellWidth: 22, halign: "center" },
+      2: { cellWidth: 24, halign: "right" },
+      3: { cellWidth: 32, halign: "right" },
+      4: { cellWidth: 30, halign: "right" },
+    },
+    alternateRowStyles: {
+      fillColor: [252, 252, 252],
+    },
   });
 
   let fy = getY(doc) + 8;
   doc.setFontSize(10);
   doc.text(`Labour: KES ${q.labour.toFixed(2)}`, 200, fy, { align: "right" });
   doc.text(`Sub-total: KES ${q.subtotal.toFixed(2)}`, 200, fy + 7, { align: "right" });
-  doc.text(`VAT (${q.vatRate}%): KES ${q.vatAmount.toFixed(2)}`,200,fy + 14,{ align: "right" });
+  doc.text(`VAT (${q.vatRate}%): KES ${q.vatAmount.toFixed(2)}`, 200, fy + 14, { align: "right" });
   doc.setFontSize(12);
   doc.setFont("helvetica", "bold");
   doc.text(`Grand Total: KES ${q.grandTotal.toFixed(2)}`, 200, fy + 26, { align: "right" });
   doc.setFont("helvetica", "normal");
-
-
 
   fy += 24;
   doc.setFontSize(10);
@@ -305,27 +316,56 @@ theme: "grid",
   doc.text(q.authorisedBy || "_______________________", 45, fy);
   doc.setTextColor(20);
 
+  const paybillLines = [
+    `Paybill Number: ${BANK_DETAILS.paybill_number}`,
+    `Account Number: ${BANK_DETAILS.paybill_account_number}`,
+  ];
+  const bankLines = [
+    `Bank Name: ${BANK_DETAILS.bank}`,
+    `Branch: ${BANK_DETAILS.branch}`,
+    `Account Name: ${BANK_DETAILS.account_name}`,
+    `Account No.: ${BANK_DETAILS.account_number}`,
+    `Bank Code: ${BANK_DETAILS.bank_code}`,
+    `Swift Code: ${BANK_DETAILS.swift_code}`,
+  ];
+
+  const paymentHeight = 32 + Math.max(paybillLines.length, bankLines.length) * 6;
+  const pageBottom = doc.internal.pageSize.getHeight() - 14;
   fy += 12;
+
+  if (fy + paymentHeight > pageBottom) {
+    doc.addPage();
+    await header(doc, "QUOTATION", `No: ${q.quoteNo || "DRAFT"}  •  ${q.date}`);
+    fy = 34;
+  }
+
   doc.setFillColor(245, 245, 245);
-  doc.rect(14, fy, 186, 36, "F");
+  doc.rect(14, fy, 186, paymentHeight, "F");
   doc.setFontSize(10);
-  doc.text("Payment — Bank Details", 18, fy + 6);
+  doc.setTextColor(20);
+  doc.text("Payment Details", 18, fy + 6);
   doc.setFontSize(9);
   doc.setTextColor(60);
-  const lines = [
-    `Bank: ${BANK_DETAILS.bank}`,
-    `Account Name: ${BANK_DETAILS.account_name}`,
-    `Branch: ${BANK_DETAILS.branch}`,
-    `Bank Code: ${BANK_DETAILS.bank_code}`,
-    `Account No: ${BANK_DETAILS.account_number}`,
-    `Swift Code: ${BANK_DETAILS.swift_code}`,
-    `KCB Paybill (Mobile): ${BANK_DETAILS.paybill_number}`,
-  ];
-  lines.forEach((l, i) => doc.text(l, 18 + (i % 2) * 95, fy + 14 + Math.floor(i / 2) * 6));
+
+  const paybillX = 18;
+  const bankX = 110;
+
+  doc.text("Paybill Payments", paybillX, fy + 16);
+  paybillLines.forEach((line, index) => doc.text(line, paybillX, fy + 24 + index * 6));
+
+  doc.text("Bank Payments", bankX, fy + 16);
+  bankLines.forEach((line, index) => doc.text(line, bankX, fy + 24 + index * 6));
 
   if (q.notes) {
     doc.setTextColor(80);
-    doc.text("Notes: " + q.notes, 14, fy + 46, { maxWidth: 186 });
+    const noteLines = doc.splitTextToSize("Notes: " + q.notes, 186);
+    let notesY = fy + paymentHeight + 8;
+    if (notesY + noteLines.length * 5 > pageBottom) {
+      doc.addPage();
+      await header(doc, "QUOTATION", `No: ${q.quoteNo || "DRAFT"}  •  ${q.date}`);
+      notesY = 34;
+    }
+    doc.text(noteLines, 14, notesY, { lineHeightFactor: 1.4 });
   }
 
   // doc.save(`Quotation-${(q.quoteNo || "draft").replace(/\W+/g, "_")}.pdf`);
@@ -349,7 +389,7 @@ export interface InspectionPdfInput {
   };
 }
 
-export async function generateInspectionPdf(doc:jsPDF,input: InspectionPdfInput) {
+export async function generateInspectionPdf(doc: jsPDF, input: InspectionPdfInput) {
   // const doc = new jsPDF();
   await header(doc, "INSPECTION REPORT", input.inspectionDate);
   const y = 34;
@@ -399,7 +439,7 @@ export async function generateInspectionPdf(doc:jsPDF,input: InspectionPdfInput)
     styles: { fontSize: 9 },
     headStyles: { fillColor: BRAND, textColor: 255 },
     columnStyles: { 2: { halign: "center", cellWidth: 22 } },
-    didParseCell: (data: any) => {
+    didParseCell: (data: CellHookData) => {
       if (data.section !== "body" || data.column.index !== 2) return;
       const statusText = String(data.cell.text?.[0] ?? "");
       if (statusText === "PASS") {
@@ -418,62 +458,61 @@ export async function generateInspectionPdf(doc:jsPDF,input: InspectionPdfInput)
 
     const failedImages: string[] = [];
 
-    const photosData = await mapWithConcurrency(
-      input.photoEvidence,
-      6,
-      async (p, idx) => {
-        const [before, during, after] = await Promise.all([
-          urlToCompressedDataUrl(p.before),
-          urlToCompressedDataUrl(p.during),
-          urlToCompressedDataUrl(p.after),
-        ]);
-        if (p.before && before.error) failedImages.push(`Row ${idx + 1} (before)`);
-        if (p.during && during.error) failedImages.push(`Row ${idx + 1} (during)`);
-        if (p.after && after.error) failedImages.push(`Row ${idx + 1} (after)`);
-        return { before: before.data, during: during.data, after: after.data };
-      },
-    );
+    const photosData = await mapWithConcurrency(input.photoEvidence, 6, async (p, idx) => {
+      const [before, during, after] = await Promise.all([
+        urlToCompressedDataUrl(p.before),
+        urlToCompressedDataUrl(p.during),
+        urlToCompressedDataUrl(p.after),
+      ]);
+      if (p.before && before.error) failedImages.push(`Row ${idx + 1} (before)`);
+      if (p.during && during.error) failedImages.push(`Row ${idx + 1} (during)`);
+      if (p.after && after.error) failedImages.push(`Row ${idx + 1} (after)`);
+      return { before: before.data, during: during.data, after: after.data };
+    });
 
     autoTable(doc, {
       startY: fy,
       head: [["Before", "During", "After"]],
-      body: photosData.map(() => [ "",  "", ""]),
-      styles: { fontSize: 9, halign: "center", valign: "middle",minCellHeight: 45 },
-      headStyles: { fillColor: BRAND, textColor: 255, halign: "center" ,minCellHeight: 10 },
+      body: photosData.map(() => ["", "", ""]),
+      styles: { fontSize: 9, halign: "center", valign: "middle", minCellHeight: 45 },
+      headStyles: { fillColor: BRAND, textColor: 255, halign: "center", minCellHeight: 10 },
       columnStyles: { 0: { cellWidth: 60 }, 1: { cellWidth: 60 }, 2: { cellWidth: 60 } },
-      didDrawCell: (data: any) => {
-    if (data.section !== "body") return;
+      didDrawCell: (data: CellHookData) => {
+        if (data.section !== "body") return;
 
-    const field = ["before", "during", "after"][data.column.index] as
-      | "before"
-      | "during"
-      | "after";
+        const field = ["before", "during", "after"][data.column.index] as
+          "before" | "during" | "after";
 
-    const img = photosData[data.row.index]?.[field];
+        const img = photosData[data.row.index]?.[field];
 
-    if (!img) return;
+        if (!img) return;
 
-    try {
-      doc.addImage(
-        img,
-        "JPEG",
-        data.cell.x + 2,
-        data.cell.y + 2,
-        data.cell.width - 4,
-        data.cell.height - 4
-      );
-    } catch (err) {
-      console.error("Failed to draw image:", err);
-      failedImages.push(`Row ${data.row.index + 1} (${field}) - render error`);
-    }
-  },
+        try {
+          doc.addImage(
+            img,
+            "JPEG",
+            data.cell.x + 2,
+            data.cell.y + 2,
+            data.cell.width - 4,
+            data.cell.height - 4,
+          );
+        } catch (err) {
+          console.error("Failed to draw image:", err);
+          failedImages.push(`Row ${data.row.index + 1} (${field}) - render error`);
+        }
+      },
     });
     fy = getY(doc) + 6;
 
     if (failedImages.length) {
       doc.setFontSize(8);
       doc.setTextColor(200, 0, 0);
-      doc.text(`Note: ${failedImages.length} image(s) could not be embedded: ${failedImages.join(", ")}`, 14, fy, { maxWidth: 186 });
+      doc.text(
+        `Note: ${failedImages.length} image(s) could not be embedded: ${failedImages.join(", ")}`,
+        14,
+        fy,
+        { maxWidth: 186 },
+      );
       doc.setTextColor(20);
       fy += 8;
     }
@@ -545,7 +584,7 @@ export interface WorksheetPdfInput {
   signatures: { technician_name?: string; supervisor_name?: string; client_name?: string };
 }
 
-export async function generateWorksheetPdf(doc:jsPDF,w: WorksheetPdfInput) {
+export async function generateWorksheetPdf(doc: jsPDF, w: WorksheetPdfInput) {
   // const doc = new jsPDF();
   await header(doc, "WORKSHEET", `Job ${w.jobNo}  •  ${w.jobDate}`);
   let y = 34;
@@ -620,10 +659,10 @@ export async function generateWorksheetPdf(doc:jsPDF,w: WorksheetPdfInput) {
 }
 
 export async function generateProjectPdf({
-    project,
-    quotation,
-    inspection,
-    worksheet,
+  project,
+  quotation,
+  inspection,
+  worksheet,
 }: {
   project: {
     title: string;
@@ -634,68 +673,67 @@ export async function generateProjectPdf({
   inspection: InspectionPdfInput;
   worksheet: WorksheetPdfInput;
 }) {
-    const doc = new jsPDF();
+  const doc = new jsPDF();
 
-    //
-    // Cover Page
-    //
+  //
+  // Cover Page
+  //
 
-    await header(doc, "PROJECT REPORT");
+  await header(doc, "PROJECT REPORT");
 
-const pageWidth = doc.internal.pageSize.getWidth();
-const pageHeight = doc.internal.pageSize.getHeight();
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
 
-const centerX = pageWidth / 2;
-const centerY = pageHeight / 2;
+  const centerX = pageWidth / 2;
+  const centerY = pageHeight / 2;
 
-// Vertical spacing
-const titleY = centerY - 25;
-const projecttitleY=centerY- 8;
-const locationY = centerY + 8;
-const serviceY = centerY + 20;
+  // Vertical spacing
+  const titleY = centerY - 25;
+  const projecttitleY = centerY - 8;
+  const locationY = centerY + 8;
+  const serviceY = centerY + 20;
 
-doc.setFont("helvetica", "bold");
-doc.setFontSize(40);
-doc.text("Overall Project Report", centerX, titleY, {
-  align: "center",
-});
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(40);
+  doc.text("Overall Project Report", centerX, titleY, {
+    align: "center",
+  });
 
-doc.setFont("helvetica", "normal");
-doc.setFontSize(16);
-doc.text(`Project Title: ${project.title}`, centerX, projecttitleY, {
-  align: "center",
-});
-doc.text(`Location: ${project.location ?? "-"}`, centerX, locationY, {
-  align: "center",
-});
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(16);
+  doc.text(`Project Title: ${project.title}`, centerX, projecttitleY, {
+    align: "center",
+  });
+  doc.text(`Location: ${project.location ?? "-"}`, centerX, locationY, {
+    align: "center",
+  });
 
-doc.text(`Service: ${project.service}`, centerX, serviceY, {
-  align: "center",
-});
+  doc.text(`Service: ${project.service}`, centerX, serviceY, {
+    align: "center",
+  });
 
+  //
+  // Quotation
+  //
 
-    //
-    // Quotation
-    //
+  doc.addPage();
+  await generateQuotationPdf(doc, quotation);
 
-    doc.addPage();
-    await generateQuotationPdf(doc, quotation);
+  //
+  // Inspection
+  //
 
-    //
-    // Inspection
-    //
+  doc.addPage();
+  await generateInspectionPdf(doc, inspection);
 
-    doc.addPage();
-    await generateInspectionPdf(doc, inspection);
+  //
+  // Worksheet
+  //
 
-    //
-    // Worksheet
-    //
+  doc.addPage();
+  await generateWorksheetPdf(doc, worksheet);
 
-    doc.addPage();
-    await generateWorksheetPdf(doc, worksheet);
-
-    doc.save(`${project.title}-Project-Report.pdf`);
+  doc.save(`${project.title}-Project-Report.pdf`);
 }
 
 // ---------------- CSV ----------------
@@ -716,5 +754,4 @@ export function downloadCsv(filename: string, rows: Array<Record<string, unknown
   a.download = filename;
   a.click();
   URL.revokeObjectURL(url);
-  
 }

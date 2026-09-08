@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import WorkDataSheet from "@/components/WorkDataSheet";
 import ApproveEvidenceDialog from "@/components/ApproveEvidenceDialog";
 import QuotationDetailsDialog from "@/components/QuotationDetailsDialog";
+import WorksheetDetailsDialog from "@/components/WorksheetDetailsDialog";
 import {
   Dialog,
   DialogContent,
@@ -142,9 +143,7 @@ function AdminHome() {
   const [completionFilter, setCompletionFilter] = useState<"all" | "completed" | "not_completed">(
     "all",
   );
-  const [paymentFilter, setPaymentFilter] = useState<"all" | "paid" | "partial" | "unpaid">(
-    "all",
-  );
+  const [paymentFilter, setPaymentFilter] = useState<"all" | "paid" | "partial" | "unpaid">("all");
   const [canManage, setCanManage] = useState(false);
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
@@ -152,7 +151,8 @@ function AdminHome() {
   const [savingEdit, setSavingEdit] = useState(false);
 
   const load = useCallback(async () => {
-    const { data } = await (supabase.from("projects") as any)
+    const { data } = await supabase
+      .from("projects")
       .select(
         `id,title,service,status,location,scheduled_date,scheduled_end_date,created_at,job_number,client_id,engineer_id,quotations(project_id,grand_total,payment_status,created_at)`,
       )
@@ -170,7 +170,10 @@ function AdminHome() {
     ) as string[];
 
     const { data: profiles } = profileIds.length
-      ? await supabase.from("profiles").select("id,full_name").in("id", profileIds as string[])
+      ? await supabase
+          .from("profiles")
+          .select("id,full_name")
+          .in("id", profileIds as string[])
       : { data: [] as ProfileRow[] };
 
     const profileMap = (profiles ?? []).reduce<Record<string, string>>((map, profile) => {
@@ -186,7 +189,7 @@ function AdminHome() {
       return {
         ...row,
         client_name: profileMap[row.client_id] ?? null,
-        engineer_name: row.engineer_id ? profileMap[row.engineer_id] ?? null : null,
+        engineer_name: row.engineer_id ? (profileMap[row.engineer_id] ?? null) : null,
         quoted_amount: latestQuotation?.grand_total ?? null,
         payment_status: latestQuotation?.payment_status ?? null,
         vendor_cost: 0,
@@ -325,7 +328,8 @@ function AdminHome() {
     const endDate = window.prompt("Schedule end date (YYYY-MM-DD)", p.scheduled_end_date ?? "");
     if (endDate === null) return;
 
-    await (supabase.from("projects") as any)
+    await supabase
+      .from("projects")
       .update({
         scheduled_date: startDate.trim() || null,
         scheduled_end_date: endDate.trim() || null,
@@ -380,7 +384,6 @@ function AdminHome() {
     const doc = new jsPDF();
     const date = new Date().toISOString().slice(0, 10);
 
-    
     doc.setFontSize(16);
     doc.text("FusionPro Work Data Sheet", 14, 20);
     doc.setFontSize(9);
@@ -418,9 +421,7 @@ function AdminHome() {
           ? `${(((r.quoted_amount - r.vendor_cost) / r.quoted_amount) * 100).toFixed(1)}%`
           : "—",
         STATUS_LABEL[r.status] ?? r.status,
-        [r.scheduled_date, r.scheduled_end_date]
-          .filter((value) => value)
-          .join(" – ") || "—",
+        [r.scheduled_date, r.scheduled_end_date].filter((value) => value).join(" – ") || "—",
       ]),
       styles: { fontSize: 8 },
       headStyles: { fillColor: [30, 30, 30] },
@@ -570,7 +571,15 @@ function AdminHome() {
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <QuotationDetailsDialog quotationId={q.id} projectTitle={q.project?.title} />
-                  <ApproveEvidenceDialog quotationId={q.id} projectId={q.project_id} onApproved={load} />
+                  <WorksheetDetailsDialog
+                    projectId={q.project_id}
+                    projectTitle={q.project?.title}
+                  />
+                  <ApproveEvidenceDialog
+                    quotationId={q.id}
+                    projectId={q.project_id}
+                    onApproved={load}
+                  />
                 </div>
               </li>
             ))}

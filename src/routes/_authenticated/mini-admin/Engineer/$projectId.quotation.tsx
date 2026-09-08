@@ -1,4 +1,3 @@
-
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { jsPDF } from "jspdf";
 import { useEffect, useState, useCallback } from "react";
@@ -27,14 +26,10 @@ interface Item {
   actual_cost?: number | null;
 }
 
-type QuotationStatus =
-  | "draft"
-  | "pending_engineer"
-  | "sent_to_client";
-
+type QuotationStatus = "draft" | "pending_engineer" | "sent_to_client";
 
 function QuotationPage() {
-   const [vatRate, setVatRate] = useState(16); // Default 16%
+  const [vatRate, setVatRate] = useState(16); // Default 16%
   const { projectId } = Route.useParams();
   const [projectTitle, setProjectTitle] = useState("");
   const [projectLocation, setProjectLocation] = useState("");
@@ -49,11 +44,11 @@ function QuotationPage() {
   const [authorisedBy, setAuthorisedBy] = useState("");
   const [notes, setNotes] = useState("");
   const [items, setItems] = useState<Item[]>([
-      {type: "subtitle",description: "Subtitle",unit: "",qty: 0,unit_cost: 0,amount: 0,},
+    { type: "subtitle", description: "Subtitle", unit: "", qty: 0, unit_cost: 0, amount: 0 },
     { type: "item", description: "", unit: "pcs", qty: 1, unit_cost: 0, amount: 0 },
   ]);
   const [labour, setLabour] = useState(0);
-  const [status, setStatus] = useState<String>("draft");
+  const [status, setStatus] = useState<string>("draft");
   const [saving, setSaving] = useState(false);
 
   const load = useCallback(async () => {
@@ -154,19 +149,19 @@ function QuotationPage() {
     );
   }
 
-const subtotal = items.reduce((sum, item) => {
+  const subtotal = items.reduce((sum, item) => {
     if (item.type === "subtitle") return sum;
 
     return sum + Number(item.amount || 0);
-}, 0);
+  }, 0);
 
-const labourAmount = Number(labour || 0);
+  const labourAmount = Number(labour || 0);
 
-const vatableAmount = subtotal + labourAmount;
+  const vatableAmount = subtotal + labourAmount;
 
-const vatAmount = vatableAmount * (vatRate / 100);
+  const vatAmount = vatableAmount * (vatRate / 100);
 
-const grandTotal = vatableAmount + vatAmount;
+  const grandTotal = vatableAmount + vatAmount;
 
   async function save(newStatus?: "draft" | "sent") {
     setSaving(true);
@@ -220,7 +215,7 @@ const grandTotal = vatableAmount + vatAmount;
           actual_cost: it.actual_cost ?? null,
           sort_order: idx,
         }));
-        const { error } = await (supabase.from("quotation_items") as any).insert(rows);
+        const { error } = await supabase.from("quotation_items").insert(rows);
         if (error) throw error;
       }
       if (newStatus) setStatus(newStatus);
@@ -242,7 +237,7 @@ const grandTotal = vatableAmount + vatAmount;
     const doc = new jsPDF();
     try {
       const doc = new jsPDF();
-      await generateQuotationPdf(doc,{
+      await generateQuotationPdf(doc, {
         projectTitle,
         service: SERVICES.find((s) => s.key === projectService)?.label ?? projectService,
         location: projectLocation,
@@ -271,7 +266,6 @@ const grandTotal = vatableAmount + vatAmount;
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to generate PDF");
     }
-    
   }
 
   return (
@@ -331,7 +325,7 @@ const grandTotal = vatableAmount + vatAmount;
             onClick={() =>
               setItems((a) => [
                 ...a,
-                { type:"item",description: "", unit: "pcs", qty: 1, unit_cost: 0, amount: 0 },
+                { type: "item", description: "", unit: "pcs", qty: 1, unit_cost: 0, amount: 0 },
               ])
             }
           >
@@ -339,25 +333,25 @@ const grandTotal = vatableAmount + vatAmount;
             Add row
           </Button>
           <Button
-    variant="outline"
-    size="sm"
-    onClick={() =>
-        setItems(a => [
-            ...a,
-            {
-                type: "subtitle",
-                description: "",
-                unit: "",
-                qty: 0,
-                unit_cost: 0,
-                amount: 0,
-            },
-        ])
-    }
->
-  <Plus className="h-4 w-4 mr-1" />
-    Add Subtitle
-</Button>
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              setItems((a) => [
+                ...a,
+                {
+                  type: "subtitle",
+                  description: "",
+                  unit: "",
+                  qty: 0,
+                  unit_cost: 0,
+                  amount: 0,
+                },
+              ])
+            }
+          >
+            <Plus className="h-4 w-4 mr-1" />
+            Add Subtitle
+          </Button>
         </div>
         <div className="mt-3 overflow-x-auto rounded-lg border">
           <table className="w-full text-sm">
@@ -373,84 +367,83 @@ const grandTotal = vatableAmount + vatAmount;
             </thead>
             <tbody>
               {items.map((it, i) => {
-    if (it.type === "subtitle") {
-        return (
-<tr key={i} className="bg-gray-100">
-  <td colSpan={6} className="p-2">
-    <div className="flex items-center gap-2">
-      <Input
-        value={it.description}
-        placeholder="Subtitle"
-        onChange={(e) =>
-          update(i, {
-            description: e.target.value,
-          })
-        }
-        className="font-bold flex-1"
-      />
+                if (it.type === "subtitle") {
+                  return (
+                    <tr key={i} className="bg-gray-100">
+                      <td colSpan={6} className="p-2">
+                        <div className="flex items-center gap-2">
+                          <Input
+                            value={it.description}
+                            placeholder="Subtitle"
+                            onChange={(e) =>
+                              update(i, {
+                                description: e.target.value,
+                              })
+                            }
+                            className="font-bold flex-1"
+                          />
 
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        onClick={() =>
-          setItems((a) => a.filter((_, j) => j !== i))
-        }
-      >
-        <Trash2 className="h-4 w-4 text-black-500" />
-      </Button>
-    </div>
-  </td>
-</tr>
-        );
-    }
-              
-              return(
-                <tr key={i} className="border-t">
-                  <td className="p-1">
-                    <Input
-                      value={it.description}
-                      onChange={(e) => update(i, { description: e.target.value })}
-                      placeholder="Item"
-                    />
-                  </td>
-                  <td className="p-1">
-                    <Input
-                      value={it.unit}
-                      onChange={(e) => update(i, { unit: e.target.value })}
-                      placeholder="pcs / m / hr"
-                    />
-                  </td>
-                  <td className="p-1">
-                    <Input
-                      type="number"
-                      value={it.qty}
-                      onChange={(e) => update(i, { qty: Number(e.target.value) })}
-                      className="text-right"
-                    />
-                  </td>
-                  <td className="p-1">
-                    <Input
-                      type="number"
-                      step="0.01"
-                      value={it.unit_cost}
-                      onChange={(e) => update(i, { unit_cost: Number(e.target.value) })}
-                      className="text-right"
-                    />
-                  </td>
-                  <td className="p-2 text-right tabular-nums">{it.amount.toFixed(2)}</td>
-                  <td className="p-1">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setItems((a) => a.filter((_, j) => j !== i))}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </td>
-                </tr>
-              );})}
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setItems((a) => a.filter((_, j) => j !== i))}
+                          >
+                            <Trash2 className="h-4 w-4 text-black-500" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                }
+
+                return (
+                  <tr key={i} className="border-t">
+                    <td className="p-1">
+                      <Input
+                        value={it.description}
+                        onChange={(e) => update(i, { description: e.target.value })}
+                        placeholder="Item"
+                      />
+                    </td>
+                    <td className="p-1">
+                      <Input
+                        value={it.unit}
+                        onChange={(e) => update(i, { unit: e.target.value })}
+                        placeholder="pcs / m / hr"
+                      />
+                    </td>
+                    <td className="p-1">
+                      <Input
+                        type="number"
+                        value={it.qty}
+                        onChange={(e) => update(i, { qty: Number(e.target.value) })}
+                        className="text-right"
+                      />
+                    </td>
+                    <td className="p-1">
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={it.unit_cost}
+                        onChange={(e) => update(i, { unit_cost: Number(e.target.value) })}
+                        className="text-right"
+                      />
+                    </td>
+                    <td className="p-2 text-right tabular-nums">{it.amount.toFixed(2)}</td>
+                    <td className="p-1">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setItems((a) => a.filter((_, j) => j !== i))}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -469,83 +462,100 @@ const grandTotal = vatableAmount + vatAmount;
             />
           </div>
         </div>
-<div className="rounded-lg border bg-surface p-4 self-start space-y-3">
-  <div className="flex items-center gap-2">
-    <Label className="flex-1">Labour (KES)</Label>
-    <Input
-      type="number"
-      step="0.01"
-      value={labour}
-      onChange={(e) => setLabour(Number(e.target.value))}
-      className="w-32 text-right"
-    />
-  </div>
+        <div className="rounded-lg border bg-surface p-4 self-start space-y-3">
+          <div className="flex items-center gap-2">
+            <Label className="flex-1">Labour (KES)</Label>
+            <Input
+              type="number"
+              step="0.01"
+              value={labour}
+              onChange={(e) => setLabour(Number(e.target.value))}
+              className="w-32 text-right"
+            />
+          </div>
 
-  <div className="flex items-center gap-2">
-    <Label className="flex-1">VAT (%)</Label>
-    <Input
-      type="number"
-      step="0.01"
-      value={vatRate}
-      onChange={(e) => setVatRate(Number(e.target.value))}
-      className="w-32 text-right"
-    />
-  </div>
+          <div className="flex items-center gap-2">
+            <Label className="flex-1">VAT (%)</Label>
+            <Input
+              type="number"
+              step="0.01"
+              value={vatRate}
+              onChange={(e) => setVatRate(Number(e.target.value))}
+              className="w-32 text-right"
+            />
+          </div>
 
-  <div className="flex justify-between text-sm">
-    <span>Sub-total</span>
-    <strong>{subtotal.toFixed(2)}</strong>
-  </div>
+          <div className="flex justify-between text-sm">
+            <span>Sub-total</span>
+            <strong>{subtotal.toFixed(2)}</strong>
+          </div>
 
-  <div className="flex justify-between text-sm">
-    <span>Labour</span>
-    <strong>{labourAmount.toFixed(2)}</strong>
-  </div>
+          <div className="flex justify-between text-sm">
+            <span>Labour</span>
+            <strong>{labourAmount.toFixed(2)}</strong>
+          </div>
 
-  <div className="flex justify-between text-sm">
-    <span>VAT ({vatRate}%)</span>
-    <strong>{vatAmount.toFixed(2)}</strong>
-  </div>
+          <div className="flex justify-between text-sm">
+            <span>VAT ({vatRate}%)</span>
+            <strong>{vatAmount.toFixed(2)}</strong>
+          </div>
 
-  <hr />
+          <hr />
 
-  <div className="flex justify-between text-base font-semibold">
-    <span>Grand Total (KES)</span>
-    <strong>{grandTotal.toFixed(2)}</strong>
-  </div>
+          <div className="flex justify-between text-base font-semibold">
+            <span>Grand Total (KES)</span>
+            <strong>{grandTotal.toFixed(2)}</strong>
+          </div>
 
-  <div className="text-xs text-muted-foreground capitalize">
-    Status: {status}
-  </div>
-</div>
+          <div className="text-xs text-muted-foreground capitalize">Status: {status}</div>
+        </div>
       </section>
 
       <section className="mt-8 rounded-lg border bg-card p-5">
-        <h3 className="font-medium">Payment Option — Bank Details</h3>
-        <div className="mt-3 grid sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
-          <div>
-            <span className="text-muted-foreground">Bank:</span>{" "}
-            <strong>{BANK_DETAILS.bank}</strong>
+        <h3 className="font-medium">Payment Details</h3>
+        <div className="mt-4 grid gap-6 md:grid-cols-2 text-sm">
+          <div className="rounded-md border bg-surface p-4">
+            <h4 className="mb-3 font-medium text-foreground">Paybill Payments</h4>
+            <div className="space-y-2">
+              <div>
+                <span className="text-muted-foreground">Paybill Number:</span>{" "}
+                <strong>{BANK_DETAILS.paybill_number}</strong>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Account Number:</span>{" "}
+                <strong>{BANK_DETAILS.paybill_account_number}</strong>
+              </div>
+            </div>
           </div>
-          <div>
-            <span className="text-muted-foreground">Account Name:</span>{" "}
-            <strong>{BANK_DETAILS.account_name}</strong>
-          </div>
-          <div>
-            <span className="text-muted-foreground">Branch:</span>{" "}
-            <strong>{BANK_DETAILS.branch}</strong>
-          </div>
-          <div>
-            <span className="text-muted-foreground">Bank Code:</span>{" "}
-            <strong>{BANK_DETAILS.bank_code}</strong>
-          </div>
-          <div>
-            <span className="text-muted-foreground">Account No:</span>{" "}
-            <strong>{BANK_DETAILS.account_number}</strong>
-          </div>
-          <div>
-            <span className="text-muted-foreground">Swift Code:</span>{" "}
-            <strong>{BANK_DETAILS.swift_code}</strong>
+
+          <div className="rounded-md border bg-surface p-4">
+            <h4 className="mb-3 font-medium text-foreground">Bank Payments</h4>
+            <div className="space-y-2">
+              <div>
+                <span className="text-muted-foreground">Bank Name:</span>{" "}
+                <strong>{BANK_DETAILS.bank}</strong>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Branch:</span>{" "}
+                <strong>{BANK_DETAILS.branch}</strong>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Account Name:</span>{" "}
+                <strong>{BANK_DETAILS.account_name}</strong>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Account No.:</span>{" "}
+                <strong>{BANK_DETAILS.account_number}</strong>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Bank Code:</span>{" "}
+                <strong>{BANK_DETAILS.bank_code}</strong>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Swift Code:</span>{" "}
+                <strong>{BANK_DETAILS.swift_code}</strong>
+              </div>
+            </div>
           </div>
         </div>
       </section>

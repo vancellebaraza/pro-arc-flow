@@ -799,6 +799,39 @@ export type Database = {
           },
         ]
       }
+      gallery_items: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          image_url: string
+          sort_order: number
+          stage: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          image_url: string
+          sort_order?: number
+          stage: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string
+          sort_order?: number
+          stage?: string
+          title?: string
+        }
+        Relationships: []
+      }
       projects: {
         Row: {
           archived: boolean

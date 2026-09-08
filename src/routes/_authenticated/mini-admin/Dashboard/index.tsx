@@ -1,10 +1,11 @@
-
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import WorkDataSheet from "@/components/WorkDataSheet";
 import ApproveEvidenceDialog from "@/components/ApproveEvidenceDialog";
+import QuotationDetailsDialog from "@/components/QuotationDetailsDialog";
+import WorksheetDetailsDialog from "@/components/WorksheetDetailsDialog";
 import {
   Dialog,
   DialogContent,
@@ -13,14 +14,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-} from "@/components/ui/table";
 import { STATUS_LABEL, SERVICES, type ServiceKey } from "@/lib/services";
 import { downloadCsv } from "@/lib/pdf";
 import { exportHistoricalProjectsPdf } from "@/lib/historicalProjects";
@@ -29,6 +22,7 @@ import autoTable from "jspdf-autotable";
 import { toast } from "sonner";
 import { FileDown, Check, Calendar, Trash2 } from "lucide-react";
 import DeleteProjectDialog from "@/components/DeleteProjectDialog";
+import GalleryManager from "@/components/GalleryManager";
 
 export const Route = createFileRoute("/_authenticated/mini-admin/Dashboard/")({
   component: AdminHome,
@@ -53,19 +47,19 @@ interface Row {
   payment_status: string | null;
 }
 
-interface PendingVendorAssignmentRow {
-  id: string;
-  project_id: string;
-  project: { title: string };
-  vendor: { name: string; category: string };
-  created_at: string;
-}
-
 interface QuotationRow {
   project_id: string;
   grand_total: number;
   payment_status: string;
   created_at: string;
+}
+
+interface PendingQuoteRow {
+  id: string;
+  project_id: string;
+  grand_total: number;
+  status: string;
+  project: { title: string };
 }
 
 interface ProjectQueryRow {
@@ -125,26 +119,13 @@ function renderScheduleDisplay(startDate: string | null, endDate: string | null)
 
 function AdminHome() {
   const [rows, setRows] = useState<Row[]>([]);
-  const [pendingQuotes, setPendingQuotes] = useState<
-    Array<{
-      id: string;
-      project_id: string;
-      grand_total: number;
-      status: string;
-      project: { title: string };
-    }>
-  >([]);
-  const [pendingVendorAssignments, setPendingVendorAssignments] = useState<
-    PendingVendorAssignmentRow[]
-  >([]);
+  const [pendingQuotes, setPendingQuotes] = useState<PendingQuoteRow[]>([]);
   const [filter, setFilter] = useState("");
   const [serviceFilter, setServiceFilter] = useState("all");
   const [completionFilter, setCompletionFilter] = useState<"all" | "completed" | "not_completed">(
     "all",
   );
-  const [paymentFilter, setPaymentFilter] = useState<"all" | "paid" | "partial" | "unpaid">(
-    "all",
-  );
+  const [paymentFilter, setPaymentFilter] = useState<"all" | "paid" | "partial" | "unpaid">("all");
   const [canManage, setCanManage] = useState(false);
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
@@ -152,7 +133,8 @@ function AdminHome() {
   const [savingEdit, setSavingEdit] = useState(false);
 
   const load = useCallback(async () => {
-    const { data } = await (supabase.from("projects") as any)
+    const { data } = await supabase
+      .from("projects")
       .select(
         `id,title,service,status,location,scheduled_date,scheduled_end_date,created_at,job_number,client_id,engineer_id,quotations(project_id,grand_total,payment_status,created_at)`,
       )
@@ -170,7 +152,10 @@ function AdminHome() {
     ) as string[];
 
     const { data: profiles } = profileIds.length
-      ? await supabase.from("profiles").select("id,full_name").in("id", profileIds as string[])
+      ? await supabase
+          .from("profiles")
+          .select("id,full_name")
+          .in("id", profileIds as string[])
       : { data: [] as ProfileRow[] };
 
     const profileMap = (profiles ?? []).reduce<Record<string, string>>((map, profile) => {
@@ -186,7 +171,7 @@ function AdminHome() {
       return {
         ...row,
         client_name: profileMap[row.client_id] ?? null,
-        engineer_name: row.engineer_id ? profileMap[row.engineer_id] ?? null : null,
+        engineer_name: row.engineer_id ? (profileMap[row.engineer_id] ?? null) : null,
         quoted_amount: latestQuotation?.grand_total ?? null,
         payment_status: latestQuotation?.payment_status ?? null,
         vendor_cost: 0,
@@ -213,33 +198,11 @@ function AdminHome() {
       })),
     );
 
-    const { data: q } = await supabase
+    const { data: quotations } = await supabase
       .from("quotations")
       .select("id,project_id,grand_total,status, project:projects(title)")
       .eq("status", "sent");
-    setPendingQuotes(
-      (q ?? []) as Array<{
-        id: string;
-        project_id: string;
-        grand_total: number;
-        status: string;
-        project: { title: string };
-      }>,
-    );
-
-    const { data: assignments, error: assignmentsError } = await supabase
-      .from("project_vendor_assignments")
-      .select(
-        "id,project_id,status,created_at, project:projects(title), vendor:vendors(name, category)",
-      )
-      .eq("status", "pending_approval")
-      .order("created_at", { ascending: false });
-
-    if (assignmentsError) {
-      toast.error(assignmentsError.message);
-    } else {
-      setPendingVendorAssignments((assignments ?? []) as PendingVendorAssignmentRow[]);
-    }
+    setPendingQuotes((quotations ?? []) as PendingQuoteRow[]);
   }, []);
   useEffect(() => {
     load();
@@ -270,13 +233,6 @@ function AdminHome() {
       mounted = false;
     };
   }, []);
-
-  async function approveQuote(qid: string, pid: string) {
-    await supabase.from("quotations").update({ status: "approved" }).eq("id", qid);
-    await supabase.from("projects").update({ status: "approved" }).eq("id", pid);
-    toast.success("Quotation approved");
-    load();
-  }
 
   function openEditDialog(project: Row) {
     setEditingProjectId(project.id);
@@ -325,7 +281,8 @@ function AdminHome() {
     const endDate = window.prompt("Schedule end date (YYYY-MM-DD)", p.scheduled_end_date ?? "");
     if (endDate === null) return;
 
-    await (supabase.from("projects") as any)
+    await supabase
+      .from("projects")
       .update({
         scheduled_date: startDate.trim() || null,
         scheduled_end_date: endDate.trim() || null,
@@ -333,21 +290,6 @@ function AdminHome() {
       })
       .eq("id", p.id);
     toast.success("Schedule updated");
-    load();
-  }
-
-  async function updateVendorAssignmentStatus(id: string, status: "approved" | "rejected") {
-    const { error } = await supabase
-      .from("project_vendor_assignments")
-      .update({ status })
-      .eq("id", id);
-
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-
-    toast.success(`Vendor assignment ${status}`);
     load();
   }
 
@@ -416,9 +358,7 @@ function AdminHome() {
           ? `${(((r.quoted_amount - r.vendor_cost) / r.quoted_amount) * 100).toFixed(1)}%`
           : "—",
         STATUS_LABEL[r.status] ?? r.status,
-        [r.scheduled_date, r.scheduled_end_date]
-          .filter((value) => value)
-          .join(" – ") || "—",
+        [r.scheduled_date, r.scheduled_end_date].filter((value) => value).join(" – ") || "—",
       ]),
       styles: { fontSize: 8 },
       headStyles: { fillColor: [30, 30, 30] },
@@ -462,7 +402,7 @@ function AdminHome() {
         <div>
           <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Admin overview</h1>
           <p className="text-muted-foreground mt-1">
-            Approve quotations, manage vendors, schedule work, export reports.
+            Manage vendors, schedule work, and export reports.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -537,7 +477,7 @@ function AdminHome() {
         </DialogContent>
       </Dialog>
 
-      <div className="mt-6 grid md:grid-cols-3 gap-4">
+      <div className="mt-6 grid gap-4 md:grid-cols-2">
         {[
           { label: "Total projects", value: rows.length },
           {
@@ -545,7 +485,6 @@ function AdminHome() {
             value: rows.filter((r) => r.status === "in_progress" || r.status === "scheduled")
               .length,
           },
-          { label: "Pending quotes", value: pendingQuotes.length },
         ].map((s) => (
           <div key={s.label} className="rounded-xl border bg-card p-5">
             <div className="text-xs uppercase tracking-wider text-muted-foreground">{s.label}</div>
@@ -557,81 +496,38 @@ function AdminHome() {
       {pendingQuotes.length > 0 && (
         <section className="mt-8">
           <h2 className="text-lg font-semibold tracking-tight">Quotations pending approval</h2>
-          <ul className="mt-3 rounded-xl border bg-card divide-y">
-            {pendingQuotes.map((q) => (
-              <li key={q.id} className="flex items-center justify-between gap-4 p-4">
+          <ul className="mt-3 divide-y rounded-xl border bg-card">
+            {pendingQuotes.map((quotation) => (
+              <li key={quotation.id} className="flex items-center justify-between gap-4 p-4">
                 <div className="min-w-0">
-                  <div className="font-medium truncate">{q.project?.title ?? "—"}</div>
+                  <div className="truncate font-medium">{quotation.project?.title ?? "—"}</div>
                   <div className="text-sm text-muted-foreground">
-                    Total: {Number(q.grand_total).toFixed(2)}
+                    Total: {Number(quotation.grand_total).toFixed(2)}
                   </div>
                 </div>
-                <ApproveEvidenceDialog quotationId={q.id} projectId={q.project_id} onApproved={load} />
+                <div className="flex shrink-0 items-center gap-2">
+                  <QuotationDetailsDialog
+                    quotationId={quotation.id}
+                    projectTitle={quotation.project?.title}
+                  />
+                  <WorksheetDetailsDialog
+                    projectId={quotation.project_id}
+                    projectTitle={quotation.project?.title}
+                  />
+                  <ApproveEvidenceDialog
+                    quotationId={quotation.id}
+                    projectId={quotation.project_id}
+                    onApproved={load}
+                  />
+                </div>
               </li>
             ))}
           </ul>
         </section>
       )}
 
-      {pendingVendorAssignments.length > 0 && (
-        <section className="mt-8">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <h2 className="text-lg font-semibold tracking-tight">
-                Vendor assignments pending approval
-              </h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                Review vendor requests submitted by engineers.
-              </p>
-            </div>
-            <Link
-              to="/admin/vendors"
-              className="text-sm text-primary underline hover:text-primary/80"
-            >
-              Manage vendors
-            </Link>
-          </div>
-          <div className="mt-4 overflow-x-auto rounded-xl border bg-card">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Project</TableHead>
-                  <TableHead>Vendor</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Requested</TableHead>
-                  <TableHead className="text-right">Action</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {pendingVendorAssignments.map((assignment) => (
-                  <TableRow key={assignment.id}>
-                    <TableCell>{assignment.project?.title ?? "—"}</TableCell>
-                    <TableCell>{assignment.vendor?.name ?? "—"}</TableCell>
-                    <TableCell>{assignment.vendor?.category ?? "—"}</TableCell>
-                    <TableCell>{new Date(assignment.created_at).toLocaleString()}</TableCell>
-                    <TableCell className="text-right gap-2 flex justify-end">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => updateVendorAssignmentStatus(assignment.id, "rejected")}
-                      >
-                        Reject
-                      </Button>
-                      <Button
-                        size="sm"
-                        onClick={() => updateVendorAssignmentStatus(assignment.id, "approved")}
-                      >
-                        Approve
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </section>
-      )}
       <WorkDataSheet />
+      <GalleryManager />
     </div>
   );
 }
