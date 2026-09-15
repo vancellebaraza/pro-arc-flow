@@ -162,6 +162,26 @@ function InspectionPage() {
     input.click();
   }
 
+  async function deleteImage(field: keyof PhotoRow, idx: number) {
+    const url = photos[idx]?.[field];
+    if (!url) return;
+
+    try {
+      const marker = "/storage/v1/object/public/project-images/";
+      const markerIndex = url.indexOf(marker);
+      if (markerIndex !== -1) {
+        const path = decodeURIComponent(url.slice(markerIndex + marker.length));
+        const { error } = await supabase.storage.from("project-images").remove([path]);
+        if (error) throw error;
+      }
+
+      setPhotos((arr) => arr.map((photo, photoIndex) => (photoIndex === idx ? { ...photo, [field]: "" } : photo)));
+      toast.success("Image deleted");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Unable to delete image");
+    }
+  }
+
   async function save() {
     setSaving(true);
     try {
@@ -435,13 +455,26 @@ function InspectionPage() {
                     {field}
                   </Label>
                   {p[field] ? (
-                    <a href={p[field]} target="_blank" rel="noreferrer">
-                      <img
-                        src={p[field]}
-                        alt={field}
-                        className="rounded border h-24 w-full object-cover"
-                      />
-                    </a>
+                    <div className="relative">
+                      <a href={p[field]} target="_blank" rel="noreferrer">
+                        <img
+                          src={p[field]}
+                          alt={field}
+                          className="rounded border h-24 w-full object-cover"
+                        />
+                      </a>
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        className="absolute right-1 top-1 h-7 w-7"
+                        onClick={() => deleteImage(field, i)}
+                        aria-label={`Delete ${field} image`}
+                        title={`Delete ${field} image`}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
                   ) : (
                     <button
                       type="button"

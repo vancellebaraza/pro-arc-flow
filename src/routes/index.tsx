@@ -168,7 +168,8 @@ function Landing() {
             alt="Engineer on site"
             className="absolute inset-0 h-full w-full object-cover object-[right_center]"
           />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.98),transparent_24%),radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.96),transparent_28%),linear-gradient(90deg,rgba(255,255,255,0.98),rgba(255,255,255,0.6) 35%,transparent 65%),linear-gradient(180deg,rgba(255,255,255,0.95),transparent 42%)]" />
+          <div className="absolute inset-0 hidden md:block bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.98),transparent_24%),radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.96),transparent_28%),linear-gradient(90deg,rgba(255,255,255,0.98),rgba(255,255,255,0.6)_35%,transparent_65%),linear-gradient(180deg,rgba(255,255,255,0.95),transparent_42%)]" />
+          <div className="absolute inset-0 block md:hidden bg-[linear-gradient(180deg,rgba(255,255,255,0.97)_0%,rgba(255,255,255,0.97)_55%,rgba(255,255,255,0.8)_75%,rgba(255,255,255,0.55)_100%)]" />
         </div>
 
         <div className="relative mx-auto max-w-6xl px-6 pt-24 pb-20 z-10">
