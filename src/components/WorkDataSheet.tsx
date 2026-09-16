@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { downloadCsv } from "@/lib/pdf";
 import { FileDown, Pencil, Calendar, Trash2 } from "lucide-react";
 import DeleteProjectDialog from "@/components/DeleteProjectDialog";
-import { SERVICES, type ServiceKey } from "@/lib/services";
+import { SERVICES, type ServiceKey, STATUS_LABEL, statusColorClasses } from "@/lib/services";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
@@ -33,6 +33,7 @@ interface Row {
   marginPercent: number | null;
   workDoneDate: string | null;
   comment: string;
+  status: string;
 }
 
 export default function WorkDataSheet() {
@@ -49,6 +50,7 @@ export default function WorkDataSheet() {
   const [vendorPayableInput, setVendorPayableInput] = useState("");
   const [vendorPaidInput, setVendorPaidInput] = useState("");
   const [savingVendor, setSavingVendor] = useState(false);
+  const [statusFilter, setStatusFilter] = useState("all");
 
   useEffect(() => {
     supabase.from("vendors").select("id,name").order("name").then(({ data }) => {
@@ -161,6 +163,7 @@ export default function WorkDataSheet() {
         marginPercent,
         workDoneDate: p.status === "completed" ? p.updated_at : null,
         comment: p.work_comment ?? "",
+        status: p.status,
       };
     });
 
@@ -295,15 +298,30 @@ export default function WorkDataSheet() {
   }
 
   const fmt = (n: number | null) => (n == null ? "—" : n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+  const displayedRows = statusFilter === "all" ? rows : rows.filter((r) => r.status === statusFilter);
 
   return (
     <section className="mt-8">
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-3 gap-3 flex-wrap">
         <h2 className="text-lg font-semibold tracking-tight">Work Data Sheet</h2>
-        <Button size="sm" variant="outline" onClick={exportCsv}>
-          <FileDown className="h-4 w-4 mr-1" />
-          Export CSV
-        </Button>
+        <div className="flex items-center gap-2">
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="h-9 rounded-md border bg-background px-2 text-xs"
+          >
+            <option value="all">All statuses</option>
+            {Object.keys(STATUS_LABEL).map((key) => (
+              <option key={key} value={key}>
+                {STATUS_LABEL[key]}
+              </option>
+            ))}
+          </select>
+          <Button size="sm" variant="outline" onClick={exportCsv}>
+            <FileDown className="h-4 w-4 mr-1" />
+            Export CSV
+          </Button>
+        </div>
       </div>
       <div className="rounded-xl border bg-card overflow-x-auto">
         <table className="w-full text-sm border-collapse">
@@ -333,20 +351,21 @@ export default function WorkDataSheet() {
               <th className="p-2 border text-right">% Margin</th>
               <th className="p-2 border">Work Done/Date</th>
               <th className="p-2 border">Comment</th>
+              <th className="p-2 border">Status</th>
               <th className="p-2 border">Actions</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={19} className="p-6 text-center text-muted-foreground">Loading…</td>
+                <td colSpan={20} className="p-6 text-center text-muted-foreground">Loading…</td>
               </tr>
-            ) : rows.length === 0 ? (
+            ) : displayedRows.length === 0 ? (
               <tr>
-                <td colSpan={19} className="p-6 text-center text-muted-foreground">No projects.</td>
+                <td colSpan={20} className="p-6 text-center text-muted-foreground">No projects.</td>
               </tr>
             ) : (
-              rows.map((r, i) => (
+              displayedRows.map((r, i) => (
                 <tr key={r.id} className="border-t">
                   <td className="p-2 border">{i + 1}</td>
                   <td className="p-2 border whitespace-nowrap">{new Date(r.date).toLocaleDateString()}</td>
@@ -375,6 +394,12 @@ export default function WorkDataSheet() {
                         if (e.target.value !== r.comment) saveComment(r.id, e.target.value);
                       }}
                     />
+                  </td>
+                  <td className="p-2 border">
+                    <span className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs ${statusColorClasses(r.status).badge}`}>
+                      <span className={`h-1.5 w-1.5 rounded-full ${statusColorClasses(r.status).dot}`} />
+                      {STATUS_LABEL[r.status] ?? r.status}
+                    </span>
                   </td>
                   <td className="p-2 border">
                     <div className="flex items-center gap-1">
