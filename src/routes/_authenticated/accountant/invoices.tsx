@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { logAudit } from "@/lib/auditLog";
+import { AlertTriangle } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/accountant/invoices")({
   component: InvoicesPage,
@@ -40,9 +41,24 @@ interface InvoiceRecord {
   quotation_id: string;
 }
 
+interface StuckProject {
+  job_number: string;
+  title: string;
+  completed_at: string | null;
+  quotation_status: string;
+  grand_total: number;
+}
+
+function daysSince(dateStr: string | null): number | null {
+  if (!dateStr) return null;
+  const diff = Date.now() - new Date(dateStr).getTime();
+  return Math.max(0, Math.floor(diff / (1000 * 60 * 60 * 24)));
+}
+
 function InvoicesPage() {
   const [availableQuotations, setAvailableQuotations] = useState<ApprovableQuotation[]>([]);
   const [invoices, setInvoices] = useState<InvoiceRecord[]>([]);
+  const [blockedProjects, setBlockedProjects] = useState<StuckProject[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState<ApprovableQuotation | null>(null);
   const [dueDate, setDueDate] = useState("");
@@ -98,6 +114,34 @@ function InvoicesPage() {
       });
 
     setAvailableQuotations(mapped);
+
+    // Completed projects whose quotation never got approved — invisible everywhere
+    // else in Accounts, and the exact gap that let real invoices go unbilled.
+    const { data: completedProjects, error: completedError } = await supabase
+      .from("projects")
+      .select("job_number,title,status,updated_at,quotations(status,grand_total)")
+      .eq("status", "completed");
+
+    if (!completedError && completedProjects) {
+      const stuck: StuckProject[] = [];
+      for (const p of completedProjects as any[]) {
+        const quotationRows = (p.quotations ?? []) as Array<{ status: string; grand_total: number }>;
+        const relevant = quotationRows.find((q) => q.status !== "approved");
+        const hasApproved = quotationRows.some((q) => q.status === "approved");
+        if (relevant && !hasApproved) {
+          stuck.push({
+            job_number: p.job_number,
+            title: p.title,
+            completed_at: p.updated_at,
+            quotation_status: relevant.status,
+            grand_total: Number(relevant.grand_total) || 0,
+          });
+        }
+      }
+      stuck.sort((a, b) => (daysSince(b.completed_at) ?? 0) - (daysSince(a.completed_at) ?? 0));
+      setBlockedProjects(stuck);
+    }
+
     setLoading(false);
   }
 
@@ -218,6 +262,45 @@ function InvoicesPage() {
           only sending it does.
         </p>
       </div>
+
+      {!loading && blockedProjects.length > 0 && (
+        <Card className="border-amber-500/40 bg-amber-500/5">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-amber-700">
+              <AlertTriangle className="h-4 w-4" />
+              Completed jobs blocked from invoicing ({blockedProjects.length})
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">
+              These jobs are marked completed but their quotation was never approved, so they
+              can't be invoiced yet. This is not an accounts problem — chase whoever approves
+              quotations.
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {blockedProjects.map((p) => {
+                const age = daysSince(p.completed_at);
+                return (
+                  <div
+                    key={p.job_number}
+                    className="flex items-center justify-between rounded-lg border border-amber-500/30 bg-background p-3"
+                  >
+                    <div>
+                      <div className="font-medium">
+                        {p.job_number} — {p.title}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        Quotation stuck at "{p.quotation_status}" • {p.grand_total.toFixed(2)}
+                        {age !== null && ` • completed ${age} day${age === 1 ? "" : "s"} ago`}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>

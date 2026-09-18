@@ -12,6 +12,13 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { logAudit } from "@/lib/auditLog";
 
@@ -26,6 +33,12 @@ interface OpenBill {
   amount: number;
   vendor_id: string;
   paid_so_far: number;
+}
+
+interface PaymentSourceAccount {
+  id: string;
+  code: string;
+  name: string;
 }
 
 interface VendorPaymentRecord {
@@ -45,6 +58,8 @@ function VendorPaymentsPage() {
   const [method, setMethod] = useState("");
   const [reference, setReference] = useState("");
   const [saving, setSaving] = useState(false);
+  const [sourceAccounts, setSourceAccounts] = useState<PaymentSourceAccount[]>([]);
+  const [sourceAccountId, setSourceAccountId] = useState("");
 
   useEffect(() => {
     void loadData();
@@ -52,6 +67,15 @@ function VendorPaymentsPage() {
 
   async function loadData() {
     setLoading(true);
+
+    const { data: accountRows } = await supabase
+      .from("accounts")
+      .select("id,code,name")
+      .eq("type", "asset")
+      .like("code", "10%")
+      .eq("is_active", true)
+      .order("code");
+    setSourceAccounts(accountRows ?? []);
 
     const { data: bills, error: billError } = await supabase
       .from("bills")
@@ -106,6 +130,8 @@ function VendorPaymentsPage() {
     setAmount((bill.amount - bill.paid_so_far).toFixed(2));
     setMethod("");
     setReference("");
+    const bank = sourceAccounts.find((a) => a.code === "1000");
+    setSourceAccountId(bank?.id ?? sourceAccounts[0]?.id ?? "");
   }
 
   async function handleRecordPayment() {
@@ -120,6 +146,10 @@ function VendorPaymentsPage() {
       toast.error(`Amount exceeds what's owed (${remaining.toFixed(2)}).`);
       return;
     }
+    if (!sourceAccountId) {
+      toast.error("Pick which account this payment came from.");
+      return;
+    }
 
     setSaving(true);
     try {
@@ -132,6 +162,7 @@ function VendorPaymentsPage() {
           amount: amt,
           method: method.trim() || null,
           reference: reference.trim() || null,
+          payment_account_id: sourceAccountId,
           created_by: userData.user?.id ?? null,
         })
         .select("id")
@@ -243,6 +274,21 @@ function VendorPaymentsPage() {
               <Input type="number" min="0" step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} />
             </div>
             <div className="space-y-2">
+              <Label>Pay from</Label>
+              <Select value={sourceAccountId} onValueChange={setSourceAccountId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select account" />
+                </SelectTrigger>
+                <SelectContent>
+                  {sourceAccounts.map((a) => (
+                    <SelectItem key={a.id} value={a.id}>
+                      {a.code} — {a.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
               <Label>Method (optional)</Label>
               <Input value={method} onChange={(e) => setMethod(e.target.value)} placeholder="e.g. M-Pesa, Bank transfer" />
             </div>
@@ -250,7 +296,7 @@ function VendorPaymentsPage() {
               <Label>Reference (optional)</Label>
               <Input value={reference} onChange={(e) => setReference(e.target.value)} />
             </div>
-            <Button onClick={handleRecordPayment} disabled={saving} className="w-full">
+            <Button onClick={handleRecordPayment} disabled={saving || !sourceAccountId} className="w-full">
               {saving ? "Recording…" : "Record payment"}
             </Button>
           </div>
