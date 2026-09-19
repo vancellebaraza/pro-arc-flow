@@ -53,7 +53,7 @@ function ReportsPage() {
 
     const { data: invoices, error: invError } = await supabase
       .from("invoices")
-      .select("id,total,status,due_date,client_id")
+      .select("id,total,status,due_date,client_id,client_display_name")
       .in("status", ["sent", "partially_paid"]);
 
     if (invError) {
@@ -95,7 +95,7 @@ function ReportsPage() {
         const remaining = (Number(inv.total) || 0) - (paidMap.get(inv.id) ?? 0);
         return {
           id: inv.id,
-          party: clientNameMap.get(inv.client_id) ?? "Unknown client",
+          party: inv.client_display_name ?? clientNameMap.get(inv.client_id) ?? "Unknown client",
           dueDate: inv.due_date,
           remaining,
           bucket: getAgingBucket(inv.due_date, today),

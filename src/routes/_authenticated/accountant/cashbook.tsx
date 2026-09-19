@@ -39,7 +39,7 @@ function CashbookPage() {
 
     const { data: payments, error: payError } = await supabase
       .from("payments")
-      .select("id,client_id,amount,method,received_date,reference");
+      .select("id,client_id,client_display_name,amount,method,received_date,reference");
 
     if (payError) {
       toast.error(payError.message);
@@ -87,7 +87,7 @@ function CashbookPage() {
       id: `pay-${p.id}`,
       date: p.received_date,
       direction: "in",
-      party: clientNameMap.get(p.client_id) ?? "Unknown client",
+      party: p.client_display_name ?? clientNameMap.get(p.client_id) ?? "Unknown client",
       method: p.method,
       reference: p.reference,
       amount: Number(p.amount) || 0,

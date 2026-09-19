@@ -20,6 +20,50 @@ interface AuditEntry {
   new_data: Record<string, unknown> | null;
 }
 
+const LABEL_OVERRIDES: Record<string, string> = {
+  id: "ID",
+  vat_amount: "VAT amount",
+  vat_rate: "VAT rate",
+  parent_id: "Parent",
+  account_id: "Account",
+  invoice_id: "Invoice",
+  quotation_id: "Quotation",
+  client_id: "Client",
+  vendor_id: "Vendor",
+  is_active: "Active",
+};
+
+function formatLabel(key: string): string {
+  if (LABEL_OVERRIDES[key]) return LABEL_OVERRIDES[key];
+  return key
+    .split("_")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+}
+
+function formatValue(value: unknown): string {
+  if (value === null || value === undefined || value === "") return "—";
+  if (typeof value === "boolean") return value ? "Yes" : "No";
+  if (typeof value === "number") return value.toLocaleString();
+  return String(value);
+}
+
+function buildChangeRows(
+  oldData: Record<string, unknown> | null,
+  newData: Record<string, unknown> | null,
+): { key: string; before: unknown; after: unknown; changed: boolean }[] {
+  const keys = new Set([...Object.keys(oldData ?? {}), ...Object.keys(newData ?? {})]);
+  return Array.from(keys)
+    .map((key) => ({
+      key,
+      before: oldData ? oldData[key] : undefined,
+      after: newData ? newData[key] : undefined,
+      changed: oldData && newData ? JSON.stringify(oldData[key]) !== JSON.stringify(newData[key]) : true,
+    }))
+    .filter((row) => (oldData && newData ? row.changed : true))
+    .sort((a, b) => a.key.localeCompare(b.key));
+}
+
 function AuditLogPage() {
   const [entries, setEntries] = useState<AuditEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -106,23 +150,25 @@ function AuditLogPage() {
                     </div>
                   </div>
                   {(e.old_data || e.new_data) && (
-                    <div className="mt-2 grid gap-2 text-xs md:grid-cols-2">
-                      {e.old_data && (
-                        <div>
-                          <div className="mb-1 text-muted-foreground">Before</div>
-                          <pre className="overflow-x-auto rounded bg-muted/50 p-2">
-                            {JSON.stringify(e.old_data, null, 2)}
-                          </pre>
+                    <div className="mt-3 space-y-1.5 rounded-md bg-muted/40 p-3">
+                      {buildChangeRows(e.old_data, e.new_data).map((row) => (
+                        <div key={row.key} className="flex flex-wrap items-baseline gap-x-2 text-sm">
+                          <span className="min-w-[9rem] font-medium text-foreground">
+                            {formatLabel(row.key)}:
+                          </span>
+                          {e.old_data && e.new_data ? (
+                            <span className="text-muted-foreground">
+                              {formatValue(row.before)}{" "}
+                              <span className="mx-1">→</span>{" "}
+                              <span className="text-foreground">{formatValue(row.after)}</span>
+                            </span>
+                          ) : (
+                            <span className="text-muted-foreground">
+                              {formatValue(e.new_data ? row.after : row.before)}
+                            </span>
+                          )}
                         </div>
-                      )}
-                      {e.new_data && (
-                        <div>
-                          <div className="mb-1 text-muted-foreground">After</div>
-                          <pre className="overflow-x-auto rounded bg-muted/50 p-2">
-                            {JSON.stringify(e.new_data, null, 2)}
-                          </pre>
-                        </div>
-                      )}
+                      ))}
                     </div>
                   )}
                 </div>

@@ -25,6 +25,7 @@ interface ApprovableQuotation {
   project_id: string;
   project_title: string;
   client_id: string;
+  client_display_name: string | null;
   subtotal: number;
   labour: number;
   vat_amount: number;
@@ -88,7 +89,7 @@ function InvoicesPage() {
 
     const { data: quotations, error: quotationsError } = await supabase
       .from("quotations")
-      .select("id,project_id,subtotal,labour,vat_amount,grand_total,projects(title,client_id)")
+      .select("id,project_id,subtotal,labour,vat_amount,grand_total,projects(title,client_id,client_display_name)")
       .eq("status", "approved");
 
     if (quotationsError) {
@@ -100,12 +101,17 @@ function InvoicesPage() {
     const mapped = (quotations ?? [])
       .filter((q) => !invoicedQuotationIds.has(q.id))
       .map((q) => {
-        const project = q.projects as unknown as { title: string; client_id: string } | null;
+        const project = q.projects as unknown as {
+          title: string;
+          client_id: string;
+          client_display_name: string | null;
+        } | null;
         return {
           id: q.id,
           project_id: q.project_id,
           project_title: project?.title ?? "Untitled project",
           client_id: project?.client_id ?? "",
+          client_display_name: project?.client_display_name ?? null,
           subtotal: Number(q.subtotal) || 0,
           labour: Number(q.labour) || 0,
           vat_amount: Number(q.vat_amount) || 0,
@@ -170,6 +176,7 @@ function InvoicesPage() {
         .insert({
           quotation_id: creating.id,
           client_id: creating.client_id,
+          client_display_name: creating.client_display_name,
           invoice_number: generatedNumber,
           due_date: dueDate || null,
           status: "draft",
@@ -323,6 +330,7 @@ function InvoicesPage() {
                   <div>
                     <div className="font-medium">{q.project_title}</div>
                     <div className="text-sm text-muted-foreground">
+                      {q.client_display_name ? `${q.client_display_name} • ` : ""}
                       Total: {q.grand_total.toFixed(2)}
                     </div>
                   </div>
@@ -376,6 +384,7 @@ function InvoicesPage() {
           <DialogHeader>
             <DialogTitle>Create invoice</DialogTitle>
             <DialogDescription>
+              {creating?.client_display_name ? `${creating.client_display_name} — ` : ""}
               {creating?.project_title} — total {creating?.grand_total.toFixed(2)}
             </DialogDescription>
           </DialogHeader>

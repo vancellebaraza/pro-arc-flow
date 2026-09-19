@@ -42,6 +42,7 @@ function NewRequest() {
       }
       const { error } = await supabase.from("projects").insert({
         client_id: u.user.id,
+        client_display_name: String(fd.get("customerName")).trim(),
         service: String(fd.get("service")) as "electrical",
         title: String(fd.get("title")),
         description: String(fd.get("description") || ""),
@@ -65,6 +66,16 @@ function NewRequest() {
         Tell us what you need. An engineer will follow up shortly.
       </p>
       <form onSubmit={submit} className="mt-8 space-y-5">
+        <div>
+          <Label htmlFor="customerName">Customer name</Label>
+          <Input
+            id="customerName"
+            name="customerName"
+            required
+            maxLength={200}
+            placeholder="The actual client's full name — this is who shows up on invoices and reports"
+          />
+        </div>
         <div>
           <Label htmlFor="service">Service</Label>
           <select
