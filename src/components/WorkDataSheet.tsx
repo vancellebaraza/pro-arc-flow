@@ -8,7 +8,11 @@ import { FileDown, Pencil, Calendar, Trash2 } from "lucide-react";
 import DeleteProjectDialog from "@/components/DeleteProjectDialog";
 import { SERVICES, type ServiceKey, STATUS_LABEL, statusColorClasses } from "@/lib/services";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
 
 interface Row {
@@ -51,7 +55,8 @@ function getProgress(status: string, amountDue: number | null) {
   if (status === "inspected") return "Awaiting quotation";
   if (status === "quoted") return "Awaiting approval";
   if (status === "approved") return "Awaiting funds";
-  if (status === "completed") return amountDue != null && amountDue > 0 ? "Awaiting balance" : "Completed";
+  if (status === "completed")
+    return amountDue != null && amountDue > 0 ? "Awaiting balance" : "Completed";
   return "Work in progress";
 }
 
@@ -70,12 +75,16 @@ export default function WorkDataSheet() {
   const [vendorPaidInput, setVendorPaidInput] = useState("");
   const [savingVendor, setSavingVendor] = useState(false);
   const [statusFilter, setStatusFilter] = useState("all");
-  const [progressFilter, setProgressFilter] = useState("");
+  const [progressFilter, setProgressFilter] = useState("all");
 
   useEffect(() => {
-    supabase.from("vendors").select("id,name").order("name").then(({ data }) => {
-      setVendorOptions((data ?? []) as { id: string; name: string }[]);
-    });
+    supabase
+      .from("vendors")
+      .select("id,name")
+      .order("name")
+      .then(({ data }) => {
+        setVendorOptions((data ?? []) as { id: string; name: string }[]);
+      });
   }, []);
 
   const load = useCallback(async () => {
@@ -94,12 +103,18 @@ export default function WorkDataSheet() {
       .map((q: any) => q.id);
 
     const { data: invoices } = quotationIds.length
-      ? await supabase.from("invoices").select("id,quotation_id,total").in("quotation_id", quotationIds)
+      ? await supabase
+          .from("invoices")
+          .select("id,quotation_id,total")
+          .in("quotation_id", quotationIds)
       : { data: [] as any[] };
 
     const invoiceIds = (invoices ?? []).map((i: any) => i.id);
     const { data: allocations } = invoiceIds.length
-      ? await supabase.from("payment_allocations").select("invoice_id,amount_applied").in("invoice_id", invoiceIds)
+      ? await supabase
+          .from("payment_allocations")
+          .select("invoice_id,amount_applied")
+          .in("invoice_id", invoiceIds)
       : { data: [] as any[] };
 
     const paidByInvoice = (allocations ?? []).reduce<Record<string, number>>((map, a: any) => {
@@ -116,7 +131,9 @@ export default function WorkDataSheet() {
     const { data: vendorAssignments } = projectIds.length
       ? await supabase
           .from("project_vendor_assignments")
-          .select("id,project_id,vendor_id,cost,amount_payable,amount_paid,status,created_at,vendors(name)")
+          .select(
+            "id,project_id,vendor_id,cost,amount_payable,amount_paid,status,created_at,vendors(name)",
+          )
           .in("project_id", projectIds)
       : { data: [] as any[] };
 
@@ -156,10 +173,19 @@ export default function WorkDataSheet() {
       const amountPayable = va?.amount_payable != null ? Number(va.amount_payable) : vendorQuoted;
       const paidToVendor = va?.amount_paid != null ? Number(va.amount_paid) : 0;
       const variance =
-        amountPayable != null && vendorQuoted != null ? Number((amountPayable - vendorQuoted).toFixed(2)) : null;
-      const dueToVendor = amountPayable != null ? Number((amountPayable - paidToVendor).toFixed(2)) : null;
-      const margin = quotedAmt != null && amountPayable != null ? Number((quotedAmt - amountPayable).toFixed(2)) : null;
-      const marginPercent = margin != null && amountPayable ? Number(((margin / amountPayable) * 100).toFixed(1)) : null;
+        amountPayable != null && vendorQuoted != null
+          ? Number((amountPayable - vendorQuoted).toFixed(2))
+          : null;
+      const dueToVendor =
+        amountPayable != null ? Number((amountPayable - paidToVendor).toFixed(2)) : null;
+      const margin =
+        quotedAmt != null && amountPayable != null
+          ? Number((quotedAmt - amountPayable).toFixed(2))
+          : null;
+      const marginPercent =
+        margin != null && amountPayable
+          ? Number(((margin / amountPayable) * 100).toFixed(1))
+          : null;
 
       return {
         id: p.id,
@@ -265,7 +291,12 @@ export default function WorkDataSheet() {
     if (vendorRow.vendorAssignmentId) {
       const { error } = await supabase
         .from("project_vendor_assignments")
-        .update({ vendor_id: vendorPickId, cost: quoted, amount_payable: payable, amount_paid: paid })
+        .update({
+          vendor_id: vendorPickId,
+          cost: quoted,
+          amount_payable: payable,
+          amount_paid: paid,
+        })
         .eq("id", vendorRow.vendorAssignmentId);
       setSavingVendor(false);
       if (error) return toast.error(error.message);
@@ -319,7 +350,10 @@ export default function WorkDataSheet() {
     );
   }
 
-  const fmt = (n: number | null) => (n == null ? "—" : n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+  const fmt = (n: number | null) =>
+    n == null
+      ? "—"
+      : n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const displayedRows = rows.filter((r) => {
     const matchesStatus = statusFilter === "all" || r.status === statusFilter;
     const matchesProgress = progressFilter === "all" || r.progress === progressFilter;
@@ -351,7 +385,9 @@ export default function WorkDataSheet() {
           >
             <option value="all">All progress</option>
             {PROGRESS_CATEGORIES.map((category) => (
-              <option key={category} value={category}>{category}</option>
+              <option key={category} value={category}>
+                {category}
+              </option>
             ))}
           </select>
           <Button size="sm" variant="outline" onClick={exportCsv}>
@@ -364,10 +400,18 @@ export default function WorkDataSheet() {
         <table className="w-full text-sm border-collapse">
           <thead>
             <tr className="text-xs uppercase tracking-wide">
-              <th colSpan={5} className="p-2 text-center bg-violet-100 border">Project</th>
-              <th colSpan={3} className="p-2 text-center bg-amber-100 border">Client</th>
-              <th colSpan={5} className="p-2 text-center bg-pink-100 border">Vendor</th>
-              <th colSpan={4} className="p-2 text-center bg-fuchsia-100 border">Work Done / Date</th>
+              <th colSpan={5} className="p-2 text-center bg-violet-100 border">
+                Project
+              </th>
+              <th colSpan={3} className="p-2 text-center bg-amber-100 border">
+                Client
+              </th>
+              <th colSpan={5} className="p-2 text-center bg-pink-100 border">
+                Vendor
+              </th>
+              <th colSpan={4} className="p-2 text-center bg-fuchsia-100 border">
+                Work Done / Date
+              </th>
             </tr>
             <tr className="text-left text-xs">
               <th className="p-2 border">No.</th>
@@ -396,17 +440,23 @@ export default function WorkDataSheet() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={21} className="p-6 text-center text-muted-foreground">Loading…</td>
+                <td colSpan={21} className="p-6 text-center text-muted-foreground">
+                  Loading…
+                </td>
               </tr>
             ) : displayedRows.length === 0 ? (
               <tr>
-                <td colSpan={21} className="p-6 text-center text-muted-foreground">No projects.</td>
+                <td colSpan={21} className="p-6 text-center text-muted-foreground">
+                  No projects.
+                </td>
               </tr>
             ) : (
               displayedRows.map((r, i) => (
                 <tr key={r.id} className="border-t">
                   <td className="p-2 border">{i + 1}</td>
-                  <td className="p-2 border whitespace-nowrap">{new Date(r.date).toLocaleDateString()}</td>
+                  <td className="p-2 border whitespace-nowrap">
+                    {new Date(r.date).toLocaleDateString()}
+                  </td>
                   <td className="p-2 border whitespace-nowrap">{r.jobNo}</td>
                   <td className="p-2 border">{r.title}</td>
                   <td className="p-2 border">{r.location}</td>
@@ -420,7 +470,9 @@ export default function WorkDataSheet() {
                   <td className="p-2 border text-right">{fmt(r.paidToVendor)}</td>
                   <td className="p-2 border text-right bg-pink-50">{fmt(r.dueToVendor)}</td>
                   <td className="p-2 border text-right">{fmt(r.margin)}</td>
-                  <td className="p-2 border text-right">{r.marginPercent != null ? `${r.marginPercent}%` : "—"}</td>
+                  <td className="p-2 border text-right">
+                    {r.marginPercent != null ? `${r.marginPercent}%` : "—"}
+                  </td>
                   <td className="p-2 border whitespace-nowrap">
                     {r.workDoneDate ? new Date(r.workDoneDate).toLocaleDateString() : "—"}
                   </td>
@@ -434,8 +486,12 @@ export default function WorkDataSheet() {
                     />
                   </td>
                   <td className="p-2 border">
-                    <span className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs ${statusColorClasses(r.status).badge}`}>
-                      <span className={`h-1.5 w-1.5 rounded-full ${statusColorClasses(r.status).dot}`} />
+                    <span
+                      className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs ${statusColorClasses(r.status).badge}`}
+                    >
+                      <span
+                        className={`h-1.5 w-1.5 rounded-full ${statusColorClasses(r.status).dot}`}
+                      />
                       {STATUS_LABEL[r.status] ?? r.status}
                     </span>
                   </td>
@@ -445,14 +501,21 @@ export default function WorkDataSheet() {
                       className="h-8 text-xs"
                       onChange={(e) => {
                         const progress = e.target.value;
-                        setRows((prev) => prev.map((row) => (row.id === r.id ? { ...row, progress } : row)));
+                        setRows((prev) =>
+                          prev.map((row) => (row.id === r.id ? { ...row, progress } : row)),
+                        );
                       }}
                       aria-label={`Progress for ${r.title}`}
                     />
                   </td>
                   <td className="p-2 border">
                     <div className="flex items-center gap-1">
-                      <Button size="sm" variant="ghost" onClick={() => openVendorDialog(r)} title="Vendor cost">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => openVendorDialog(r)}
+                        title="Vendor cost"
+                      >
                         <span className="text-xs font-semibold">KES</span>
                       </Button>
                       <Button size="sm" variant="ghost" onClick={() => openEdit(r)}>
@@ -462,7 +525,11 @@ export default function WorkDataSheet() {
                         <Calendar className="h-4 w-4" />
                       </Button>
                       <DeleteProjectDialog projectId={r.id} projectTitle={r.title} onDeleted={load}>
-                        <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="text-destructive hover:text-destructive"
+                        >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </DeleteProjectDialog>
@@ -480,7 +547,11 @@ export default function WorkDataSheet() {
             <DialogTitle>Edit project</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
-            <Input value={editTitle} onChange={(e) => setEditTitle(e.target.value)} placeholder="Project title" />
+            <Input
+              value={editTitle}
+              onChange={(e) => setEditTitle(e.target.value)}
+              placeholder="Project title"
+            />
             <select
               value={editService}
               onChange={(e) => setEditService(e.target.value as ServiceKey)}
@@ -488,13 +559,19 @@ export default function WorkDataSheet() {
             >
               <option value="">Select service</option>
               {SERVICES.map((s) => (
-                <option key={s.key} value={s.key}>{s.label}</option>
+                <option key={s.key} value={s.key}>
+                  {s.label}
+                </option>
               ))}
             </select>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditingId(null)} disabled={savingEdit}>Cancel</Button>
-            <Button onClick={saveEdit} disabled={savingEdit}>Save</Button>
+            <Button variant="outline" onClick={() => setEditingId(null)} disabled={savingEdit}>
+              Cancel
+            </Button>
+            <Button onClick={saveEdit} disabled={savingEdit}>
+              Save
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -513,26 +590,47 @@ export default function WorkDataSheet() {
               >
                 <option value="">Select vendor</option>
                 {vendorOptions.map((v) => (
-                  <option key={v.id} value={v.id}>{v.name}</option>
+                  <option key={v.id} value={v.id}>
+                    {v.name}
+                  </option>
                 ))}
               </select>
             </div>
             <div>
               <label className="text-xs text-muted-foreground">Amount quoted by vendor</label>
-              <Input type="number" value={vendorQuotedInput} onChange={(e) => setVendorQuotedInput(e.target.value)} />
+              <Input
+                type="number"
+                value={vendorQuotedInput}
+                onChange={(e) => setVendorQuotedInput(e.target.value)}
+              />
             </div>
             <div>
-              <label className="text-xs text-muted-foreground">Amount payable (final agreed amount)</label>
-              <Input type="number" value={vendorPayableInput} onChange={(e) => setVendorPayableInput(e.target.value)} placeholder="Same as quoted if blank" />
+              <label className="text-xs text-muted-foreground">
+                Amount payable (final agreed amount)
+              </label>
+              <Input
+                type="number"
+                value={vendorPayableInput}
+                onChange={(e) => setVendorPayableInput(e.target.value)}
+                placeholder="Same as quoted if blank"
+              />
             </div>
             <div>
               <label className="text-xs text-muted-foreground">Amount already paid to vendor</label>
-              <Input type="number" value={vendorPaidInput} onChange={(e) => setVendorPaidInput(e.target.value)} />
+              <Input
+                type="number"
+                value={vendorPaidInput}
+                onChange={(e) => setVendorPaidInput(e.target.value)}
+              />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setVendorRow(null)} disabled={savingVendor}>Cancel</Button>
-            <Button onClick={saveVendor} disabled={savingVendor}>Save</Button>
+            <Button variant="outline" onClick={() => setVendorRow(null)} disabled={savingVendor}>
+              Cancel
+            </Button>
+            <Button onClick={saveVendor} disabled={savingVendor}>
+              Save
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
