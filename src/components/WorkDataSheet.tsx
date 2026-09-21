@@ -34,6 +34,25 @@ interface Row {
   workDoneDate: string | null;
   comment: string;
   status: string;
+  progress: string;
+}
+
+const PROGRESS_CATEGORIES = [
+  "Awaiting approval",
+  "Awaiting quotation",
+  "Awaiting funds",
+  "Work in progress",
+  "Completed",
+  "Awaiting balance",
+] as const;
+
+function getProgress(status: string, amountDue: number | null) {
+  if (status === "requested") return "Awaiting approval";
+  if (status === "inspected") return "Awaiting quotation";
+  if (status === "quoted") return "Awaiting approval";
+  if (status === "approved") return "Awaiting funds";
+  if (status === "completed") return amountDue != null && amountDue > 0 ? "Awaiting balance" : "Completed";
+  return "Work in progress";
 }
 
 export default function WorkDataSheet() {
@@ -51,6 +70,7 @@ export default function WorkDataSheet() {
   const [vendorPaidInput, setVendorPaidInput] = useState("");
   const [savingVendor, setSavingVendor] = useState(false);
   const [statusFilter, setStatusFilter] = useState("all");
+  const [progressFilter, setProgressFilter] = useState("");
 
   useEffect(() => {
     supabase.from("vendors").select("id,name").order("name").then(({ data }) => {
@@ -164,6 +184,7 @@ export default function WorkDataSheet() {
         workDoneDate: p.status === "completed" ? p.updated_at : null,
         comment: p.work_comment ?? "",
         status: p.status,
+        progress: getProgress(p.status, amountDue),
       };
     });
 
@@ -293,12 +314,17 @@ export default function WorkDataSheet() {
         margin_percent: r.marginPercent != null ? `${r.marginPercent}%` : "",
         work_done_date: r.workDoneDate ?? "",
         comment: r.comment,
+        progress: r.progress,
       })),
     );
   }
 
   const fmt = (n: number | null) => (n == null ? "—" : n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-  const displayedRows = statusFilter === "all" ? rows : rows.filter((r) => r.status === statusFilter);
+  const displayedRows = rows.filter((r) => {
+    const matchesStatus = statusFilter === "all" || r.status === statusFilter;
+    const matchesProgress = progressFilter === "all" || r.progress === progressFilter;
+    return matchesStatus && matchesProgress;
+  });
 
   return (
     <section className="mt-8">
@@ -315,6 +341,17 @@ export default function WorkDataSheet() {
               <option key={key} value={key}>
                 {STATUS_LABEL[key]}
               </option>
+            ))}
+          </select>
+          <select
+            value={progressFilter}
+            onChange={(e) => setProgressFilter(e.target.value)}
+            className="h-9 rounded-md border bg-background px-2 text-xs"
+            aria-label="Filter by progress"
+          >
+            <option value="all">All progress</option>
+            {PROGRESS_CATEGORIES.map((category) => (
+              <option key={category} value={category}>{category}</option>
             ))}
           </select>
           <Button size="sm" variant="outline" onClick={exportCsv}>
@@ -352,17 +389,18 @@ export default function WorkDataSheet() {
               <th className="p-2 border">Work Done/Date</th>
               <th className="p-2 border">Comment</th>
               <th className="p-2 border">Status</th>
+              <th className="p-2 border">Progress</th>
               <th className="p-2 border">Actions</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={20} className="p-6 text-center text-muted-foreground">Loading…</td>
+                <td colSpan={21} className="p-6 text-center text-muted-foreground">Loading…</td>
               </tr>
             ) : displayedRows.length === 0 ? (
               <tr>
-                <td colSpan={20} className="p-6 text-center text-muted-foreground">No projects.</td>
+                <td colSpan={21} className="p-6 text-center text-muted-foreground">No projects.</td>
               </tr>
             ) : (
               displayedRows.map((r, i) => (
@@ -400,6 +438,17 @@ export default function WorkDataSheet() {
                       <span className={`h-1.5 w-1.5 rounded-full ${statusColorClasses(r.status).dot}`} />
                       {STATUS_LABEL[r.status] ?? r.status}
                     </span>
+                  </td>
+                  <td className="p-2 border min-w-[180px]">
+                    <Input
+                      value={r.progress}
+                      className="h-8 text-xs"
+                      onChange={(e) => {
+                        const progress = e.target.value;
+                        setRows((prev) => prev.map((row) => (row.id === r.id ? { ...row, progress } : row)));
+                      }}
+                      aria-label={`Progress for ${r.title}`}
+                    />
                   </td>
                   <td className="p-2 border">
                     <div className="flex items-center gap-1">
