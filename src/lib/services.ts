@@ -145,8 +145,8 @@ export const STATUS_COLOR_CLASSES: Record<StatusColorGroup, { dot: string; badge
     badge: "bg-green-500/10 text-green-700 border border-green-200",
   },
   scope: {
-    dot: "bg-green-500",
-    badge: "bg-green-500/10 text-green-700 border border-green-200",
+    dot: "bg-fuchsia-500",
+    badge: "bg-fuchsia-500/10 text-fuchsia-700 border border-fuchsia-200",
   },
 };
 
@@ -155,6 +155,13 @@ export function statusColorGroup(status: string): StatusColorGroup {
 }
 
 export function statusColorClasses(status: string) {
+  if (status === "requested") {
+    return {
+      dot: "bg-yellow-400",
+      badge: "bg-yellow-400/20 text-yellow-900 border border-yellow-300",
+    };
+  }
+
   return STATUS_COLOR_CLASSES[statusColorGroup(status)];
 }
 

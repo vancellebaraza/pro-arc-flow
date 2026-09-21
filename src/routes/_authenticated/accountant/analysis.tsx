@@ -355,7 +355,7 @@ function AccountantAnalysisPage() {
                 setSelectedCategory(category.key);
                 setSelectedProjectId(null);
               }}
-              className="rounded-lg border bg-card p-5 text-left transition hover:border-foreground/40 hover:shadow-sm"
+              className={`rounded-lg border p-5 text-left transition hover:border-foreground/40 hover:shadow-sm ${category.key === "scope" ? "bg-fuchsia-100" : "bg-card"}`}
             >
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2">

@@ -330,7 +330,7 @@ export default function WorkDataSheet() {
               <th colSpan={5} className="p-2 text-center bg-violet-100 border">Project</th>
               <th colSpan={3} className="p-2 text-center bg-amber-100 border">Client</th>
               <th colSpan={5} className="p-2 text-center bg-pink-100 border">Vendor</th>
-              <th colSpan={4} className="p-2 text-center bg-green-100 border">Work Done / Date</th>
+              <th colSpan={4} className="p-2 text-center bg-fuchsia-100 border">Work Done / Date</th>
             </tr>
             <tr className="text-left text-xs">
               <th className="p-2 border">No.</th>
