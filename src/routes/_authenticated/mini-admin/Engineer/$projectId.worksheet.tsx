@@ -1,4 +1,3 @@
-
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { useEffect, useState, useCallback } from "react";
@@ -37,6 +36,8 @@ interface VendorOption {
   phone: string;
   cost: number | null;
 }
+
+const ALL_CATEGORIES = "__all_categories__";
 
 function WorksheetPage() {
   const { projectId } = Route.useParams();
@@ -125,9 +126,8 @@ function WorksheetPage() {
       const matchesSearch =
         !vendorSearch ||
         vendor.name.toLowerCase().includes(vendorSearch.toLowerCase()) ||
-        vendor.category.toLowerCase().includes(vendorSearch.toLowerCase());
-      const matchesCategory =
-        !vendorCategoryFilter || vendor.category === vendorCategoryFilter;
+        (vendor.category ?? "").toLowerCase().includes(vendorSearch.toLowerCase());
+      const matchesCategory = !vendorCategoryFilter || vendor.category === vendorCategoryFilter;
       return matchesSearch && matchesCategory;
     });
   }
@@ -220,7 +220,6 @@ function WorksheetPage() {
   async function exportPdf() {
     const doc = new jsPDF();
     try {
-    
       await generateWorksheetPdf(doc, {
         clientName,
         jobNo,
@@ -238,13 +237,12 @@ function WorksheetPage() {
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to generate PDF");
     }
-    
   }
 
   return (
     <div className="p-4 md:p-8 fade-in max-w-5xl mx-auto pb-24">
       <Link
-        to="/engineer/$projectId"
+        to="/mini-admin/Engineer/$projectId"
         params={{ projectId }}
         className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
       >
@@ -304,10 +302,7 @@ function WorksheetPage() {
               Search vendors and request approval from admin for this project.
             </p>
           </div>
-          <Button
-            onClick={assignVendor}
-            disabled={!selectedVendorId || assignmentLoading}
-          >
+          <Button onClick={assignVendor} disabled={!selectedVendorId || assignmentLoading}>
             Assign vendor
           </Button>
         </div>
@@ -324,15 +319,23 @@ function WorksheetPage() {
           <div>
             <Label>Category filter</Label>
             <Select
-              value={vendorCategoryFilter}
-              onValueChange={setVendorCategoryFilter}
+              value={vendorCategoryFilter || ALL_CATEGORIES}
+              onValueChange={(value) =>
+                setVendorCategoryFilter(value === ALL_CATEGORIES ? "" : value)
+              }
             >
               <SelectTrigger>
                 <SelectValue placeholder="All categories" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All categories</SelectItem>
-                {Array.from(new Set(vendors.map((vendor) => vendor.category))).map((category) => (
+                <SelectItem value={ALL_CATEGORIES}>All categories</SelectItem>
+                {Array.from(
+                  new Set(
+                    vendors
+                      .map((vendor) => vendor.category?.trim())
+                      .filter((category): category is string => Boolean(category)),
+                  ),
+                ).map((category) => (
                   <SelectItem key={category} value={category}>
                     {category}
                   </SelectItem>
@@ -351,7 +354,8 @@ function WorksheetPage() {
             <SelectContent>
               {filteredVendors().map((vendor) => (
                 <SelectItem key={vendor.id} value={vendor.id}>
-                  {vendor.name} — {vendor.category} {vendor.cost != null ? `• ₦${vendor.cost.toFixed(2)}` : ""}
+                  {vendor.name} — {vendor.category}{" "}
+                  {vendor.cost != null ? `• ₦${vendor.cost.toFixed(2)}` : ""}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -362,7 +366,12 @@ function WorksheetPage() {
           <div className="mt-4 rounded-lg border bg-surface p-4">
             {(() => {
               const vendor = vendors.find((item) => item.id === selectedVendorId);
-              if (!vendor) return <div className="text-sm text-muted-foreground">Selected vendor not available.</div>;
+              if (!vendor)
+                return (
+                  <div className="text-sm text-muted-foreground">
+                    Selected vendor not available.
+                  </div>
+                );
               return (
                 <div className="grid gap-2 md:grid-cols-2">
                   <div>
@@ -373,7 +382,8 @@ function WorksheetPage() {
                     <div>Cost: {vendor.cost != null ? `₦${vendor.cost.toFixed(2)}` : "—"}</div>
                     <div>Phone: {vendor.phone}</div>
                     <div>
-                      WhatsApp: {vendor.whatsapp_phone ? (
+                      WhatsApp:{" "}
+                      {vendor.whatsapp_phone ? (
                         <a
                           href={`https://wa.me/${vendor.whatsapp_phone.replace(/\D/g, "")}`}
                           target="_blank"
