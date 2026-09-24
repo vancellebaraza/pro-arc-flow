@@ -40,9 +40,12 @@ export default function GalleryManager() {
   }, []);
 
   const uploadFiles = useCallback(async (files: FileList | File[]) => {
-    const imageFiles = Array.from(files).filter((f) => f.type.startsWith("image/"));
+    const imageExtensions = /\.(avif|gif|jpe?g|png|webp)$/i;
+    const imageFiles = Array.from(files).filter(
+      (file) => file.type.startsWith("image/") || imageExtensions.test(file.name),
+    );
     if (imageFiles.length === 0) {
-      toast.error("Please drop image files only.");
+      toast.error("Please choose a JPG, PNG, WEBP, GIF, or AVIF image.");
       return;
     }
 
@@ -51,11 +54,12 @@ export default function GalleryManager() {
       const { data: userData } = await supabase.auth.getUser();
       if (!userData.user) throw new Error("You must be signed in.");
 
-      let failed = 0;
+      const failures: string[] = [];
 
       for (const file of imageFiles) {
         try {
-          const path = `gallery/${userData.user.id}/${Date.now()}-${file.name}`;
+          const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
+          const path = `gallery/${userData.user.id}/${crypto.randomUUID()}-${safeName}`;
           const { error: uploadError } = await supabase.storage
             .from("gallery-images")
             .upload(path, file);
@@ -73,19 +77,19 @@ export default function GalleryManager() {
             created_by: userData.user.id,
           });
           if (insertError) throw insertError;
-        } catch {
-          failed += 1;
+        } catch (error) {
+          failures.push(error instanceof Error ? error.message : `Unable to upload ${file.name}`);
         }
       }
 
-      if (failed === 0) {
+      if (failures.length === 0) {
         toast.success(
           imageFiles.length === 1
             ? "Photo added to the gallery."
             : `${imageFiles.length} photos added.`,
         );
       } else {
-        toast.error(`${failed} of ${imageFiles.length} photo(s) failed to upload.`);
+        toast.error(`${failures.length} of ${imageFiles.length} photo(s) failed: ${failures[0]}`);
       }
 
       void load();
