@@ -1,20 +1,17 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ImageOff } from "lucide-react";
+import { X } from "lucide-react";
 
-interface GalleryPair {
+interface GalleryPhoto {
   id: string;
-  title: string;
-  description: string | null;
   image_url: string;
-  after_image_url: string | null;
   sort_order: number;
 }
 
 export default function GallerySection() {
-  const [items, setItems] = useState<GalleryPair[]>([]);
+  const [items, setItems] = useState<GalleryPhoto[]>([]);
   const [loading, setLoading] = useState(true);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [openImage, setOpenImage] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -22,21 +19,24 @@ export default function GallerySection() {
     async function load() {
       const { data, error } = await supabase
         .from("gallery_items")
-        .select("id,title,description,image_url,after_image_url,sort_order")
+        .select("id,image_url,sort_order")
         .order("sort_order", { ascending: true })
         .order("created_at", { ascending: true });
 
       if (!active) return;
+
       if (error) {
         console.error(error);
         setItems([]);
       } else {
-        setItems((data ?? []) as GalleryPair[]);
+        setItems((data ?? []) as GalleryPhoto[]);
       }
+
       setLoading(false);
     }
 
     void load();
+
     return () => {
       active = false;
     };
@@ -56,55 +56,56 @@ export default function GallerySection() {
 
         {loading ? (
           <div className="mt-8 rounded-xl border border-dashed bg-background p-12 text-center text-sm text-muted-foreground">
-            Loading gallery...
+            Loading gallery…
           </div>
         ) : items.length === 0 ? (
           <div className="mt-8 rounded-xl border border-dashed bg-background p-12 text-center text-sm text-muted-foreground">
             No project photos are available yet.
           </div>
         ) : (
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-            {items.map((item) => {
-              const expanded = expandedId === item.id;
-              return (
-                <article key={item.id} className="group overflow-hidden rounded-2xl border bg-background shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
-                  <div className="grid grid-cols-2 gap-px bg-border">
-                    <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-                      <img src={item.image_url} alt={`${item.title} - before`} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
-                      <span className="absolute left-2 top-2 rounded-full border border-white/20 bg-black/50 px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.15em] text-white backdrop-blur-sm">Before</span>
-                    </div>
-                    <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-                      {item.after_image_url ? (
-                        <img src={item.after_image_url} alt={`${item.title} - after`} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
-                      ) : (
-                        <div className="flex h-full items-center justify-center text-muted-foreground"><ImageOff className="h-6 w-6" /></div>
-                      )}
-                      <span className="absolute left-2 top-2 rounded-full border border-white/20 bg-black/50 px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.15em] text-white backdrop-blur-sm">After</span>
-                    </div>
-                  </div>
-                  <div className="p-4">
-                    <h3 className="text-lg font-semibold">{item.title}</h3>
-                    {item.description && (
-                      <p className="mt-2 text-sm text-muted-foreground">
-                        {expanded ? item.description : item.description.slice(0, 90)}
-                      </p>
-                    )}
-                    {item.description && item.description.length > 90 && (
-                      <button type="button" className="mt-2 text-xs font-medium text-primary hover:underline" onClick={() => setExpandedId(expanded ? null : item.id)}>
-                        {expanded ? "Hide details" : "Read more"}
-                      </button>
-                    )}
-                  </div>
-                </article>
-              );
-            })}
+          <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+            {items.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => setOpenImage(item.image_url)}
+                className="group overflow-hidden rounded-xl border bg-background shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+              >
+                <img
+                  src={item.image_url}
+                  alt="Project photo"
+                  className="aspect-square w-full object-cover transition duration-500 group-hover:scale-105"
+                  onError={(event) => {
+                    event.currentTarget.style.display = "none";
+                  }}
+                />
+              </button>
+            ))}
           </div>
         )}
-
-        <div className="mt-10 text-center text-xs uppercase tracking-[0.2em] text-muted-foreground">
-          Before / After project pairs
-        </div>
       </div>
+
+      {openImage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          onClick={() => setOpenImage(null)}
+        >
+          <button
+            type="button"
+            onClick={() => setOpenImage(null)}
+            aria-label="Close"
+            className="absolute right-4 top-4 rounded-full bg-white/10 p-2 text-white hover:bg-white/20"
+          >
+            <X className="h-5 w-5" />
+          </button>
+          <img
+            src={openImage}
+            alt="Project photo enlarged"
+            className="max-h-[90vh] max-w-[90vw] rounded-lg object-contain"
+            onClick={(event) => event.stopPropagation()}
+          />
+        </div>
+      )}
     </section>
   );
 }

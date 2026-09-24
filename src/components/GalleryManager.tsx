@@ -1,43 +1,37 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Trash2, UploadCloud } from "lucide-react";
 
-interface GalleryPair {
+interface GalleryPhoto {
   id: string;
-  title: string;
-  description: string | null;
   image_url: string;
-  after_image_url: string | null;
   sort_order: number;
 }
 
-const initialForm = { title: "", description: "", sort_order: 0 };
-
 export default function GalleryManager() {
-  const [items, setItems] = useState<GalleryPair[]>([]);
-  const [form, setForm] = useState(initialForm);
-  const [beforeFile, setBeforeFile] = useState<File | null>(null);
-  const [afterFile, setAfterFile] = useState<File | null>(null);
+  const [items, setItems] = useState<GalleryPhoto[]>([]);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function load() {
     setLoading(true);
     const { data, error } = await supabase
       .from("gallery_items")
-      .select("id,title,description,image_url,after_image_url,sort_order")
+      .select("id,image_url,sort_order")
       .order("sort_order", { ascending: true })
       .order("created_at", { ascending: true });
+
     if (error) {
       toast.error(error.message);
       setItems([]);
     } else {
-      setItems((data ?? []) as GalleryPair[]);
+      setItems((data ?? []) as GalleryPhoto[]);
     }
+
     setLoading(false);
   }
 
@@ -45,50 +39,68 @@ export default function GalleryManager() {
     void load();
   }, []);
 
-  async function uploadImage(file: File, userId: string) {
-    const path = `gallery/${userId}/${Date.now()}-${file.name}`;
-    const { error } = await supabase.storage.from("gallery-images").upload(path, file);
-    if (error) throw error;
-    return supabase.storage.from("gallery-images").getPublicUrl(path).data.publicUrl;
-  }
-
-  async function handleUploadAndSave() {
-    if (!form.title.trim()) {
-      toast.error("Please enter a project title.");
-      return;
-    }
-    if (!beforeFile || !afterFile) {
-      toast.error("Please choose both a before and an after image.");
+  const uploadFiles = useCallback(async (files: FileList | File[]) => {
+    const imageFiles = Array.from(files).filter((f) => f.type.startsWith("image/"));
+    if (imageFiles.length === 0) {
+      toast.error("Please drop image files only.");
       return;
     }
 
-    setSaving(true);
+    setUploading(true);
     try {
       const { data: userData } = await supabase.auth.getUser();
       if (!userData.user) throw new Error("You must be signed in.");
-      const [beforeUrl, afterUrl] = await Promise.all([
-        uploadImage(beforeFile, userData.user.id),
-        uploadImage(afterFile, userData.user.id),
-      ]);
-      const { error } = await supabase.from("gallery_items").insert({
-        title: form.title.trim(),
-        description: form.description.trim() || null,
-        image_url: beforeUrl,
-        after_image_url: afterUrl,
-        stage: "before",
-        sort_order: Number(form.sort_order) || 0,
-        created_by: userData.user.id,
-      });
-      if (error) throw error;
-      setForm(initialForm);
-      setBeforeFile(null);
-      setAfterFile(null);
-      toast.success("Project pair added to the gallery.");
+
+      let failed = 0;
+
+      for (const file of imageFiles) {
+        try {
+          const path = `gallery/${userData.user.id}/${Date.now()}-${file.name}`;
+          const { error: uploadError } = await supabase.storage
+            .from("gallery-images")
+            .upload(path, file);
+          if (uploadError) throw uploadError;
+
+          const { data: publicData } = supabase.storage.from("gallery-images").getPublicUrl(path);
+
+          const { error: insertError } = await supabase.from("gallery_items").insert({
+            title: file.name,
+            image_url: publicData.publicUrl,
+            // "stage" and "after_image_url" predate this drag-and-drop model and
+            // are no longer used — kept only because the column is still required.
+            stage: "before",
+            sort_order: 0,
+            created_by: userData.user.id,
+          });
+          if (insertError) throw insertError;
+        } catch {
+          failed += 1;
+        }
+      }
+
+      if (failed === 0) {
+        toast.success(
+          imageFiles.length === 1
+            ? "Photo added to the gallery."
+            : `${imageFiles.length} photos added.`,
+        );
+      } else {
+        toast.error(`${failed} of ${imageFiles.length} photo(s) failed to upload.`);
+      }
+
       void load();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Unable to upload gallery pair");
+      toast.error(error instanceof Error ? error.message : "Unable to upload photos");
     } finally {
-      setSaving(false);
+      setUploading(false);
+    }
+  }, []);
+
+  function handleDrop(event: React.DragEvent<HTMLDivElement>) {
+    event.preventDefault();
+    setDragOver(false);
+    if (event.dataTransfer.files?.length) {
+      void uploadFiles(event.dataTransfer.files);
     }
   }
 
@@ -98,29 +110,81 @@ export default function GalleryManager() {
       toast.error(error.message);
       return;
     }
-    toast.success("Gallery pair removed.");
+
+    toast.success("Photo removed.");
     setItems((current) => current.filter((item) => item.id !== itemId));
   }
 
   return (
     <section className="mt-8 rounded-xl border bg-card p-5">
       <h2 className="text-lg font-semibold tracking-tight">Photo gallery</h2>
-      <p className="text-sm text-muted-foreground">Add a before-and-after pair for a project.</p>
-      <div className="mt-5 grid gap-4 md:grid-cols-2">
-        <div className="space-y-3 rounded-lg border bg-background p-4">
-          <div><label className="mb-1 block text-sm font-medium">Project title</label><Input value={form.title} onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))} placeholder="Example: Kitchen renovation" /></div>
-          <div><label className="mb-1 block text-sm font-medium">Description</label><Textarea value={form.description} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} rows={3} placeholder="Short project description" /></div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div><label className="mb-1 block text-sm font-medium">Before image</label><Input type="file" accept="image/*" onChange={(event) => setBeforeFile(event.target.files?.[0] ?? null)} /></div>
-            <div><label className="mb-1 block text-sm font-medium">After image</label><Input type="file" accept="image/*" onChange={(event) => setAfterFile(event.target.files?.[0] ?? null)} /></div>
+      <p className="text-sm text-muted-foreground">
+        Drag and drop finished photos here. Each photo should already contain all the description
+        text it needs — nothing else to fill in.
+      </p>
+
+      <div
+        onDragOver={(event) => {
+          event.preventDefault();
+          setDragOver(true);
+        }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={handleDrop}
+        onClick={() => fileInputRef.current?.click()}
+        className={`mt-5 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed p-10 text-center transition ${
+          dragOver ? "border-primary bg-primary/5" : "border-border bg-background"
+        }`}
+      >
+        <UploadCloud className="h-8 w-8 text-muted-foreground" />
+        <p className="text-sm font-medium">
+          {uploading ? "Uploading…" : "Drag photos here, or click to browse"}
+        </p>
+        <p className="text-xs text-muted-foreground">You can drop multiple photos at once.</p>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          multiple
+          className="hidden"
+          onChange={(event) => {
+            if (event.target.files?.length) void uploadFiles(event.target.files);
+            event.target.value = "";
+          }}
+        />
+      </div>
+
+      <div className="mt-6">
+        <h3 className="text-sm font-medium uppercase tracking-[0.12em] text-muted-foreground">
+          Current photos
+        </h3>
+
+        {loading ? (
+          <p className="mt-3 text-sm text-muted-foreground">Loading gallery photos…</p>
+        ) : items.length === 0 ? (
+          <p className="mt-3 text-sm text-muted-foreground">No photos yet.</p>
+        ) : (
+          <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+            {items.map((item) => (
+              <div key={item.id} className="group relative overflow-hidden rounded-lg border">
+                <img
+                  src={item.image_url}
+                  alt="Gallery photo"
+                  className="aspect-square w-full object-cover"
+                />
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="icon"
+                  onClick={() => handleDelete(item.id)}
+                  aria-label="Delete photo"
+                  className="absolute right-2 top-2 h-7 w-7 opacity-0 transition group-hover:opacity-100"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            ))}
           </div>
-          <div><label className="mb-1 block text-sm font-medium">Sort order</label><Input type="number" value={form.sort_order} onChange={(event) => setForm((current) => ({ ...current, sort_order: Number(event.target.value) || 0 }))} /></div>
-          <Button onClick={handleUploadAndSave} disabled={saving} className="w-full"><UploadCloud className="mr-2 h-4 w-4" />{saving ? "Uploading..." : "Add pair to gallery"}</Button>
-        </div>
-        <div className="rounded-lg border bg-background p-4">
-          <h3 className="text-sm font-medium uppercase tracking-[0.12em] text-muted-foreground">Current entries</h3>
-          {loading ? <p className="mt-3 text-sm text-muted-foreground">Loading gallery items...</p> : items.length === 0 ? <p className="mt-3 text-sm text-muted-foreground">No gallery items yet.</p> : <div className="mt-3 space-y-3">{items.map((item) => <div key={item.id} className="flex gap-3 rounded-lg border p-2"><img src={item.image_url} alt={`${item.title} - before`} className="h-16 w-16 rounded-md object-cover" />{item.after_image_url && <img src={item.after_image_url} alt={`${item.title} - after`} className="h-16 w-16 rounded-md object-cover" />}<div className="min-w-0 flex-1"><p className="truncate font-medium">{item.title}</p><p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{item.description || "No description"}</p></div><Button type="button" variant="ghost" size="icon" onClick={() => handleDelete(item.id)} aria-label={`Delete ${item.title}`}><Trash2 className="h-4 w-4" /></Button></div>)}</div>}
-        </div>
+        )}
       </div>
     </section>
   );
