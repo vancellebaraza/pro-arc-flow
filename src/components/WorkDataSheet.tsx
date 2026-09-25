@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { downloadCsv } from "@/lib/pdf";
-import { FileDown, Pencil, Calendar, Trash2 } from "lucide-react";
+import { FileDown, Pencil, Calendar, Trash2, Filter } from "lucide-react";
 import DeleteProjectDialog from "@/components/DeleteProjectDialog";
 import { SERVICES, type ServiceKey, STATUS_LABEL, statusColorClasses } from "@/lib/services";
 import {
@@ -76,6 +76,8 @@ export default function WorkDataSheet() {
   const [savingVendor, setSavingVendor] = useState(false);
   const [statusFilter, setStatusFilter] = useState("all");
   const [progressFilter, setProgressFilter] = useState("all");
+  const [commentFilter, setCommentFilter] = useState("");
+  const [showCommentFilter, setShowCommentFilter] = useState(false);
 
   useEffect(() => {
     supabase
@@ -357,7 +359,8 @@ export default function WorkDataSheet() {
   const displayedRows = rows.filter((r) => {
     const matchesStatus = statusFilter === "all" || r.status === statusFilter;
     const matchesProgress = progressFilter === "all" || r.progress === progressFilter;
-    return matchesStatus && matchesProgress;
+    const matchesComment = r.comment.toLowerCase().includes(commentFilter.toLowerCase());
+    return matchesStatus && matchesProgress && matchesComment;
   });
 
   return (
@@ -431,7 +434,31 @@ export default function WorkDataSheet() {
               <th className="p-2 border text-right">Margin</th>
               <th className="p-2 border text-right">% Margin</th>
               <th className="p-2 border">Work Done/Date</th>
-              <th className="p-2 border">Comment</th>
+              <th className="p-2 border">
+                <div className="flex items-center gap-1">
+                  <span>Comment</span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6"
+                    onClick={() => setShowCommentFilter((visible) => !visible)}
+                    aria-label="Filter comments"
+                    title="Filter comments"
+                  >
+                    <Filter className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+                {showCommentFilter && (
+                  <Input
+                    value={commentFilter}
+                    onChange={(e) => setCommentFilter(e.target.value)}
+                    placeholder="Filter comments"
+                    aria-label="Filter comments"
+                    className="mt-1 h-7 min-w-[140px] text-xs font-normal normal-case tracking-normal"
+                  />
+                )}
+              </th>
               <th className="p-2 border">Status</th>
               <th className="p-2 border">Progress</th>
               <th className="p-2 border">Actions</th>
