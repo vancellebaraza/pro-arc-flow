@@ -406,6 +406,32 @@ export default function WorkDataSheet() {
     const matchesComment = r.comment.toLowerCase().includes(commentFilter.toLowerCase());
     return matchesStatus && matchesProgress && matchesComment;
   });
+  const totals = displayedRows.reduce(
+    (sum, row) => ({
+      quotedAmt: sum.quotedAmt + (row.quotedAmt ?? 0),
+      paidByClient: sum.paidByClient + row.paidByClient,
+      amountDue: sum.amountDue + (row.amountDue ?? 0),
+      vendorQuoted: sum.vendorQuoted + (row.vendorQuoted ?? 0),
+      variance: sum.variance + (row.variance ?? 0),
+      amountPayable: sum.amountPayable + (row.amountPayable ?? 0),
+      paidToVendor: sum.paidToVendor + row.paidToVendor,
+      dueToVendor: sum.dueToVendor + (row.dueToVendor ?? 0),
+      margin: sum.margin + (row.margin ?? 0),
+    }),
+    {
+      quotedAmt: 0,
+      paidByClient: 0,
+      amountDue: 0,
+      vendorQuoted: 0,
+      variance: 0,
+      amountPayable: 0,
+      paidToVendor: 0,
+      dueToVendor: 0,
+      margin: 0,
+    },
+  );
+  const totalMarginPercent =
+    totals.amountPayable !== 0 ? (totals.margin / totals.amountPayable) * 100 : null;
 
   return (
     <section className="mt-8">
@@ -619,6 +645,29 @@ export default function WorkDataSheet() {
               ))
             )}
           </tbody>
+          {!loading && (
+            <tfoot>
+              <tr className="border-t-2 bg-muted/50 font-semibold">
+                <td colSpan={5} className="p-2 border text-right">
+                  Totals
+                </td>
+                <td className="p-2 border text-right">{fmt(totals.quotedAmt)}</td>
+                <td className="p-2 border text-right">{fmt(totals.paidByClient)}</td>
+                <td className="p-2 border text-right">{fmt(totals.amountDue)}</td>
+                <td className="p-2 border" />
+                <td className="p-2 border text-right">{fmt(totals.vendorQuoted)}</td>
+                <td className="p-2 border text-right">{fmt(totals.variance)}</td>
+                <td className="p-2 border text-right">{fmt(totals.amountPayable)}</td>
+                <td className="p-2 border text-right">{fmt(totals.paidToVendor)}</td>
+                <td className="p-2 border text-right">{fmt(totals.dueToVendor)}</td>
+                <td className="p-2 border text-right">{fmt(totals.margin)}</td>
+                <td className="p-2 border text-right">
+                  {totalMarginPercent != null ? `${totalMarginPercent.toFixed(1)}%` : "—"}
+                </td>
+                <td colSpan={5} className="p-2 border" />
+              </tr>
+            </tfoot>
+          )}
         </table>
       </div>
       <Dialog open={!!editingId} onOpenChange={(open) => !open && setEditingId(null)}>
