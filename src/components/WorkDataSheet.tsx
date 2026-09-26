@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { downloadCsv } from "@/lib/pdf";
 import { FileDown, Pencil, Calendar, Trash2, Filter } from "lucide-react";
+import { FaRecycle, FaUndo } from "react-icons/fa";
 import DeleteProjectDialog from "@/components/DeleteProjectDialog";
 import { SERVICES, type ServiceKey, STATUS_LABEL, statusColorClasses } from "@/lib/services";
 import {
@@ -39,6 +40,14 @@ interface Row {
   comment: string;
   status: string;
   progress: string;
+}
+
+interface ArchivedProject {
+  id: string;
+  job_number: string | null;
+  title: string;
+  location: string | null;
+  archived_at: string | null;
 }
 
 const PROGRESS_CATEGORIES = [
@@ -78,6 +87,10 @@ export default function WorkDataSheet() {
   const [progressFilter, setProgressFilter] = useState("all");
   const [commentFilter, setCommentFilter] = useState("");
   const [showCommentFilter, setShowCommentFilter] = useState(false);
+  const [deletedProjectsOpen, setDeletedProjectsOpen] = useState(false);
+  const [deletedProjects, setDeletedProjects] = useState<ArchivedProject[]>([]);
+  const [loadingDeletedProjects, setLoadingDeletedProjects] = useState(false);
+  const [restoringProjectId, setRestoringProjectId] = useState<string | null>(null);
 
   useEffect(() => {
     supabase
@@ -326,6 +339,37 @@ export default function WorkDataSheet() {
     load();
   }
 
+  async function openDeletedProjects() {
+    setDeletedProjectsOpen(true);
+    setLoadingDeletedProjects(true);
+    const { data, error } = await (supabase.from("projects") as any)
+      .select("id,job_number,title,location,archived_at")
+      .eq("archived", true)
+      .order("archived_at", { ascending: false });
+    setLoadingDeletedProjects(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    setDeletedProjects((data ?? []) as ArchivedProject[]);
+  }
+
+  async function restoreProject(project: ArchivedProject) {
+    setRestoringProjectId(project.id);
+    const { error } = await supabase
+      .from("projects")
+      .update({ archived: false, archived_at: null, archived_by: null })
+      .eq("id", project.id);
+    setRestoringProjectId(null);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    setDeletedProjects((current) => current.filter((item) => item.id !== project.id));
+    toast.success(`Project restored: ${project.title}`);
+    load();
+  }
+
   function exportCsv() {
     downloadCsv(
       `work-data-sheet-${Date.now()}.csv`,
@@ -368,6 +412,15 @@ export default function WorkDataSheet() {
       <div className="flex items-center justify-between mb-3 gap-3 flex-wrap">
         <h2 className="text-lg font-semibold tracking-tight">Work Data Sheet</h2>
         <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={openDeletedProjects}
+            aria-label="View deleted projects"
+            title="View deleted projects"
+          >
+            <FaRecycle className="h-4 w-4" />
+          </Button>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
@@ -600,6 +653,58 @@ export default function WorkDataSheet() {
               Save
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={deletedProjectsOpen} onOpenChange={setDeletedProjectsOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Deleted projects</DialogTitle>
+          </DialogHeader>
+          {loadingDeletedProjects ? (
+            <p className="text-sm text-muted-foreground">Loading deleted projects...</p>
+          ) : deletedProjects.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No deleted projects.</p>
+          ) : (
+            <div className="max-h-[60vh] overflow-y-auto rounded-md border">
+              <table className="w-full text-sm">
+                <thead className="bg-muted/50 text-left text-xs uppercase tracking-wide">
+                  <tr>
+                    <th className="p-2">Project</th>
+                    <th className="p-2">Job No.</th>
+                    <th className="p-2">Location</th>
+                    <th className="p-2">Deleted</th>
+                    <th className="p-2 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {deletedProjects.map((project) => (
+                    <tr key={project.id} className="border-t">
+                      <td className="p-2">{project.title}</td>
+                      <td className="p-2">{project.job_number ?? "—"}</td>
+                      <td className="p-2">{project.location ?? "—"}</td>
+                      <td className="p-2 whitespace-nowrap">
+                        {project.archived_at
+                          ? new Date(project.archived_at).toLocaleDateString()
+                          : "—"}
+                      </td>
+                      <td className="p-2 text-right">
+                        <Button
+                          type="button"
+                          size="sm"
+                          className="bg-emerald-600 text-white hover:bg-emerald-700"
+                          onClick={() => restoreProject(project)}
+                          disabled={restoringProjectId === project.id}
+                        >
+                          <FaUndo className="mr-1 h-3.5 w-3.5" />
+                          {restoringProjectId === project.id ? "Restoring..." : "Restore"}
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
       <Dialog open={!!vendorRow} onOpenChange={(open) => !open && setVendorRow(null)}>
