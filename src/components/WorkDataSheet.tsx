@@ -20,6 +20,7 @@ interface Row {
   id: string;
   jobNo: string;
   date: string;
+  engineer: string | null;
   title: string;
   service: string;
   location: string;
@@ -106,12 +107,23 @@ export default function WorkDataSheet() {
     setLoading(true);
     const { data: projects } = await (supabase.from("projects") as any)
       .select(
-        "id,job_number,title,service,location,status,created_at,updated_at,work_comment,quotations(id,grand_total,created_at)",
+        "id,job_number,title,service,location,status,created_at,updated_at,work_comment,engineer_id,quotations(id,grand_total,created_at)",
       )
       .eq("archived", false)
       .order("created_at", { ascending: false });
 
     const projectRows = (projects ?? []) as any[];
+
+    const engineerIds = Array.from(
+      new Set(projectRows.map((project) => project.engineer_id).filter(Boolean)),
+    ) as string[];
+    const { data: engineerProfiles } = engineerIds.length
+      ? await supabase.from("profiles").select("id,full_name").in("id", engineerIds)
+      : { data: [] as { id: string; full_name: string | null }[] };
+    const engineerNames = (engineerProfiles ?? []).reduce<Record<string, string>>((map, profile) => {
+      map[profile.id] = profile.full_name ?? "";
+      return map;
+    }, {});
 
     const quotationIds = projectRows
       .flatMap((p) => (Array.isArray(p.quotations) ? p.quotations : []))
@@ -207,6 +219,7 @@ export default function WorkDataSheet() {
         service: p.service,
         jobNo: p.job_number ?? "—",
         date: p.created_at,
+        engineer: p.engineer_id ? engineerNames[p.engineer_id] || null : null,
         title: p.title,
         location: p.location ?? "—",
         quotedAmt,
@@ -376,6 +389,7 @@ export default function WorkDataSheet() {
       rows.map((r) => ({
         job_id: r.jobNo,
         date: r.date,
+        engineer: r.engineer ?? "",
         project_name: r.title,
         location: r.location,
         quoted_amt: r.quotedAmt ?? "",
@@ -482,7 +496,7 @@ export default function WorkDataSheet() {
         <table className="w-full text-sm border-collapse">
           <thead>
             <tr className="text-xs uppercase tracking-wide">
-              <th colSpan={5} className="p-2 text-center bg-violet-100 border">
+              <th colSpan={6} className="p-2 text-center bg-violet-100 border">
                 Project
               </th>
               <th colSpan={3} className="p-2 text-center bg-amber-100 border">
@@ -501,6 +515,7 @@ export default function WorkDataSheet() {
               <th className="p-2 border">Project ID</th>
               <th className="p-2 border">Project Name</th>
               <th className="p-2 border">Location</th>
+              <th className="p-2 border">Engineer</th>
               <th className="p-2 border text-right">Quoted Amt</th>
               <th className="p-2 border text-right">Amt Paid</th>
               <th className="p-2 border text-right">Amount Due</th>
@@ -546,13 +561,13 @@ export default function WorkDataSheet() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={21} className="p-6 text-center text-muted-foreground">
+                <td colSpan={22} className="p-6 text-center text-muted-foreground">
                   Loading…
                 </td>
               </tr>
             ) : displayedRows.length === 0 ? (
               <tr>
-                <td colSpan={21} className="p-6 text-center text-muted-foreground">
+                <td colSpan={22} className="p-6 text-center text-muted-foreground">
                   No projects.
                 </td>
               </tr>
@@ -566,6 +581,7 @@ export default function WorkDataSheet() {
                   <td className="p-2 border whitespace-nowrap">{r.jobNo}</td>
                   <td className="p-2 border">{r.title}</td>
                   <td className="p-2 border">{r.location}</td>
+                  <td className="p-2 border">{r.engineer ?? "—"}</td>
                   <td className="p-2 border text-right">{fmt(r.quotedAmt)}</td>
                   <td className="p-2 border text-right">{fmt(r.paidByClient)}</td>
                   <td className="p-2 border text-right bg-amber-50">{fmt(r.amountDue)}</td>
