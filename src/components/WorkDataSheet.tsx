@@ -664,7 +664,7 @@ export default function WorkDataSheet() {
           {!loading && (
             <tfoot>
               <tr className="border-t-2 bg-muted/50 font-semibold">
-                <td colSpan={5} className="p-2 border text-right">
+                <td colSpan={6} className="p-2 border text-right">
                   Totals
                 </td>
                 <td className="p-2 border text-right">{fmt(totals.quotedAmt)}</td>
