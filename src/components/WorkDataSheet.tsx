@@ -87,6 +87,7 @@ export default function WorkDataSheet() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [progressFilter, setProgressFilter] = useState("all");
   const [commentFilter, setCommentFilter] = useState("");
+  const [projectSearch, setProjectSearch] = useState("");
   const [showCommentFilter, setShowCommentFilter] = useState(false);
   const [deletedProjectsOpen, setDeletedProjectsOpen] = useState(false);
   const [deletedProjects, setDeletedProjects] = useState<ArchivedProject[]>([]);
@@ -418,7 +419,8 @@ export default function WorkDataSheet() {
     const matchesStatus = statusFilter === "all" || r.status === statusFilter;
     const matchesProgress = progressFilter === "all" || r.progress === progressFilter;
     const matchesComment = r.comment.toLowerCase().includes(commentFilter.toLowerCase());
-    return matchesStatus && matchesProgress && matchesComment;
+    const matchesProjectName = r.title.toLowerCase().includes(projectSearch.trim().toLowerCase());
+    return matchesStatus && matchesProgress && matchesComment && matchesProjectName;
   });
   const totals = displayedRows.reduce(
     (sum, row) => ({
@@ -451,7 +453,14 @@ export default function WorkDataSheet() {
     <section className="mt-8">
       <div className="flex items-center justify-between mb-3 gap-3 flex-wrap">
         <h2 className="text-lg font-semibold tracking-tight">Work Data Sheet</h2>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <Input
+            value={projectSearch}
+            onChange={(e) => setProjectSearch(e.target.value)}
+            placeholder="Search project name"
+            aria-label="Search projects by name"
+            className="h-9 w-full text-xs sm:w-48"
+          />
           <Button
             size="sm"
             variant="outline"

@@ -8,10 +8,18 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { SERVICES } from "@/lib/services";
 
 interface ProjectComment {
   id: string;
   title: string;
+  service: string;
+  location: string | null;
+  engineer_name: string | null;
+  scheduled_date: string | null;
+  scheduled_end_date: string | null;
+  quoted_amount: number | null;
+  payment_status: string | null;
   work_comment: string | null;
 }
 
@@ -33,6 +41,13 @@ export default function ProjectCommentSummary({ projects }: Props) {
     left.localeCompare(right),
   );
   const selectedProjects = selectedComment ? comments[selectedComment] ?? [] : [];
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const selectedProject = selectedProjects.find((project) => project.id === selectedProjectId);
+  const formatDate = (value: string | null) => {
+    if (!value) return "—";
+    const date = new Date(`${value.slice(0, 10)}T00:00:00`);
+    return Number.isNaN(date.getTime()) ? value : date.toLocaleDateString();
+  };
 
   return (
     <>
@@ -40,6 +55,7 @@ export default function ProjectCommentSummary({ projects }: Props) {
         type="button"
         onClick={() => {
           setSelectedComment(null);
+          setSelectedProjectId(null);
           setOpen(true);
         }}
         className="rounded-xl border bg-card p-5 text-left transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -61,29 +77,101 @@ export default function ProjectCommentSummary({ projects }: Props) {
         open={open}
         onOpenChange={(nextOpen) => {
           setOpen(nextOpen);
-          if (!nextOpen) setSelectedComment(null);
+          if (!nextOpen) {
+            setSelectedComment(null);
+            setSelectedProjectId(null);
+          }
         }}
       >
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>{selectedComment ?? "Project comments"}</DialogTitle>
+            <DialogTitle>{selectedProject?.title ?? selectedComment ?? "Project comments"}</DialogTitle>
             <DialogDescription>
-              {selectedComment
+              {selectedProject
+                ? "Project details"
+                : selectedComment
                 ? `${selectedProjects.length} project${selectedProjects.length === 1 ? "" : "s"} with this comment`
                 : "Choose a comment to see its projects."}
             </DialogDescription>
           </DialogHeader>
 
-          {selectedComment ? (
+          {selectedProject ? (
+            <div className="max-h-[55vh] space-y-3 overflow-y-auto">
+              <Button variant="ghost" size="sm" onClick={() => setSelectedProjectId(null)}>
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Projects with this comment
+              </Button>
+              <dl className="grid gap-x-4 gap-y-3 rounded-md border p-4 text-sm sm:grid-cols-2">
+                <div>
+                  <dt className="text-muted-foreground">Scheduled date</dt>
+                  <dd className="mt-1 font-medium">
+                    {formatDate(selectedProject.scheduled_date)}
+                    {selectedProject.scheduled_end_date
+                      ? ` - ${formatDate(selectedProject.scheduled_end_date)}`
+                      : ""}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-muted-foreground">Engineer assigned</dt>
+                  <dd className="mt-1 font-medium">{selectedProject.engineer_name || "—"}</dd>
+                </div>
+                <div>
+                  <dt className="text-muted-foreground">Project title</dt>
+                  <dd className="mt-1 font-medium">{selectedProject.title}</dd>
+                </div>
+                <div>
+                  <dt className="text-muted-foreground">Service</dt>
+                  <dd className="mt-1 font-medium">
+                    {SERVICES.find((service) => service.key === selectedProject.service)?.label ??
+                      selectedProject.service}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-muted-foreground">Location</dt>
+                  <dd className="mt-1 font-medium">{selectedProject.location || "—"}</dd>
+                </div>
+                <div>
+                  <dt className="text-muted-foreground">Quoted amount</dt>
+                  <dd className="mt-1 font-medium">
+                    {selectedProject.quoted_amount == null
+                      ? "—"
+                      : `KES ${selectedProject.quoted_amount.toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}`}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-muted-foreground">Payment status</dt>
+                  <dd className="mt-1 font-medium">
+                    {selectedProject.payment_status || "Unpaid"}
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          ) : selectedComment ? (
             <div className="max-h-[55vh] space-y-2 overflow-y-auto">
-              <Button variant="ghost" size="sm" onClick={() => setSelectedComment(null)}>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setSelectedComment(null);
+                  setSelectedProjectId(null);
+                }}
+              >
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 All comments
               </Button>
               {selectedProjects.map((project) => (
-                <div key={project.id} className="rounded-md border px-3 py-2 text-sm">
+                <button
+                  key={project.id}
+                  type="button"
+                  onClick={() => setSelectedProjectId(project.id)}
+                  className="flex w-full items-center justify-between gap-3 rounded-md border px-3 py-2 text-left text-sm hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
                   {project.title}
-                </div>
+                  <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+                </button>
               ))}
             </div>
           ) : commentGroups.length ? (
