@@ -14,6 +14,7 @@ interface ProjectComment {
   id: string;
   title: string;
   service: string;
+  status: string;
   location: string | null;
   engineer_name: string | null;
   scheduled_date: string | null;
@@ -30,6 +31,7 @@ interface Props {
 export default function ProjectCommentSummary({ projects }: Props) {
   const [open, setOpen] = useState(false);
   const [selectedComment, setSelectedComment] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<"paid" | "partially_paid" | null>(null);
 
   const comments = projects.reduce<Record<string, ProjectComment[]>>((groups, project) => {
     const comment = project.work_comment?.trim();
@@ -40,7 +42,36 @@ export default function ProjectCommentSummary({ projects }: Props) {
   const commentGroups = Object.entries(comments).sort(([left], [right]) =>
     left.localeCompare(right),
   );
-  const selectedProjects = selectedComment ? comments[selectedComment] ?? [] : [];
+  const getPaymentCategory = (project: ProjectComment) => {
+    const comment = project.work_comment?.trim().toLowerCase() ?? "";
+    if (comment.includes("completed and partially paid")) return "partially_paid";
+    if (comment.includes("completed and paid")) return "paid";
+    if (project.status !== "completed") return null;
+    if (project.payment_status?.toLowerCase() === "paid") return "paid";
+    if (["partial", "partially_paid"].includes(project.payment_status?.toLowerCase() ?? "")) {
+      return "partially_paid";
+    }
+    return null;
+  };
+  const completedAndPaidProjects = projects.filter(
+    (project) => getPaymentCategory(project) === "paid",
+  );
+  const completedAndPartiallyPaidProjects = projects.filter(
+    (project) => getPaymentCategory(project) === "partially_paid",
+  );
+  const selectedCategoryLabel =
+    selectedCategory === "paid"
+      ? "Completed and paid"
+      : selectedCategory === "partially_paid"
+        ? "Completed and partially paid"
+        : null;
+  const selectedProjects = selectedComment
+    ? comments[selectedComment] ?? []
+    : selectedCategory === "paid"
+      ? completedAndPaidProjects
+      : selectedCategory === "partially_paid"
+        ? completedAndPartiallyPaidProjects
+        : [];
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const selectedProject = selectedProjects.find((project) => project.id === selectedProjectId);
   const formatDate = (value: string | null) => {
@@ -51,16 +82,17 @@ export default function ProjectCommentSummary({ projects }: Props) {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => {
-          setSelectedComment(null);
-          setSelectedProjectId(null);
-          setOpen(true);
-        }}
-        className="rounded-xl border bg-card p-5 text-left transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      >
-        <div className="flex items-center justify-between gap-3">
+      <div className="rounded-xl border bg-card p-5">
+        <button
+          type="button"
+          onClick={() => {
+            setSelectedComment(null);
+            setSelectedCategory(null);
+            setSelectedProjectId(null);
+            setOpen(true);
+          }}
+          className="flex w-full items-center justify-between gap-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
           <div>
             <div className="text-xs uppercase tracking-wider text-muted-foreground">
               Project comments
@@ -70,8 +102,42 @@ export default function ProjectCommentSummary({ projects }: Props) {
             </div>
           </div>
           <MessageSquareText className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+        </button>
+        <div className="mt-4 space-y-1 border-t pt-3 text-sm">
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedComment(null);
+              setSelectedCategory("paid");
+              setSelectedProjectId(null);
+              setOpen(true);
+            }}
+            className="flex w-full items-center justify-between gap-3 rounded-sm py-1 text-left hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <span className="text-muted-foreground">Completed and paid</span>
+            <span className="flex items-center gap-2 font-medium tabular-nums">
+              {completedAndPaidProjects.length}
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedComment(null);
+              setSelectedCategory("partially_paid");
+              setSelectedProjectId(null);
+              setOpen(true);
+            }}
+            className="flex w-full items-center justify-between gap-3 rounded-sm py-1 text-left hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <span className="text-muted-foreground">Completed and partially paid</span>
+            <span className="flex items-center gap-2 font-medium tabular-nums">
+              {completedAndPartiallyPaidProjects.length}
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </span>
+          </button>
         </div>
-      </button>
+      </div>
 
       <Dialog
         open={open}
@@ -79,17 +145,22 @@ export default function ProjectCommentSummary({ projects }: Props) {
           setOpen(nextOpen);
           if (!nextOpen) {
             setSelectedComment(null);
+            setSelectedCategory(null);
             setSelectedProjectId(null);
           }
         }}
       >
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>{selectedProject?.title ?? selectedComment ?? "Project comments"}</DialogTitle>
+            <DialogTitle>
+              {selectedProject?.title ?? selectedComment ?? selectedCategoryLabel ?? "Project comments"}
+            </DialogTitle>
             <DialogDescription>
               {selectedProject
                 ? "Project details"
-                : selectedComment
+                : selectedCategory
+                  ? `${selectedProjects.length} project${selectedProjects.length === 1 ? "" : "s"} in this category`
+                  : selectedComment
                 ? `${selectedProjects.length} project${selectedProjects.length === 1 ? "" : "s"} with this comment`
                 : "Choose a comment to see its projects."}
             </DialogDescription>
@@ -99,7 +170,7 @@ export default function ProjectCommentSummary({ projects }: Props) {
             <div className="max-h-[55vh] space-y-3 overflow-y-auto">
               <Button variant="ghost" size="sm" onClick={() => setSelectedProjectId(null)}>
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Projects with this comment
+                {selectedCategoryLabel ? "Projects in this category" : "Projects with this comment"}
               </Button>
               <dl className="grid gap-x-4 gap-y-3 rounded-md border p-4 text-sm sm:grid-cols-2">
                 <div>
@@ -147,29 +218,45 @@ export default function ProjectCommentSummary({ projects }: Props) {
                     {selectedProject.payment_status || "Unpaid"}
                   </dd>
                 </div>
+                <div className="sm:col-span-2">
+                  <dt className="text-muted-foreground">Work comment</dt>
+                  <dd className="mt-1 whitespace-pre-wrap font-medium">
+                    {selectedProject.work_comment?.trim() || "—"}
+                  </dd>
+                </div>
               </dl>
             </div>
-          ) : selectedComment ? (
+          ) : selectedComment || selectedCategory ? (
             <div className="max-h-[55vh] space-y-2 overflow-y-auto">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => {
                   setSelectedComment(null);
+                  setSelectedCategory(null);
                   setSelectedProjectId(null);
                 }}
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 All comments
               </Button>
-              {selectedProjects.map((project) => (
+              {selectedProjects.length === 0 ? (
+                <p className="px-3 py-2 text-sm text-muted-foreground">
+                  {selectedCategory ? "No projects in this category." : "No projects with this comment."}
+                </p>
+              ) : selectedProjects.map((project) => (
                 <button
                   key={project.id}
                   type="button"
                   onClick={() => setSelectedProjectId(project.id)}
                   className="flex w-full items-center justify-between gap-3 rounded-md border px-3 py-2 text-left text-sm hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
-                  {project.title}
+                  <span className="min-w-0">
+                    <span className="block truncate">{project.title}</span>
+                    <span className="mt-1 block whitespace-normal text-xs text-muted-foreground">
+                      {project.work_comment?.trim() || "No work comment"}
+                    </span>
+                  </span>
                   <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
                 </button>
               ))}
@@ -181,7 +268,10 @@ export default function ProjectCommentSummary({ projects }: Props) {
                   key={comment}
                   variant="ghost"
                   className="h-auto w-full justify-between gap-3 whitespace-normal py-3 text-left"
-                  onClick={() => setSelectedComment(comment)}
+                  onClick={() => {
+                    setSelectedCategory(null);
+                    setSelectedComment(comment);
+                  }}
                 >
                   <span className="min-w-0 break-words">{comment}</span>
                   <span className="flex shrink-0 items-center gap-2 text-muted-foreground">

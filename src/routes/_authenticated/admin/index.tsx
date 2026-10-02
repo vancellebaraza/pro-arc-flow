@@ -543,16 +543,8 @@ function AdminHome() {
         </DialogContent>
       </Dialog>
 
-      <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {[
-          { label: "Total projects", value: rows.length },
-          {
-            label: "In progress",
-            value: rows.filter((r) => r.status === "in_progress" || r.status === "scheduled")
-              .length,
-          },
-          { label: "Pending quotes", value: pendingQuotes.length },
-        ].map((s) => (
+      <div className="mt-6 grid gap-4 md:grid-cols-2">
+        {[{ label: "Total projects", value: rows.length }].map((s) => (
           <div key={s.label} className="rounded-xl border bg-card p-5">
             <div className="text-xs uppercase tracking-wider text-muted-foreground">{s.label}</div>
             <div className="mt-1 text-3xl font-semibold">{s.value}</div>
@@ -649,7 +641,15 @@ function AdminHome() {
           </div>
         </section>
       )}
-      <WorkDataSheet />
+      <WorkDataSheet
+        onCommentChange={(projectId, workComment) =>
+          setRows((current) =>
+            current.map((row) =>
+              row.id === projectId ? { ...row, work_comment: workComment } : row,
+            ),
+          )
+        }
+      />
     </div>
   );
 }

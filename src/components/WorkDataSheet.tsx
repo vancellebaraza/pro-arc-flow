@@ -51,6 +51,10 @@ interface ArchivedProject {
   archived_at: string | null;
 }
 
+interface Props {
+  onCommentChange: (projectId: string, comment: string) => void;
+}
+
 const PROGRESS_CATEGORIES = [
   "Awaiting approval",
   "Awaiting quotation",
@@ -70,7 +74,7 @@ function getProgress(status: string, amountDue: number | null) {
   return "Work in progress";
 }
 
-export default function WorkDataSheet() {
+export default function WorkDataSheet({ onCommentChange }: Props) {
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -252,7 +256,6 @@ export default function WorkDataSheet() {
   }, [load]);
 
   async function saveComment(id: string, value: string) {
-    setRows((prev) => prev.map((r) => (r.id === id ? { ...r, comment: value } : r)));
     const { error } = await supabase.from("projects").update({ work_comment: value }).eq("id", id);
     if (error) toast.error(error.message);
   }
@@ -609,10 +612,17 @@ export default function WorkDataSheet() {
                   </td>
                   <td className="p-2 border min-w-[160px]">
                     <Input
-                      defaultValue={r.comment}
+                      value={r.comment}
                       className="h-8 text-xs"
+                      onChange={(e) => {
+                        const comment = e.target.value;
+                        setRows((prev) =>
+                          prev.map((row) => (row.id === r.id ? { ...row, comment } : row)),
+                        );
+                        onCommentChange(r.id, comment);
+                      }}
                       onBlur={(e) => {
-                        if (e.target.value !== r.comment) saveComment(r.id, e.target.value);
+                        void saveComment(r.id, e.target.value);
                       }}
                     />
                   </td>
