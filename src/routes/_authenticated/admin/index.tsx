@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import WorkDataSheet from "@/components/WorkDataSheet";
+import ProjectCommentSummary from "@/components/ProjectCommentSummary";
 import ApproveEvidenceDialog from "@/components/ApproveEvidenceDialog";
 import QuotationDetailsDialog from "@/components/QuotationDetailsDialog";
 import WorksheetDetailsDialog from "@/components/WorksheetDetailsDialog";
@@ -52,6 +53,7 @@ interface Row {
   quoted_amount: number | null;
   vendor_cost: number;
   payment_status: string | null;
+  work_comment: string | null;
 }
 
 interface PendingVendorAssignmentRow {
@@ -81,6 +83,7 @@ interface ProjectQueryRow {
   job_number: string | null;
   client_id: string;
   engineer_id: string | null;
+  work_comment: string | null;
   quotations?: QuotationRow[];
 }
 
@@ -154,7 +157,7 @@ function AdminHome() {
     const { data } = await supabase
       .from("projects")
       .select(
-        `id,title,service,status,location,scheduled_date,scheduled_end_date,created_at,job_number,client_id,engineer_id,quotations(project_id,grand_total,payment_status,created_at)`,
+        `id,title,service,status,location,scheduled_date,scheduled_end_date,created_at,job_number,client_id,engineer_id,work_comment,quotations(project_id,grand_total,payment_status,created_at)`,
       )
       .eq("archived", false)
       .order("created_at", { ascending: false });
@@ -540,7 +543,7 @@ function AdminHome() {
         </DialogContent>
       </Dialog>
 
-      <div className="mt-6 grid md:grid-cols-3 gap-4">
+      <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {[
           { label: "Total projects", value: rows.length },
           {
@@ -555,6 +558,7 @@ function AdminHome() {
             <div className="mt-1 text-3xl font-semibold">{s.value}</div>
           </div>
         ))}
+        <ProjectCommentSummary projects={rows} />
       </div>
 
       {pendingQuotes.length > 0 && (

@@ -56,8 +56,8 @@ const PROGRESS_CATEGORIES = [
   "Awaiting quotation",
   "Awaiting funds",
   "Work in progress",
-  "Completed",
-  "Awaiting balance",
+  "Complete fully paid",
+  "Complete with balance",
 ] as const;
 
 function getProgress(status: string, amountDue: number | null) {
@@ -66,7 +66,7 @@ function getProgress(status: string, amountDue: number | null) {
   if (status === "quoted") return "Awaiting approval";
   if (status === "approved") return "Awaiting funds";
   if (status === "completed")
-    return amountDue != null && amountDue > 0 ? "Awaiting balance" : "Completed";
+    return amountDue != null && amountDue > 0 ? "Complete with balance" : "Complete fully paid";
   return "Work in progress";
 }
 
