@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { downloadCsv } from "@/lib/pdf";
-import { FileDown, Pencil, Calendar, Trash2, Filter } from "lucide-react";
+import { FileDown, Pencil, Calendar, Trash2, Filter, Save } from "lucide-react";
 import { FaRecycle, FaUndo } from "react-icons/fa";
 import DeleteProjectDialog from "@/components/DeleteProjectDialog";
 import { SERVICES, type ServiceKey, STATUS_LABEL, statusColorClasses } from "@/lib/services";
@@ -77,6 +77,7 @@ function getProgress(status: string, amountDue: number | null) {
 export default function WorkDataSheet({ onCommentChange }: Props) {
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
+  const [savingCommentIds, setSavingCommentIds] = useState<Set<string>>(new Set());
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [editService, setEditService] = useState<ServiceKey | "">("");
@@ -256,8 +257,18 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
   }, [load]);
 
   async function saveComment(id: string, value: string) {
+    setSavingCommentIds((current) => new Set(current).add(id));
     const { error } = await supabase.from("projects").update({ work_comment: value }).eq("id", id);
-    if (error) toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success("Comment saved");
+    }
+    setSavingCommentIds((current) => {
+      const next = new Set(current);
+      next.delete(id);
+      return next;
+    });
   }
 
   function openEdit(r: Row) {
@@ -611,20 +622,32 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
                     {r.workDoneDate ? new Date(r.workDoneDate).toLocaleDateString() : "—"}
                   </td>
                   <td className="p-2 border min-w-[160px]">
-                    <Input
-                      value={r.comment}
-                      className="h-8 text-xs"
-                      onChange={(e) => {
-                        const comment = e.target.value;
-                        setRows((prev) =>
-                          prev.map((row) => (row.id === r.id ? { ...row, comment } : row)),
-                        );
-                        onCommentChange(r.id, comment);
-                      }}
-                      onBlur={(e) => {
-                        void saveComment(r.id, e.target.value);
-                      }}
-                    />
+                    <div className="flex min-w-[190px] items-center gap-1">
+                      <Input
+                        value={r.comment}
+                        className="h-9 min-w-0 flex-1 text-xs"
+                        onChange={(e) => {
+                          const comment = e.target.value;
+                          setRows((prev) =>
+                            prev.map((row) => (row.id === r.id ? { ...row, comment } : row)),
+                          );
+                          onCommentChange(r.id, comment);
+                        }}
+                        aria-label={`Comment for ${r.title}`}
+                      />
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="outline"
+                        className="h-9 w-9 shrink-0"
+                        onClick={() => void saveComment(r.id, r.comment)}
+                        disabled={savingCommentIds.has(r.id)}
+                        aria-label={`Save comment for ${r.title}`}
+                        title="Save comment"
+                      >
+                        <Save className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </td>
                   <td className="p-2 border">
                     <span
