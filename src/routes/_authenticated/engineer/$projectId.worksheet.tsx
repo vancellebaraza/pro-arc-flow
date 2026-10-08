@@ -37,6 +37,8 @@ interface VendorOption {
   cost: number | null;
 }
 
+const ALL_CATEGORIES = "__all_categories__";
+
 function WorksheetPage() {
   const { projectId } = Route.useParams();
   const [worksheetId, setWorksheetId] = useState<string | null>(null);
@@ -223,7 +225,7 @@ function WorksheetPage() {
 
   async function exportPdf() {
     const doc = new jsPDF();
-    
+
     try {
       await generateWorksheetPdf(doc,{
         clientName,
@@ -242,7 +244,6 @@ function WorksheetPage() {
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to generate PDF");
     }
-    
   }
 
   return (
@@ -328,15 +329,23 @@ function WorksheetPage() {
           <div>
             <Label>Category filter</Label>
             <Select
-              value={vendorCategoryFilter}
-              onValueChange={setVendorCategoryFilter}
+              value={vendorCategoryFilter || ALL_CATEGORIES}
+              onValueChange={(value) =>
+                setVendorCategoryFilter(value === ALL_CATEGORIES ? "" : value)
+              }
             >
               <SelectTrigger>
                 <SelectValue placeholder="All categories" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All categories</SelectItem>
-                {Array.from(new Set(vendors.map((vendor) => vendor.category))).map((category) => (
+                <SelectItem value={ALL_CATEGORIES}>All categories</SelectItem>
+                {Array.from(
+                  new Set(
+                    vendors
+                      .map((vendor) => vendor.category?.trim())
+                      .filter((category): category is string => Boolean(category)),
+                  ),
+                ).map((category) => (
                   <SelectItem key={category} value={category}>
                     {category}
                   </SelectItem>

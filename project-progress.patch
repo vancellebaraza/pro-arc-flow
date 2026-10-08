@@ -1,0 +1,375 @@
+diff --git a/src/components/ProgressButton.tsx b/src/components/ProgressButton.tsx
+new file mode 100644
+index 0000000..6a992b5
+--- /dev/null
++++ b/src/components/ProgressButton.tsx
+@@ -0,0 +1,60 @@
++import { Check, ChevronDown } from "lucide-react";
++import {
++  DropdownMenu,
++  DropdownMenuContent,
++  DropdownMenuItem,
++  DropdownMenuSeparator,
++  DropdownMenuTrigger,
++} from "@/components/ui/dropdown-menu";
++import { PROGRESS_CATEGORIES, type ProgressCategory } from "@/lib/progress";
++
++interface Props {
++  value: ProgressCategory | null;
++  disabled?: boolean;
++  onChange: (value: ProgressCategory | null) => void;
++}
++
++// Red until a progress is chosen, green once one is set.
++export default function ProgressButton({ value, disabled, onChange }: Props) {
++  const isSet = value !== null;
++
++  return (
++    <DropdownMenu>
++      <DropdownMenuTrigger asChild>
++        <button
++          type="button"
++          disabled={disabled}
++          aria-label={isSet ? `Progress: ${value}. Change progress` : "Set progress"}
++          className={`pointer-events-auto inline-flex h-6 max-w-[11rem] items-center gap-1 rounded-md px-2 text-xs font-semibold text-white shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 disabled:opacity-60 ${
++            isSet
++              ? "bg-green-600 hover:bg-green-700 focus-visible:ring-green-600"
++              : "bg-red-600 hover:bg-red-700 focus-visible:ring-red-600"
++          }`}
++        >
++          <span className="truncate">{value ?? "Set progress"}</span>
++          <ChevronDown className="h-3 w-3 shrink-0" />
++        </button>
++      </DropdownMenuTrigger>
++      <DropdownMenuContent align="end" className="w-52">
++        {PROGRESS_CATEGORIES.map((category) => (
++          <DropdownMenuItem
++            key={category}
++            onSelect={() => onChange(category)}
++            className="justify-between"
++          >
++            {category}
++            {value === category && <Check className="h-4 w-4 text-green-600" />}
++          </DropdownMenuItem>
++        ))}
++        {isSet && (
++          <>
++            <DropdownMenuSeparator />
++            <DropdownMenuItem onSelect={() => onChange(null)} className="text-muted-foreground">
++              Clear progress
++            </DropdownMenuItem>
++          </>
++        )}
++      </DropdownMenuContent>
++    </DropdownMenu>
++  );
++}
+diff --git a/src/components/WorkDataSheet.tsx b/src/components/WorkDataSheet.tsx
+index 4989d9e..08668ff 100644
+--- a/src/components/WorkDataSheet.tsx
++++ b/src/components/WorkDataSheet.tsx
+@@ -7,6 +7,7 @@ import { downloadCsv } from "@/lib/pdf";
+ import { FileDown, Pencil, Calendar, Trash2, Filter, Save } from "lucide-react";
+ import { FaRecycle, FaUndo } from "react-icons/fa";
+ import DeleteProjectDialog from "@/components/DeleteProjectDialog";
++import { PROGRESS_CATEGORIES } from "@/lib/progress";
+ import { SERVICES, type ServiceKey, STATUS_LABEL, statusColorClasses } from "@/lib/services";
+ import {
+   Dialog,
+@@ -41,6 +42,7 @@ interface Row {
+   comment: string;
+   status: string;
+   progress: string;
++  progressSet: boolean;
+ }
+ 
+ interface ArchivedProject {
+@@ -55,15 +57,6 @@ interface Props {
+   onCommentChange: (projectId: string, comment: string) => void;
+ }
+ 
+-const PROGRESS_CATEGORIES = [
+-  "Awaiting approval",
+-  "Awaiting quotation",
+-  "Awaiting funds",
+-  "Work in progress",
+-  "Complete fully paid",
+-  "Complete with balance",
+-] as const;
+-
+ function getProgress(status: string, amountDue: number | null) {
+   if (status === "requested") return "Awaiting approval";
+   if (status === "inspected") return "Awaiting quotation";
+@@ -131,6 +124,19 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
+       return map;
+     }, {});
+ 
++    // Progress picked by the mini admin on the Engineer page. Projects without one
++    // fall back to the automatic guess from their status.
++    const { data: progressRows, error: progressError } = await (supabase as any)
++      .from("project_progress")
++      .select("project_id,progress");
++    if (progressError) console.error("Could not load project progress", progressError);
++    const manualProgress = ((progressRows ?? []) as { project_id: string; progress: string }[]).reduce<
++      Record<string, string>
++    >((map, row) => {
++      map[row.project_id] = row.progress;
++      return map;
++    }, {});
++
+     const quotationIds = projectRows
+       .flatMap((p) => (Array.isArray(p.quotations) ? p.quotations : []))
+       .map((q: any) => q.id);
+@@ -244,7 +250,8 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
+         workDoneDate: p.status === "completed" ? p.updated_at : null,
+         comment: p.work_comment ?? "",
+         status: p.status,
+-        progress: getProgress(p.status, amountDue),
++        progress: manualProgress[p.id] ?? getProgress(p.status, amountDue),
++        progressSet: p.id in manualProgress,
+       };
+     });
+ 
+@@ -660,17 +667,19 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
+                     </span>
+                   </td>
+                   <td className="p-2 border min-w-[180px]">
+-                    <Input
+-                      value={r.progress}
+-                      className="h-8 text-xs"
+-                      onChange={(e) => {
+-                        const progress = e.target.value;
+-                        setRows((prev) =>
+-                          prev.map((row) => (row.id === r.id ? { ...row, progress } : row)),
+-                        );
+-                      }}
+-                      aria-label={`Progress for ${r.title}`}
+-                    />
++                    <span
++                      title={
++                        r.progressSet
++                          ? "Set from the Engineer page"
++                          : "Automatic until a progress is set on the Engineer page"
++                      }
++                      aria-label={`Progress for ${r.title}: ${r.progress}`}
++                      className={`inline-block rounded-md px-2 py-1 text-xs font-medium ${
++                        r.progressSet ? "bg-green-100 text-green-800" : "bg-muted text-muted-foreground"
++                      }`}
++                    >
++                      {r.progress}
++                    </span>
+                   </td>
+                   <td className="p-2 border">
+                     <div className="flex items-center gap-1">
+diff --git a/src/lib/progress.ts b/src/lib/progress.ts
+new file mode 100644
+index 0000000..fdfc4ad
+--- /dev/null
++++ b/src/lib/progress.ts
+@@ -0,0 +1,12 @@
++// The progress labels the mini admin can pick for a project. These exact strings
++// are also enforced by a check constraint in the database.
++export const PROGRESS_CATEGORIES = [
++  "Awaiting approval",
++  "Awaiting quotation",
++  "Awaiting funds",
++  "Work in progress",
++  "Complete fully paid",
++  "Complete with balance",
++] as const;
++
++export type ProgressCategory = (typeof PROGRESS_CATEGORIES)[number];
+diff --git a/src/routes/_authenticated/mini-admin/Engineer/index.tsx b/src/routes/_authenticated/mini-admin/Engineer/index.tsx
+index 0093803..dc0485c 100644
+--- a/src/routes/_authenticated/mini-admin/Engineer/index.tsx
++++ b/src/routes/_authenticated/mini-admin/Engineer/index.tsx
+@@ -19,6 +19,8 @@ import {
+   DialogTitle,
+ } from "@/components/ui/dialog";
+ import { toast } from "sonner";
++import ProgressButton from "@/components/ProgressButton";
++import type { ProgressCategory } from "@/lib/progress";
+ 
+ export const Route = createFileRoute("/_authenticated/mini-admin/Engineer/")({
+   component: EngineerHome,
+@@ -72,6 +74,7 @@ function EngineerHome() {
+   const [loading, setLoading] = useState(true);
+   const [savingTodo, setSavingTodo] = useState(false);
+   const [q, setQ] = useState("");
++  const [progressMap, setProgressMap] = useState<Record<string, ProgressCategory>>({});
+ 
+   const visibleDates = Array.from({ length: 7 }, (_, index) => addDays(weekStart, index));
+ 
+@@ -86,8 +89,12 @@ function EngineerHome() {
+ 
+       setEngineerId(userData.user.id);
+ 
+-      const [{ data: projectRows }, { data: profileRows }, { data: todoRows, error: todoError }] =
+-        await Promise.all([
++      const [
++        { data: projectRows },
++        { data: profileRows },
++        { data: todoRows, error: todoError },
++        { data: progressRows, error: progressError },
++      ] = await Promise.all([
+           supabase
+             .from("projects")
+             .select("id,title,service,status,location,engineer_id,created_at,scheduled_date")
+@@ -101,11 +108,24 @@ function EngineerHome() {
+             .gte("todo_date", format(weekStart, "yyyy-MM-dd"))
+             .lte("todo_date", format(addDays(weekStart, 6), "yyyy-MM-dd"))
+             .order("todo_date", { ascending: true }),
++          (supabase as any).from("project_progress").select("project_id,progress"),
+         ]);
+ 
+       if (todoError) {
+         toast.error(todoError.message);
+       }
++      if (progressError) {
++        console.error("Could not load project progress", progressError);
++      }
++
++      setProgressMap(
++        ((progressRows ?? []) as { project_id: string; progress: ProgressCategory }[]).reduce<
++          Record<string, ProgressCategory>
++        >((map, row) => {
++          map[row.project_id] = row.progress;
++          return map;
++        }, {}),
++      );
+ 
+       setProjects((projectRows ?? []) as Project[]);
+       setEngineerName(profileRows?.full_name ?? "Engineer");
+@@ -133,6 +153,44 @@ function EngineerHome() {
+   const doneCount = todos.filter((todo) => todo.is_done).length;
+   const notDoneCount = todos.filter((todo) => !todo.is_done).length;
+ 
++  async function changeProgress(projectId: string, next: ProgressCategory | null) {
++    const previous = progressMap[projectId] ?? null;
++
++    // Update the screen straight away, then undo it if saving fails.
++    setProgressMap((current) => {
++      const copy = { ...current };
++      if (next) copy[projectId] = next;
++      else delete copy[projectId];
++      return copy;
++    });
++
++    const { data: userData } = await supabase.auth.getUser();
++    const query = next
++      ? (supabase as any).from("project_progress").upsert(
++          {
++            project_id: projectId,
++            progress: next,
++            updated_by: userData.user?.id ?? null,
++            updated_at: new Date().toISOString(),
++          },
++          { onConflict: "project_id" },
++        )
++      : (supabase as any).from("project_progress").delete().eq("project_id", projectId);
++
++    const { error } = await query;
++    if (error) {
++      setProgressMap((current) => {
++        const copy = { ...current };
++        if (previous) copy[projectId] = previous;
++        else delete copy[projectId];
++        return copy;
++      });
++      toast.error(error.message);
++      return;
++    }
++    toast.success(next ? `Progress set to "${next}"` : "Progress cleared");
++  }
++
+   function openTodoEditor(date: Date, todo?: StaffTodo) {
+     setEditState({ date, todo });
+     setForm({
+@@ -228,21 +286,33 @@ function EngineerHome() {
+             const svc = SERVICES.find((s) => s.key === p.service);
+             const colors = statusColorClasses(p.status);
+             return (
+-              <li key={p.id}>
++              <li
++                key={p.id}
++                className="relative h-full overflow-hidden rounded-xl border bg-card p-5 pl-6 transition hover:border-foreground/40 hover:shadow-sm"
++              >
++                {/* The whole card opens the project; the progress button sits above it. */}
+                 <Link
+                   to="/mini-admin/Engineer/$projectId"
+                   params={{ projectId: p.id }}
+-                  className="relative block h-full overflow-hidden rounded-xl border bg-card p-5 pl-6 hover:border-foreground/40 hover:shadow-sm transition"
+-                >
+-                  <div className={`absolute inset-y-0 left-0 w-[3px] ${colors.dot}`} />
+-                  <div className="flex items-center justify-between">
++                  aria-label={`Open ${p.title}`}
++                  className="absolute inset-0 z-0"
++                />
++                <div className={`absolute inset-y-0 left-0 w-[3px] ${colors.dot}`} />
++                <div className="pointer-events-none relative z-10">
++                  <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1.5">
+                     <span className="text-xs uppercase tracking-wider text-muted-foreground">
+                       {svc?.label ?? p.service}
+                     </span>
+-                    <span className={`inline-flex items-center gap-2 rounded-full px-2 py-0.5 text-xs ${colors.badge}`}>
+-                      <span className={`h-1.5 w-1.5 rounded-full ${colors.dot}`} />
+-                      {STATUS_LABEL[p.status] ?? p.status}
+-                    </span>
++                    <div className="flex items-center gap-1.5">
++                      <ProgressButton
++                        value={progressMap[p.id] ?? null}
++                        onChange={(value) => changeProgress(p.id, value)}
++                      />
++                      <span className={`inline-flex items-center gap-2 rounded-full px-2 py-0.5 text-xs ${colors.badge}`}>
++                        <span className={`h-1.5 w-1.5 rounded-full ${colors.dot}`} />
++                        {STATUS_LABEL[p.status] ?? p.status}
++                      </span>
++                    </div>
+                   </div>
+                   <h3 className="mt-2 font-medium truncate">{p.title}</h3>
+                   <p className="text-xs text-muted-foreground truncate">{p.location ?? "—"}</p>
+@@ -252,7 +322,7 @@ function EngineerHome() {
+                     </span>
+                     <ArrowRight className="h-4 w-4" />
+                   </div>
+-                </Link>
++                </div>
+               </li>
+             );
+           })}
+diff --git a/supabase/migrations/20261008100000_project_progress.sql b/supabase/migrations/20261008100000_project_progress.sql
+new file mode 100644
+index 0000000..2c8735b
+--- /dev/null
++++ b/supabase/migrations/20261008100000_project_progress.sql
+@@ -0,0 +1,30 @@
++-- Manual progress label for each project, set by the mini admin / admin from the
++-- Engineer page and shown (read-only) in the dashboard's Progress column.
++-- Kept in its own table so changing it never touches the project row (which would
++-- bump projects.updated_at and shift "work done" dates).
++create table if not exists public.project_progress (
++  project_id uuid primary key references public.projects(id) on delete cascade,
++  progress text not null check (
++    progress in (
++      'Awaiting approval',
++      'Awaiting quotation',
++      'Awaiting funds',
++      'Work in progress',
++      'Complete fully paid',
++      'Complete with balance'
++    )
++  ),
++  updated_by uuid references auth.users(id),
++  updated_at timestamptz not null default now()
++);
++
++alter table public.project_progress enable row level security;
++
++grant select, insert, update, delete on public.project_progress to authenticated;
++grant all on public.project_progress to service_role;
++
++drop policy if exists "project_progress_staff_all" on public.project_progress;
++create policy "project_progress_staff_all" on public.project_progress
++  for all to authenticated
++  using (public.has_role(auth.uid(), 'mini_admin') or public.has_role(auth.uid(), 'admin'))
++  with check (public.has_role(auth.uid(), 'mini_admin') or public.has_role(auth.uid(), 'admin'));

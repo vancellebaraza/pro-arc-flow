@@ -3,7 +3,7 @@ import { SERVICES } from "@/lib/services";
 import { Logo } from "@/components/Logo";
 import { ArrowRight, Menu, ShieldCheck, ClipboardList, BarChart3 } from "lucide-react";
 import Footer from "@/components/ui/footer";
-import GallerySection from "@/components/GallerySection";
+
 import { useState } from "react";
 import {
   Dialog,
@@ -104,9 +104,9 @@ function Landing() {
               Services
             </a>
 
-            <a href="#gallery" className="text-muted-foreground transition hover:text-foreground">
+            <Link to="/gallery" className="text-muted-foreground transition hover:text-foreground">
               Gallery
-            </a>
+            </Link>
 
             <Link to="/about" className="text-muted-foreground transition hover:text-foreground">
               About
@@ -138,9 +138,9 @@ function Landing() {
                 </DropdownMenuItem>
 
                 <DropdownMenuItem asChild>
-                  <a href="#gallery" className="w-full">
+                  <Link to="/gallery" className="w-full">
                     Gallery
-                  </a>
+                  </Link>
                 </DropdownMenuItem>
 
                 <DropdownMenuItem asChild>
@@ -386,7 +386,7 @@ function Landing() {
         </DialogContent>
       </Dialog>
 
-      <GallerySection />
+      
 
       <Footer />
 

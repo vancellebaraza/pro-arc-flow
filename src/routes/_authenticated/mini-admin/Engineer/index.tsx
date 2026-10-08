@@ -19,6 +19,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import ProgressButton from "@/components/ProgressButton";
+import type { ProgressCategory } from "@/lib/progress";
 
 export const Route = createFileRoute("/_authenticated/mini-admin/Engineer/")({
   component: EngineerHome,
@@ -72,6 +74,7 @@ function EngineerHome() {
   const [loading, setLoading] = useState(true);
   const [savingTodo, setSavingTodo] = useState(false);
   const [q, setQ] = useState("");
+  const [progressMap, setProgressMap] = useState<Record<string, ProgressCategory>>({});
 
   const visibleDates = Array.from({ length: 7 }, (_, index) => addDays(weekStart, index));
 
@@ -86,8 +89,12 @@ function EngineerHome() {
 
       setEngineerId(userData.user.id);
 
-      const [{ data: projectRows }, { data: profileRows }, { data: todoRows, error: todoError }] =
-        await Promise.all([
+      const [
+        { data: projectRows },
+        { data: profileRows },
+        { data: todoRows, error: todoError },
+        { data: progressRows, error: progressError },
+      ] = await Promise.all([
           supabase
             .from("projects")
             .select("id,title,service,status,location,engineer_id,created_at,scheduled_date")
@@ -101,11 +108,24 @@ function EngineerHome() {
             .gte("todo_date", format(weekStart, "yyyy-MM-dd"))
             .lte("todo_date", format(addDays(weekStart, 6), "yyyy-MM-dd"))
             .order("todo_date", { ascending: true }),
+          (supabase as any).from("project_progress").select("project_id,progress"),
         ]);
 
       if (todoError) {
         toast.error(todoError.message);
       }
+      if (progressError) {
+        console.error("Could not load project progress", progressError);
+      }
+
+      setProgressMap(
+        ((progressRows ?? []) as { project_id: string; progress: ProgressCategory }[]).reduce<
+          Record<string, ProgressCategory>
+        >((map, row) => {
+          map[row.project_id] = row.progress;
+          return map;
+        }, {}),
+      );
 
       setProjects((projectRows ?? []) as Project[]);
       setEngineerName(profileRows?.full_name ?? "Engineer");
@@ -132,6 +152,44 @@ function EngineerHome() {
   const todoMap = new Map(todos.map((todo) => [`${todo.staff_user_id}|${todo.todo_date}`, todo]));
   const doneCount = todos.filter((todo) => todo.is_done).length;
   const notDoneCount = todos.filter((todo) => !todo.is_done).length;
+
+  async function changeProgress(projectId: string, next: ProgressCategory | null) {
+    const previous = progressMap[projectId] ?? null;
+
+    // Update the screen straight away, then undo it if saving fails.
+    setProgressMap((current) => {
+      const copy = { ...current };
+      if (next) copy[projectId] = next;
+      else delete copy[projectId];
+      return copy;
+    });
+
+    const { data: userData } = await supabase.auth.getUser();
+    const query = next
+      ? (supabase as any).from("project_progress").upsert(
+          {
+            project_id: projectId,
+            progress: next,
+            updated_by: userData.user?.id ?? null,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: "project_id" },
+        )
+      : (supabase as any).from("project_progress").delete().eq("project_id", projectId);
+
+    const { error } = await query;
+    if (error) {
+      setProgressMap((current) => {
+        const copy = { ...current };
+        if (previous) copy[projectId] = previous;
+        else delete copy[projectId];
+        return copy;
+      });
+      toast.error(error.message);
+      return;
+    }
+    toast.success(next ? `Progress set to "${next}"` : "Progress cleared");
+  }
 
   function openTodoEditor(date: Date, todo?: StaffTodo) {
     setEditState({ date, todo });
@@ -228,21 +286,33 @@ function EngineerHome() {
             const svc = SERVICES.find((s) => s.key === p.service);
             const colors = statusColorClasses(p.status);
             return (
-              <li key={p.id}>
+              <li
+                key={p.id}
+                className="relative h-full overflow-hidden rounded-xl border bg-card p-5 pl-6 transition hover:border-foreground/40 hover:shadow-sm"
+              >
+                {/* The whole card opens the project; the progress button sits above it. */}
                 <Link
                   to="/mini-admin/Engineer/$projectId"
                   params={{ projectId: p.id }}
-                  className="relative block h-full overflow-hidden rounded-xl border bg-card p-5 pl-6 hover:border-foreground/40 hover:shadow-sm transition"
-                >
-                  <div className={`absolute inset-y-0 left-0 w-[3px] ${colors.dot}`} />
-                  <div className="flex items-center justify-between">
+                  aria-label={`Open ${p.title}`}
+                  className="absolute inset-0 z-0"
+                />
+                <div className={`absolute inset-y-0 left-0 w-[3px] ${colors.dot}`} />
+                <div className="pointer-events-none relative z-10">
+                  <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1.5">
                     <span className="text-xs uppercase tracking-wider text-muted-foreground">
                       {svc?.label ?? p.service}
                     </span>
-                    <span className={`inline-flex items-center gap-2 rounded-full px-2 py-0.5 text-xs ${colors.badge}`}>
-                      <span className={`h-1.5 w-1.5 rounded-full ${colors.dot}`} />
-                      {STATUS_LABEL[p.status] ?? p.status}
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <ProgressButton
+                        value={progressMap[p.id] ?? null}
+                        onChange={(value) => changeProgress(p.id, value)}
+                      />
+                      <span className={`inline-flex items-center gap-2 rounded-full px-2 py-0.5 text-xs ${colors.badge}`}>
+                        <span className={`h-1.5 w-1.5 rounded-full ${colors.dot}`} />
+                        {STATUS_LABEL[p.status] ?? p.status}
+                      </span>
+                    </div>
                   </div>
                   <h3 className="mt-2 font-medium truncate">{p.title}</h3>
                   <p className="text-xs text-muted-foreground truncate">{p.location ?? "—"}</p>
@@ -252,7 +322,7 @@ function EngineerHome() {
                     </span>
                     <ArrowRight className="h-4 w-4" />
                   </div>
-                </Link>
+                </div>
               </li>
             );
           })}

@@ -7,6 +7,7 @@ import { downloadCsv } from "@/lib/pdf";
 import { FileDown, Pencil, Calendar, Trash2, Filter, Save } from "lucide-react";
 import { FaRecycle, FaUndo } from "react-icons/fa";
 import DeleteProjectDialog from "@/components/DeleteProjectDialog";
+import { PROGRESS_CATEGORIES } from "@/lib/progress";
 import { SERVICES, type ServiceKey, STATUS_LABEL, statusColorClasses } from "@/lib/services";
 import {
   Dialog,
@@ -41,6 +42,7 @@ interface Row {
   comment: string;
   status: string;
   progress: string;
+  progressSet: boolean;
 }
 
 interface ArchivedProject {
@@ -54,15 +56,6 @@ interface ArchivedProject {
 interface Props {
   onCommentChange: (projectId: string, comment: string) => void;
 }
-
-const PROGRESS_CATEGORIES = [
-  "Awaiting approval",
-  "Awaiting quotation",
-  "Awaiting funds",
-  "Work in progress",
-  "Complete fully paid",
-  "Complete with balance",
-] as const;
 
 function getProgress(status: string, amountDue: number | null) {
   if (status === "requested") return "Awaiting approval";
@@ -128,6 +121,19 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
       : { data: [] as { id: string; full_name: string | null }[] };
     const engineerNames = (engineerProfiles ?? []).reduce<Record<string, string>>((map, profile) => {
       map[profile.id] = profile.full_name ?? "";
+      return map;
+    }, {});
+
+    // Progress picked by the mini admin on the Engineer page. Projects without one
+    // fall back to the automatic guess from their status.
+    const { data: progressRows, error: progressError } = await (supabase as any)
+      .from("project_progress")
+      .select("project_id,progress");
+    if (progressError) console.error("Could not load project progress", progressError);
+    const manualProgress = ((progressRows ?? []) as { project_id: string; progress: string }[]).reduce<
+      Record<string, string>
+    >((map, row) => {
+      map[row.project_id] = row.progress;
       return map;
     }, {});
 
@@ -244,7 +250,8 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
         workDoneDate: p.status === "completed" ? p.updated_at : null,
         comment: p.work_comment ?? "",
         status: p.status,
-        progress: getProgress(p.status, amountDue),
+        progress: manualProgress[p.id] ?? getProgress(p.status, amountDue),
+        progressSet: p.id in manualProgress,
       };
     });
 
@@ -660,17 +667,19 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
                     </span>
                   </td>
                   <td className="p-2 border min-w-[180px]">
-                    <Input
-                      value={r.progress}
-                      className="h-8 text-xs"
-                      onChange={(e) => {
-                        const progress = e.target.value;
-                        setRows((prev) =>
-                          prev.map((row) => (row.id === r.id ? { ...row, progress } : row)),
-                        );
-                      }}
-                      aria-label={`Progress for ${r.title}`}
-                    />
+                    <span
+                      title={
+                        r.progressSet
+                          ? "Set from the Engineer page"
+                          : "Automatic until a progress is set on the Engineer page"
+                      }
+                      aria-label={`Progress for ${r.title}: ${r.progress}`}
+                      className={`inline-block rounded-md px-2 py-1 text-xs font-medium ${
+                        r.progressSet ? "bg-green-100 text-green-800" : "bg-muted text-muted-foreground"
+                      }`}
+                    >
+                      {r.progress}
+                    </span>
                   </td>
                   <td className="p-2 border">
                     <div className="flex items-center gap-1">

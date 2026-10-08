@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAccountantRouteRouteImport } from './routes/_authenticated/accountant/route'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
@@ -87,6 +88,11 @@ const AboutRoute = AboutRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GalleryRoute = GalleryRouteImport.update({
+  id: '/gallery',
+  path: '/gallery',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -424,6 +430,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
+  '/gallery': typeof GalleryRoute
   '/reset-password': typeof ResetPasswordRoute
   '/accountant': typeof AuthenticatedAccountantRouteRouteWithChildren
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
@@ -485,6 +492,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
+  '/gallery': typeof GalleryRoute
   '/reset-password': typeof ResetPasswordRoute
   '/mini-admin': typeof AuthenticatedMiniAdminRouteRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -543,6 +551,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
+  '/gallery': typeof GalleryRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/accountant': typeof AuthenticatedAccountantRouteRouteWithChildren
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
@@ -606,6 +615,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/auth'
+    | '/gallery'
     | '/reset-password'
     | '/accountant'
     | '/admin'
@@ -667,6 +677,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/auth'
+    | '/gallery'
     | '/reset-password'
     | '/mini-admin'
     | '/dashboard'
@@ -724,6 +735,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/about'
     | '/auth'
+    | '/gallery'
     | '/reset-password'
     | '/_authenticated/accountant'
     | '/_authenticated/admin'
@@ -787,6 +799,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
   AuthRoute: typeof AuthRoute
+  GalleryRoute: typeof GalleryRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
 }
 
@@ -818,6 +831,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gallery': {
+      id: '/gallery'
+      path: '/gallery'
+      fullPath: '/gallery'
+      preLoaderRoute: typeof GalleryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -1464,6 +1484,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   AuthRoute: AuthRoute,
+  GalleryRoute: GalleryRoute,
   ResetPasswordRoute: ResetPasswordRoute,
 }
 export const routeTree = rootRouteImport
