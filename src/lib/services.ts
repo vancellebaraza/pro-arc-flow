@@ -16,9 +16,9 @@ export type ServiceKey =
   | "plumbing"
   | "landscaping"
   | "painting"
-  | "cctv"
+  | "cctv_installation"
   | "solar"
-  | "civil"
+  | "civil_works"
   | "electric_fence"
   | "renovation"
   | "tank_cleaning";
@@ -45,14 +45,14 @@ export const SERVICES: Array<{
     image: "/electric.jpeg",
   },
   {
-    key: "cctv",
+    key: "cctv_installation",
     label: "CCTV",
     icon: Camera,
     desc: "Installation, configuration, maintenance, repair, and upgrading of CCTV surveillance systems, cameras, NVRs, DVRs, monitors, and networking infrastructure.",
     image: "/cctv.jpeg",
   },
   {
-    key: "civil",
+    key: "civil_works",
     label: "Civil Works",
     icon: HardHat,
     desc: "Construction, repair, and maintenance of masonry, concrete works, paving, drainage, walls, floors, manholes, structural repairs, and other building-related works.",

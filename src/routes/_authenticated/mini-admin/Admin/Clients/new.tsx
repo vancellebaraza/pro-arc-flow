@@ -32,6 +32,8 @@ function NewRequest() {
     try {
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) throw new Error("Not signed in");
+      const service = SERVICES.find((option) => option.key === fd.get("service"))?.key;
+      if (!service) throw new Error("Please select a valid service");
       const urls: string[] = [];
       for (const file of files) {
         const path = `${u.user.id}/${Date.now()}-${file.name}`;
@@ -43,7 +45,7 @@ function NewRequest() {
       const { error } = await supabase.from("projects").insert({
         client_id: u.user.id,
         client_display_name: String(fd.get("customerName")).trim(),
-        service: String(fd.get("service")) as "electrical",
+        service,
         title: String(fd.get("title")),
         description: String(fd.get("description") || ""),
         location: String(fd.get("location") || ""),
