@@ -27,6 +27,11 @@ function NewRequest() {
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
+    const service = SERVICES.find((option) => option.key === fd.get("service"));
+    if (!service) {
+      toast.error("Please select a valid service");
+      return;
+    }
     setSubmitting(true);
     try {
       const { data: u } = await supabase.auth.getUser();
@@ -41,7 +46,7 @@ function NewRequest() {
       }
       const { error } = await supabase.from("projects").insert({
         client_id: u.user.id,
-        service: String(fd.get("service")) as "electrical",
+        service: service.key,
         title: String(fd.get("title")),
         description: String(fd.get("description") || ""),
         location: String(fd.get("location") || ""),
