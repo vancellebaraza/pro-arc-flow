@@ -84,7 +84,7 @@ function EngineerHome() {
           No projects found.
         </div>
       ) : (
-        <ul className="mb-5 grid gap-5 [grid-template-columns:repeat(auto-fill,minmax(340px,1fr))]">
+        <ul className="mb-5 grid gap-5 [grid-template-columns:repeat(auto-fill,minmax(min(380px,100%),1fr))]">
           {filtered.map((p) => {
             const svc = SERVICES.find((s) => s.key === p.service);
             const colors = statusColorClasses(p.status);
@@ -93,22 +93,26 @@ function EngineerHome() {
                 <Link
                   to="/engineer/$projectId"
                   params={{ projectId: p.id }}
-                  className="relative block h-full overflow-hidden rounded-xl border bg-card p-4 pl-5 md:p-5 md:pl-6 hover:border-foreground/40 hover:shadow-sm transition"
+                  className="relative flex h-full flex-col overflow-hidden rounded-2xl border bg-card p-5 pl-6 shadow-[var(--shadow-card)] transition-[transform,box-shadow] duration-150 hover:-translate-y-px hover:shadow-[var(--shadow-raised-hover)] active:scale-[0.98] motion-reduce:transform-none md:p-6 md:pl-7"
                 >
                   <div className={`absolute inset-y-0 left-0 w-[3px] ${colors.dot}`} />
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="text-sm text-muted-foreground">
+                  <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+                    <span className="shrink-0 text-[13px] font-medium uppercase tracking-wide text-muted-foreground">
                       {svc?.label ?? p.service}
                     </span>
-                    <StatusChip status={p.status} />
+                    <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+                      <StatusChip status={p.status} />
+                    </div>
                   </div>
-                  <h3 className="mt-3 truncate text-base font-semibold">{p.title}</h3>
-                  <p className="truncate text-sm text-muted-foreground">{p.location ?? "—"}</p>
-                  <div className="mt-4 flex items-center justify-between border-t pt-3 text-[13px] text-muted-foreground">
-                    <span>
-                      {p.scheduled_date ? `Scheduled ${p.scheduled_date}` : "Unscheduled"}
-                    </span>
-                    <ArrowRight className="h-4 w-4" />
+                  <h3 className="mt-3 line-clamp-2 text-lg font-semibold leading-snug">{p.title}</h3>
+                  <p className="mt-1 truncate text-sm text-muted-foreground">{p.location ?? "—"}</p>
+                  <div className="mt-auto pt-4">
+                    <div className="flex items-center justify-between border-t pt-3 text-sm text-muted-foreground">
+                      <span>
+                        {p.scheduled_date ? `Scheduled ${p.scheduled_date}` : "Unscheduled"}
+                      </span>
+                      <ArrowRight className="h-4 w-4" />
+                    </div>
                   </div>
                 </Link>
               </li>
