@@ -153,10 +153,21 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+    // supabase-js can re-emit SIGNED_IN (for example on tab refocus) for the same
+    // user, so only react when the signed-in user actually changes.
+    let currentUserId: string | null | undefined;
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      const userId = session?.user?.id ?? null;
+      if (event === "INITIAL_SESSION" || event === "TOKEN_REFRESHED") {
+        currentUserId = userId;
+        return;
+      }
+      if (event === "SIGNED_IN" && userId === currentUserId) return;
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
+      currentUserId = userId;
       router.invalidate();
-      if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
+      if (event === "SIGNED_OUT") queryClient.clear();
+      else queryClient.invalidateQueries();
     });
     return () => sub.subscription.unsubscribe();
   }, [router, queryClient]);
