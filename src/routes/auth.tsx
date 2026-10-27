@@ -12,21 +12,17 @@ import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { ensureFixedAccounts } from "@/lib/setup.functions";
 import WhatsAppButton from "@/components/WhatsAppButton2";
+import { getRolesCached, getUserCached } from "@/lib/auth-cache";
 
 
 async function redirectToRoleHome(navigate: ReturnType<typeof useNavigate>) {
-  const { data: userData } = await supabase.auth.getUser();
+  const { data: userData } = await getUserCached();
   if (!userData.user) {
     navigate({ to: "/auth", replace: true });
     return;
   }
 
-  const { data: rolesData } = await supabase
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", userData.user.id);
-
-  const roles = (rolesData ?? []).map((role) => role.role as string);
+  const roles = (await getRolesCached(userData.user.id)) ?? [];
   const primaryRole = roles.includes("admin")
     ? "admin"
     : roles.includes("accountant")

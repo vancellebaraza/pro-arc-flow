@@ -8,6 +8,7 @@ import {
 } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyRoles, signOutClean } from "@/lib/auth";
+import { getRolesCached, getUserCached } from "@/lib/auth-cache";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,7 +23,7 @@ import {
   BarChart3,
   Bell,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,8 +35,10 @@ import { AIAssistant } from "@/components/AIAssistant";
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
   beforeLoad: async () => {
-    const { data, error } = await supabase.auth.getUser();
+    const { data, error } = await getUserCached();
     if (error || !data.user) throw redirect({ to: "/auth" });
+    // Load roles once here so requireRole and the layout reuse them.
+    await getRolesCached(data.user.id);
     return { user: data.user };
   },
   component: AuthedLayout,
@@ -51,38 +54,43 @@ function AuthedLayout() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [notifications, setNotifications] = useState<Array<{ id: string; title: string; body: string | null; link: string | null; read_at: string | null }>>([]);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const mountedRef = useRef(false);
+
+  const loadNotifications = useCallback(async () => {
+    const { data: userData } = await getUserCached();
+    if (!userData.user) return;
+    const { data } = await supabase
+      .from("notifications")
+      .select("id,title,body,link,read_at")
+      .eq("user_id", userData.user.id)
+      .is("read_at", null)
+      .order("created_at", { ascending: false })
+      .limit(20);
+    if (mountedRef.current) {
+      setNotifications(
+        (data ?? []) as Array<{
+          id: string;
+          title: string;
+          body: string | null;
+          link: string | null;
+          read_at: string | null;
+        }>,
+      );
+    }
+  }, []);
+
+  // Load once on mount, and again each time the dropdown is opened.
+  useEffect(() => {
+    mountedRef.current = true;
+    loadNotifications();
+    return () => {
+      mountedRef.current = false;
+    };
+  }, [loadNotifications]);
 
   useEffect(() => {
-    let mounted = true;
-    async function loadNotifications() {
-      const { data: userData } = await supabase.auth.getUser();
-      if (!userData.user || !mounted) return;
-      const { data } = await supabase
-        .from("notifications")
-        .select("id,title,body,link,read_at")
-        .eq("user_id", userData.user.id)
-        .is("read_at", null)
-        .order("created_at", { ascending: false })
-        .limit(20);
-      if (mounted) {
-        setNotifications(
-          (data ?? []) as Array<{
-            id: string;
-            title: string;
-            body: string | null;
-            link: string | null;
-            read_at: string | null;
-          }>,
-        );
-      }
-    }
-    if (notificationsOpen || pathname) {
-      loadNotifications();
-    }
-    return () => {
-      mounted = false;
-    };
-  }, [notificationsOpen, pathname]);
+    if (notificationsOpen) loadNotifications();
+  }, [notificationsOpen, loadNotifications]);
 
   async function handleNotificationClick(notificationId: string, link: string | null) {
     await supabase.from("notifications").update({ read_at: new Date().toISOString() }).eq("id", notificationId);
