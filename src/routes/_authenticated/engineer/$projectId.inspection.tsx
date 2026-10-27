@@ -291,7 +291,7 @@ function InspectionPage() {
         <ArrowLeft className="h-4 w-4 mr-1" />
         Back to project
       </Link>
-      <h1 className="mt-3 text-2xl md:text-3xl font-semibold tracking-tight">Inspection Report</h1>
+      <h1 className="font-display text-[1.75rem] font-bold leading-tight mt-3">Inspection Report</h1>
       <p className="text-muted-foreground mt-1">
         Complete the checklist, photo evidence and sign-off.
       </p>
@@ -359,7 +359,7 @@ function InspectionPage() {
 
       <section className="mt-10">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold tracking-tight">Inspection Checklist</h2>
+          <h2 className="font-display text-xl font-bold">Inspection Checklist</h2>
           <Button
             variant="outline"
             size="sm"
@@ -434,7 +434,7 @@ function InspectionPage() {
 
       <section className="mt-10">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold tracking-tight">Photo Evidence</h2>
+          <h2 className="font-display text-xl font-bold">Photo Evidence</h2>
           <Button
             variant="outline"
             size="sm"
@@ -452,7 +452,7 @@ function InspectionPage() {
             >
               {(["before", "during", "after"] as const).map((field) => (
                 <div key={field} className="space-y-1">
-                  <Label className="text-xs text-muted-foreground">
+                  <Label className="text-sm text-muted-foreground">
                     {field}
                   </Label>
                   {p[field] ? (
@@ -505,22 +505,22 @@ function InspectionPage() {
       </section>
 
       <section className="mt-10">
-        <h2 className="text-lg font-semibold tracking-tight">Sign-off</h2>
+        <h2 className="font-display text-xl font-bold">Sign-off</h2>
         <div className="mt-3 grid md:grid-cols-3 gap-4">
           <div className="rounded-lg border p-4 bg-card">
             <Label>Client Signature</Label>
             <SignaturePad value={sigClient || null} onChange={(v) => setSigClient(v ?? "")} label="Client signature" />
-            <div className="mt-3 text-xs text-muted-foreground">Client signature collected on site.</div>
+            <div className="mt-3 text-sm text-muted-foreground">Client signature collected on site.</div>
           </div>
           <div className="rounded-lg border p-4 bg-card">
             <Label>Inspector Signature</Label>
             <SignaturePad value={sigInspector || null} onChange={(v) => setSigInspector(v ?? "")} label="Inspector signature" />
-            <div className="mt-3 text-xs text-muted-foreground">Inspector signature collected on site.</div>
+            <div className="mt-3 text-sm text-muted-foreground">Inspector signature collected on site.</div>
           </div>
           <div className="rounded-lg border p-4 bg-card">
             <Label>Technician Signature</Label>
             <SignaturePad value={sigTechnician || null} onChange={(v) => setSigTechnician(v ?? "")} label="Technician signature" />
-            <div className="mt-3 text-xs text-muted-foreground">Technician signature collected on site.</div>
+            <div className="mt-3 text-sm text-muted-foreground">Technician signature collected on site.</div>
           </div>
         </div>
       </section>

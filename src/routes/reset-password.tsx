@@ -66,7 +66,7 @@ function ResetPasswordPage() {
         <div className="mb-6 flex justify-center">
           <Logo className="h-29 w-auto" />
         </div>
-        <h1 className="text-xl font-semibold text-center mb-6">Set a new password</h1>
+        <h1 className="font-display text-[1.75rem] font-bold leading-tight text-center mb-6">Set a new password</h1>
         <form onSubmit={updatePassword} className="space-y-4">
           <div>
             <Label htmlFor="password">New password</Label>

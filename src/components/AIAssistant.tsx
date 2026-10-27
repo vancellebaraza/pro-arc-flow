@@ -60,7 +60,7 @@ export function AIAssistant() {
           </div>
           <div className="flex-1 overflow-y-auto p-4 space-y-3 text-sm">
             {messages.length === 0 && (
-              <div className="text-muted-foreground text-xs leading-relaxed">
+              <div className="text-muted-foreground text-sm leading-relaxed">
                 Hi — I&apos;m FusionPro AI. I answer using your system data only. Try:
                 <ul className="mt-2 space-y-1 list-disc pl-4">
                   <li>What&apos;s the status of my projects?</li>
@@ -80,7 +80,7 @@ export function AIAssistant() {
               </div>
             ))}
             {loading && (
-              <div className="text-muted-foreground text-xs flex items-center gap-1">
+              <div className="text-muted-foreground text-sm flex items-center gap-1">
                 <Loader2 className="h-3 w-3 animate-spin" /> thinking…
               </div>
             )}

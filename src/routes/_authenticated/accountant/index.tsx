@@ -156,7 +156,7 @@ function AccountantDashboardPage() {
   return (
     <div className="mx-auto max-w-7xl p-4 md:p-8">
       <div className="space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">Accounting overview</h1>
+        <h1 className="font-display text-[1.75rem] font-bold leading-tight">Accounting overview</h1>
         <p className="text-muted-foreground">
           Live figures from the general ledger, invoices, and bills.
         </p>
@@ -175,7 +175,7 @@ function AccountantDashboardPage() {
             <Link key={card.title} to={card.to} className="rounded-lg border bg-card p-5 transition-colors hover:bg-accent">
               <div className="text-sm text-muted-foreground">{card.title}</div>
               <div className="mt-3 text-xl font-semibold">{card.value}</div>
-              <div className="mt-1 text-xs text-muted-foreground">{card.sub}</div>
+              <div className="mt-1 text-sm text-muted-foreground">{card.sub}</div>
             </Link>
           ))
         )}

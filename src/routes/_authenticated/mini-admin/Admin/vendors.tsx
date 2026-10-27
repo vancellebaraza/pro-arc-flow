@@ -146,7 +146,7 @@ function VendorManagementPage() {
     <div className="fade-in">
       <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="font-display text-2xl font-semibold">Vendor Management</h1>
+          <h1 className="font-display text-[1.75rem] font-bold leading-tight">Vendor Management</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Create, edit, and review vendors available for project assignments.
           </p>
@@ -162,7 +162,7 @@ function VendorManagementPage() {
       <section className="grid gap-5 lg:grid-cols-[1.2fr_1fr]">
         <div className="rounded-xl border bg-card p-5">
           <div className="flex items-center justify-between gap-3">
-            <h2 className="font-display text-lg font-semibold">Vendor details</h2>
+            <h2 className="font-display text-xl font-bold">Vendor details</h2>
             <Button size="sm" variant="outline" className="shrink-0" onClick={resetForm}>
               <Plus className="h-4 w-4 mr-1" /> New vendor
             </Button>
@@ -265,7 +265,7 @@ function VendorManagementPage() {
         </div>
 
         <div className="rounded-xl border bg-card p-5">
-          <h2 className="font-display text-lg font-semibold">Vendor list</h2>
+          <h2 className="font-display text-xl font-bold">Vendor list</h2>
           <p className="text-sm text-muted-foreground mt-1">
             Tap a vendor row to load it into the form.
           </p>

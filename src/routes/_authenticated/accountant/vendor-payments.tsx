@@ -206,7 +206,7 @@ function VendorPaymentsPage() {
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-6 p-4 md:p-8">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Vendor Payments</h1>
+        <h1 className="font-display text-[1.75rem] font-bold leading-tight">Vendor Payments</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Record payments to vendors against approved bills. Posts to the ledger immediately.
         </p>

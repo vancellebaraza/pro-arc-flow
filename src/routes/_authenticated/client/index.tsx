@@ -84,7 +84,7 @@ function ClientHome() {
     <div className="p-6 md:p-10 max-w-5xl mx-auto fade-in">
       <div className="flex items-end justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">My projects</h1>
+          <h1 className="font-display text-[1.75rem] font-bold leading-tight">My projects</h1>
           <p className="text-muted-foreground mt-1">
             Track requests, view inspections and approve quotations.
           </p>
@@ -125,7 +125,7 @@ function ClientHome() {
                     <div className={`absolute inset-y-0 left-0 w-[3px] ${colors.dot}`} />
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-sm text-muted-foreground">
                           {svc?.label ?? p.service}
                         </span>
                         <StatusChip status={p.status} />
@@ -134,7 +134,7 @@ function ClientHome() {
                       <div className="text-sm text-muted-foreground">
                         Client: {p.profiles?.full_name ?? "Unknown"}
                       </div>
-                      <div className="text-xs text-muted-foreground truncate">
+                      <div className="text-sm text-muted-foreground truncate">
                         Location:{p.location ?? "—"}
                       </div>
                     </div>

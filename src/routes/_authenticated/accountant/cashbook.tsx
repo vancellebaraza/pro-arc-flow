@@ -126,7 +126,7 @@ function CashbookPage() {
   return (
     <div className="mx-auto max-w-7xl p-4 md:p-8">
       <div className="space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">Cashbook</h1>
+        <h1 className="font-display text-[1.75rem] font-bold leading-tight">Cashbook</h1>
         <p className="text-muted-foreground">
           A running log of every payment received from clients and every payment made to vendors, in date order.
         </p>

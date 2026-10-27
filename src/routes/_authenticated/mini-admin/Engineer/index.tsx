@@ -259,7 +259,7 @@ function EngineerHome() {
     <div className="fade-in">
       <div className="flex items-end justify-between flex-wrap gap-4 mb-4">
         <div>
-          <h1 className="font-display text-2xl font-semibold">Engineer dashboard</h1>
+          <h1 className="font-display text-[1.75rem] font-bold leading-tight">Engineer dashboard</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Pick a project to open inspection, quotation, worksheet and more.
           </p>
@@ -301,7 +301,7 @@ function EngineerHome() {
                 <div className={`absolute inset-y-0 left-0 w-[3px] ${colors.dot}`} />
                 <div className="pointer-events-none relative z-10">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="text-xs text-muted-foreground">
+                    <span className="text-sm text-muted-foreground">
                       {svc?.label ?? p.service}
                     </span>
                     <div className="flex flex-wrap items-center gap-2">
@@ -333,7 +333,7 @@ function EngineerHome() {
       <section className="mb-4 rounded-xl border bg-card p-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <h2 className="text-lg font-semibold tracking-tight">My Staff To Do Row</h2>
+            <h2 className="font-display text-xl font-bold">My Staff To Do Row</h2>
             <p className="text-sm text-muted-foreground mt-1">
               Add your weekly activity row here. Admin will see these entries in Staff To Do.
             </p>
@@ -415,7 +415,7 @@ function EngineerHome() {
                           {todo ? (
                             <>
                               <div className="text-sm font-semibold">{todo.activity}</div>
-                              <div className="mt-1 text-xs text-muted-foreground">
+                              <div className="mt-1 text-sm text-muted-foreground">
                                 {todo.location ?? "No location"}
                               </div>
                               <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-white/80 px-2 py-1 text-xs font-semibold text-slate-700">

@@ -316,10 +316,10 @@ const [
 
       <div className="mt-4 flex items-start justify-between gap-4 flex-wrap">
         <div className="min-w-0">
-          <div className="text-xs text-muted-foreground">
+          <div className="text-sm text-muted-foreground">
             {svc?.label} · {STATUS_LABEL[project.status] ?? project.status}
           </div>
-          <h1 className="font-display text-2xl font-semibold mt-1 truncate">
+          <h1 className="font-display text-[1.75rem] font-bold leading-tight mt-1 truncate">
             {project.title}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">{project.location ?? "—"}</p>
@@ -359,7 +359,7 @@ const [
     <FileText className="mr-2 h-4 w-4" />
     Download Project Report
 </Button>
-      <h2 className="mt-5 text-lg font-semibold tracking-tight">Forms & tools</h2>
+      <h2 className="font-display text-xl font-bold mt-5">Forms & tools</h2>
       <p className="text-sm text-muted-foreground">
         Each form opens in its own page so you have room to work.
       </p>

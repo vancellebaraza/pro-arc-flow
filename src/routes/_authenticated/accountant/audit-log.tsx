@@ -120,7 +120,7 @@ function AuditLogPage() {
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-6 p-4 md:p-8">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Audit Log</h1>
+        <h1 className="font-display text-[1.75rem] font-bold leading-tight">Audit Log</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           A read-only record of who changed what, and when. Nothing here can be edited or deleted.
         </p>
@@ -145,7 +145,7 @@ function AuditLogPage() {
                       <span className="text-muted-foreground">on</span>{" "}
                       <span className="font-medium">{e.table_name}</span>
                     </div>
-                    <div className="text-xs text-muted-foreground">
+                    <div className="text-sm text-muted-foreground">
                       {e.changed_by_name} • {new Date(e.changed_at).toLocaleString()}
                     </div>
                   </div>

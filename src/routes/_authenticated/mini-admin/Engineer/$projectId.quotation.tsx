@@ -280,7 +280,7 @@ function QuotationPage() {
         <ArrowLeft className="h-4 w-4 mr-1" />
         Back to project
       </Link>
-      <h1 className="mt-3 font-display text-2xl font-semibold">Quotation</h1>
+      <h1 className="font-display text-[1.75rem] font-bold leading-tight mt-3">Quotation</h1>
       <p className="mt-1 text-sm text-muted-foreground">Project: {projectTitle}</p>
 
       <section className="mt-5 grid md:grid-cols-2 gap-4">
@@ -320,7 +320,7 @@ function QuotationPage() {
 
       <section className="mt-5">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold tracking-tight">Line Items</h2>
+          <h2 className="font-display text-xl font-bold">Line Items</h2>
           <Button
             variant="outline"
             size="sm"
@@ -509,7 +509,7 @@ function QuotationPage() {
             <strong>{grandTotal.toFixed(2)}</strong>
           </div>
 
-          <div className="text-xs text-muted-foreground capitalize">Status: {status}</div>
+          <div className="text-sm text-muted-foreground capitalize">Status: {status}</div>
         </div>
       </section>
 

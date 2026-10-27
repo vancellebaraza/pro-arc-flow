@@ -214,10 +214,10 @@ function ProjectViewerDetail() {
         </Link>
       </div>
       <div className="mt-4">
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <span>{svc?.label}</span>·<span>{STATUS_LABEL[project.status] ?? project.status}</span>
         </div>
-        <h1 className="text-2xl md:text-3xl font-semibold tracking-tight mt-1">{project.title}</h1>
+        <h1 className="font-display text-[1.75rem] font-bold leading-tight mt-1">{project.title}</h1>
         <p className="text-muted-foreground mt-1">{project.location}</p>
       </div>
 
@@ -242,7 +242,7 @@ function ProjectViewerDetail() {
       )}
 
       <section className="mt-10">
-        <h2 className="text-lg font-semibold tracking-tight">Inspection reports</h2>
+        <h2 className="font-display text-xl font-bold">Inspection reports</h2>
         {inspections.length === 0 ? (
           <p className="text-sm text-muted-foreground mt-2">No inspections yet.</p>
         ) : (
@@ -283,7 +283,7 @@ function ProjectViewerDetail() {
                   </div>
                 )}
                 {ins.signatures && Object.keys(ins.signatures).length > 0 && (
-                  <div className="mt-3 text-xs text-muted-foreground">
+                  <div className="mt-3 text-sm text-muted-foreground">
                     Signed by: {Object.entries(ins.signatures).map(([role, name]) => `${role}: ${name}`).join(", ")}
                   </div>
                 )}
@@ -295,7 +295,7 @@ function ProjectViewerDetail() {
 
       <section className="mt-10">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold tracking-tight">Job worksheet / report</h2>
+          <h2 className="font-display text-xl font-bold">Job worksheet / report</h2>
           {worksheet && (
             <Button variant="outline" size="sm" onClick={downloadWorksheet}>
               <FileDown className="h-4 w-4 mr-1" />
@@ -309,41 +309,41 @@ function ProjectViewerDetail() {
           <div className="mt-3 rounded-lg border bg-card p-4 space-y-4">
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
               <div>
-                <div className="text-xs text-muted-foreground">Job no.</div>
+                <div className="text-sm text-muted-foreground">Job no.</div>
                 <div>{worksheet.job_no || "—"}</div>
               </div>
               <div>
-                <div className="text-xs text-muted-foreground">Job date</div>
+                <div className="text-sm text-muted-foreground">Job date</div>
                 <div>{worksheet.job_date || "—"}</div>
               </div>
               <div>
-                <div className="text-xs text-muted-foreground">Job type</div>
+                <div className="text-sm text-muted-foreground">Job type</div>
                 <div>{worksheet.job_type || "—"}</div>
               </div>
               <div>
-                <div className="text-xs text-muted-foreground">Technician</div>
+                <div className="text-sm text-muted-foreground">Technician</div>
                 <div>{worksheet.technician || "—"}</div>
               </div>
               <div>
-                <div className="text-xs text-muted-foreground">Person in charge</div>
+                <div className="text-sm text-muted-foreground">Person in charge</div>
                 <div>{worksheet.person_in_charge || "—"}</div>
               </div>
               <div>
-                <div className="text-xs text-muted-foreground">Location</div>
+                <div className="text-sm text-muted-foreground">Location</div>
                 <div>{worksheet.job_location || "—"}</div>
               </div>
             </div>
 
             {worksheet.job_description && (
               <div>
-                <div className="text-xs text-muted-foreground mb-1">Description</div>
+                <div className="text-sm text-muted-foreground mb-1">Description</div>
                 <p className="text-sm leading-relaxed">{worksheet.job_description}</p>
               </div>
             )}
 
             {Array.isArray(worksheet.observations) && worksheet.observations.some((o) => o.observation) && (
               <div>
-                <div className="text-xs text-muted-foreground mb-2">Observations & actions taken</div>
+                <div className="text-sm text-muted-foreground mb-2">Observations & actions taken</div>
                 <ul className="text-sm space-y-2">
                   {worksheet.observations
                     .filter((o) => o.observation)
@@ -361,7 +361,7 @@ function ProjectViewerDetail() {
 
             {Array.isArray(worksheet.images_before) && worksheet.images_before.length > 0 && (
               <div>
-                <div className="text-xs text-muted-foreground mb-2">Photos</div>
+                <div className="text-sm text-muted-foreground mb-2">Photos</div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {worksheet.images_before.map((u, i) => (
                     <a
@@ -384,15 +384,15 @@ function ProjectViewerDetail() {
                 worksheet.signatures.client_name) && (
                 <div className="grid grid-cols-3 gap-3 text-sm border-t pt-3">
                   <div>
-                    <div className="text-xs text-muted-foreground">Technician</div>
+                    <div className="text-sm text-muted-foreground">Technician</div>
                     <div>{worksheet.signatures.technician_name || "—"}</div>
                   </div>
                   <div>
-                    <div className="text-xs text-muted-foreground">Supervisor</div>
+                    <div className="text-sm text-muted-foreground">Supervisor</div>
                     <div>{worksheet.signatures.supervisor_name || "—"}</div>
                   </div>
                   <div>
-                    <div className="text-xs text-muted-foreground">Client</div>
+                    <div className="text-sm text-muted-foreground">Client</div>
                     <div>{worksheet.signatures.client_name || "—"}</div>
                   </div>
                 </div>
@@ -403,7 +403,7 @@ function ProjectViewerDetail() {
 
       <section className="mt-10">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold tracking-tight">Quotation</h2>
+          <h2 className="font-display text-xl font-bold">Quotation</h2>
           {quote && (
             <Button variant="outline" size="sm" onClick={downloadPdf}>
               <FileDown className="h-4 w-4 mr-1" />
@@ -446,7 +446,7 @@ function ProjectViewerDetail() {
                 Grand total: <strong>{Number(quote.grand_total).toFixed(2)}</strong>
               </div>
             </div>
-            <div className="border-t p-3 text-xs text-muted-foreground text-right capitalize">
+            <div className="border-t p-3 text-sm text-muted-foreground text-right capitalize">
               Status: {quote.status}
             </div>
           </div>

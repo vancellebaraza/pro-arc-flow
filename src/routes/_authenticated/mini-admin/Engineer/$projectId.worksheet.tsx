@@ -250,7 +250,7 @@ function WorksheetPage() {
         <ArrowLeft className="h-4 w-4 mr-1" />
         Back to project
       </Link>
-      <h1 className="mt-3 font-display text-2xl font-semibold">
+      <h1 className="font-display text-[1.75rem] font-bold leading-tight mt-3">
         FusionPro Limited Worksheet
       </h1>
       <p className="mt-1 text-sm text-muted-foreground">Document 2 — site assessment & sign-off.</p>
@@ -298,7 +298,7 @@ function WorksheetPage() {
       <section className="mt-5 rounded-xl border bg-card p-5">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <h2 className="text-lg font-semibold tracking-tight">Assign Vendor</h2>
+            <h2 className="font-display text-xl font-bold">Assign Vendor</h2>
             <p className="text-sm text-muted-foreground mt-1">
               Search vendors and request approval from admin for this project.
             </p>
@@ -408,7 +408,7 @@ function WorksheetPage() {
 
       <section className="mt-5">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold tracking-tight">Site Visit & Scope Assessment</h2>
+          <h2 className="font-display text-xl font-bold">Site Visit & Scope Assessment</h2>
           <Button
             variant="outline"
             size="sm"
@@ -470,7 +470,7 @@ function WorksheetPage() {
       </section>
 
       <section className="mt-5">
-        <h2 className="text-lg font-semibold tracking-tight">Images Before</h2>
+        <h2 className="font-display text-xl font-bold">Images Before</h2>
         <label className="mt-3 flex items-center justify-center rounded-md border border-dashed bg-surface px-4 py-6 text-sm text-muted-foreground cursor-pointer hover:bg-accent transition">
           <UploadCloud className="h-4 w-4 mr-2" /> Click to upload before-images
           <input
@@ -504,7 +504,7 @@ function WorksheetPage() {
       </section>
 
       <section className="mt-5">
-        <h2 className="text-lg font-semibold tracking-tight">Signatures</h2>
+        <h2 className="font-display text-xl font-bold">Signatures</h2>
         <div className="mt-3 grid md:grid-cols-3 gap-4">
           <div className="rounded-lg border p-4 bg-card">
             <Label>Technician Signature (Name)</Label>

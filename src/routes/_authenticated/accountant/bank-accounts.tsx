@@ -199,7 +199,7 @@ function BankAccountsPage() {
     <div className="mx-auto max-w-7xl p-4 md:p-8">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">Bank Accounts</h1>
+          <h1 className="font-display text-[1.75rem] font-bold leading-tight">Bank Accounts</h1>
           <p className="mt-1 text-muted-foreground">
             Set up bank accounts linked to your ledger, ready for statement import and reconciliation.
           </p>

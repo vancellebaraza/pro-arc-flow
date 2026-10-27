@@ -231,7 +231,7 @@ function AuthedLayout() {
                     >
                       <div className="text-sm font-medium">{notification.title}</div>
                       {notification.body && (
-                        <div className="text-xs text-muted-foreground">{notification.body}</div>
+                        <div className="text-sm text-muted-foreground">{notification.body}</div>
                       )}
                     </DropdownMenuItem>
                   ))

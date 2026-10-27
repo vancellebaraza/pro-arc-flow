@@ -165,7 +165,7 @@ function AuthPage() {
           <Logo className="h-29 w-auto" />
         </Link>
         <div>
-          <h1 className="text-3xl font-semibold tracking-tight max-w-md leading-tight">
+          <h1 className="font-display text-[1.75rem] font-bold leading-tight max-w-md">
             FusionPro Limited property operations, unified.
           </h1>
           <p className="mt-3 text-muted-foreground max-w-md">
@@ -173,7 +173,7 @@ function AuthPage() {
             place.
           </p>
         </div>
-        <p className="text-xs text-muted-foreground">
+        <p className="text-sm text-muted-foreground">
           © {new Date().getFullYear()} FusionPro Limited
         </p>
       </div>
@@ -206,7 +206,7 @@ function AuthPage() {
                     setResetMode((v) => !v);
                     setResetSent(false);
                   }}
-                  className="block text-xs text-muted-foreground hover:underline"
+                  className="block text-sm text-muted-foreground hover:underline"
                 >
                   Forgot password?
                 </button>
@@ -235,7 +235,7 @@ function AuthPage() {
               )}
             </TabsContent>
             <TabsContent value="signup">
-              <p className="mt-4 text-xs text-muted-foreground leading-relaxed">
+              <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
                 New accounts are automatically set up as <strong>client portals</strong>. Engineer
                 and admin access is reserved.
               </p>
@@ -263,7 +263,7 @@ function AuthPage() {
               </form>
             </TabsContent>
           </Tabs>
-          <p className="mt-6 text-xs text-muted-foreground text-center">
+          <p className="mt-6 text-sm text-muted-foreground text-center">
             <Link to="/" className="hover:underline">
               ← Back to home
             </Link>

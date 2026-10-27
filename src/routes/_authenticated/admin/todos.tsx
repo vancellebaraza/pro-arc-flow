@@ -319,7 +319,7 @@ setEngineers(profiles as StaffMember[]);
     <div className="p-4 md:p-8 fade-in max-w-7xl mx-auto">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Staff To Do List</h1>
+          <h1 className="font-display text-[1.75rem] font-bold leading-tight">Staff To Do List</h1>
           <p className="text-muted-foreground mt-1">
             Track field staff activities by date. Only admins can view and manage these entries.
           </p>
@@ -333,7 +333,7 @@ setEngineers(profiles as StaffMember[]);
         <div className="rounded-xl border bg-card p-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="text-lg font-semibold tracking-tight">Week view</h2>
+              <h2 className="font-display text-xl font-bold">Week view</h2>
               <p className="text-sm text-muted-foreground mt-1">
                 Use the controls to move between weeks and edit tasks for each staff member.
               </p>
@@ -356,12 +356,12 @@ setEngineers(profiles as StaffMember[]);
 
         <div className="rounded-xl border bg-card p-5 grid gap-3 sm:grid-cols-2">
           <div className="rounded-xl border border-emerald-200 bg-emerald-500/10 p-4">
-            <div className="text-xs text-muted-foreground">Done</div>
-            <div className="mt-1 text-3xl font-semibold text-emerald-900">{doneCount}</div>
+            <div className="text-sm text-muted-foreground">Done</div>
+            <div className="mt-1 text-[2rem] font-bold leading-tight text-emerald-900">{doneCount}</div>
           </div>
           <div className="rounded-xl border border-rose-200 bg-rose-500/10 p-4">
-            <div className="text-xs text-muted-foreground">Not done</div>
-            <div className="mt-1 text-3xl font-semibold text-rose-900">{notDoneCount}</div>
+            <div className="text-sm text-muted-foreground">Not done</div>
+            <div className="mt-1 text-[2rem] font-bold leading-tight text-rose-900">{notDoneCount}</div>
           </div>
         </div>
       </div>
@@ -369,7 +369,7 @@ setEngineers(profiles as StaffMember[]);
       {/* <section className="mt-6 rounded-xl border bg-card p-5">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <h2 className="text-lg font-semibold tracking-tight">Add staff row</h2>
+            <h2 className="font-display text-xl font-bold">Add staff row</h2>
             <p className="text-sm text-muted-foreground mt-1">
               Select an engineer to include in the grid for this week.
             </p>
@@ -464,7 +464,7 @@ setEngineers(profiles as StaffMember[]);
     <section className="mt-6 rounded-xl border bg-card p-5">
   <div className="flex items-center gap-3 mb-4">
     <Calendar className="h-5 w-5" />
-    <h2 className="text-lg font-semibold">
+    <h2 className="font-display text-xl font-bold">
       Daily Calendar
     </h2>
   </div>

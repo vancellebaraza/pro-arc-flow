@@ -474,7 +474,7 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
   return (
     <section className="mt-5">
       <div className="flex items-center justify-between mb-3 gap-3 flex-wrap">
-        <h2 className="font-display text-lg font-semibold">Work Data Sheet</h2>
+        <h2 className="font-display text-xl font-bold">Work Data Sheet</h2>
         <div className="flex flex-wrap items-center gap-2">
           <Input
             value={projectSearch}
@@ -524,13 +524,13 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
         </div>
       </div>
       <div className="max-h-[calc(100vh-14rem)] min-h-[320px] overflow-auto rounded-2xl border bg-card">
-        <table className="w-full min-w-[2912px] table-fixed border-separate border-spacing-0 text-sm">
+        <table className="w-full min-w-[3424px] table-fixed border-separate border-spacing-0 text-[15px]">
           <colgroup>
             <col style={{ width: 56 }} />
-            <col style={{ width: 110 }} />
             <col style={{ width: 120 }} />
-            <col style={{ width: 240 }} />
-            <col style={{ width: 180 }} />
+            <col style={{ width: 132 }} />
+            <col style={{ width: 320 }} />
+            <col style={{ width: 250 }} />
             <col style={{ width: 160 }} />
             <col style={{ width: 128 }} />
             <col style={{ width: 128 }} />
@@ -543,14 +543,14 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
             <col style={{ width: 128 }} />
             <col style={{ width: 128 }} />
             <col style={{ width: 96 }} />
-            <col style={{ width: 130 }} />
+            <col style={{ width: 150 }} />
             <col style={{ width: 220 }} />
-            <col style={{ width: 150 }} />
-            <col style={{ width: 150 }} />
+            <col style={{ width: 210 }} />
+            <col style={{ width: 210 }} />
             <col style={{ width: 168 }} />
           </colgroup>
           <thead>
-            <tr className="h-10 text-[13px]">
+            <tr className="h-10 text-sm">
               <th
                 colSpan={6}
                 className="sticky top-0 z-20 whitespace-nowrap border-b bg-[var(--accent)] px-3 text-left font-semibold text-foreground"
@@ -576,7 +576,7 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
                 Work done / date
               </th>
             </tr>
-            <tr className="h-11 text-[13px]">
+            <tr className="h-11 text-sm">
               <th className="sticky left-0 top-10 z-30 whitespace-nowrap border-b bg-card px-3 text-left font-semibold text-foreground">
                 No.
               </th>
@@ -652,7 +652,7 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
                     onChange={(e) => setCommentFilter(e.target.value)}
                     placeholder="Filter comments"
                     aria-label="Filter comments"
-                    className="mb-1 h-7 min-w-[140px] text-[13px] font-normal"
+                    className="mb-1 h-8 min-w-[140px] text-sm font-normal"
                   />
                 )}
               </th>
@@ -800,7 +800,7 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
                         onClick={() => openVendorDialog(r)}
                         title="Vendor cost"
                       >
-                        <span className="text-[13px] font-semibold">KES</span>
+                        <span className="text-sm font-semibold">KES</span>
                       </Button>
                       <Button
                         size="sm"
@@ -969,7 +969,7 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
           </DialogHeader>
           <div className="space-y-3">
             <div>
-              <label className="text-xs text-muted-foreground">Vendor</label>
+              <label className="text-sm text-muted-foreground">Vendor</label>
               <select
                 value={vendorPickId}
                 onChange={(e) => setVendorPickId(e.target.value)}
@@ -984,7 +984,7 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
               </select>
             </div>
             <div>
-              <label className="text-xs text-muted-foreground">Amount quoted by vendor</label>
+              <label className="text-sm text-muted-foreground">Amount quoted by vendor</label>
               <Input
                 type="number"
                 value={vendorQuotedInput}
@@ -992,7 +992,7 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
               />
             </div>
             <div>
-              <label className="text-xs text-muted-foreground">
+              <label className="text-sm text-muted-foreground">
                 Amount payable (final agreed amount)
               </label>
               <Input
@@ -1003,7 +1003,7 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
               />
             </div>
             <div>
-              <label className="text-xs text-muted-foreground">Amount already paid to vendor</label>
+              <label className="text-sm text-muted-foreground">Amount already paid to vendor</label>
               <Input
                 type="number"
                 value={vendorPaidInput}

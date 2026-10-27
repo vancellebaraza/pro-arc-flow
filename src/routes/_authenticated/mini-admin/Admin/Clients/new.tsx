@@ -64,7 +64,7 @@ function NewRequest() {
 
   return (
     <div className="max-w-2xl fade-in">
-      <h1 className="font-display text-2xl font-semibold">New service request</h1>
+      <h1 className="font-display text-[1.75rem] font-bold leading-tight">New service request</h1>
       <p className="mt-1 text-sm text-muted-foreground">
         Tell us what you need. An engineer will follow up shortly.
       </p>

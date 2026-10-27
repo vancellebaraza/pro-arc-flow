@@ -137,7 +137,7 @@ function AccountantLayout() {
   return (
     <div className="flex min-h-screen bg-background">
       <div className="fixed left-0 right-0 top-0 z-50 flex h-16 items-center justify-between border-b bg-card px-4 md:hidden">
-        <h1 className="text-lg font-bold">Accountant</h1>
+        <h1 className="font-display text-[1.75rem] font-bold leading-tight">Accountant</h1>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -173,7 +173,7 @@ function AccountantLayout() {
 
       <aside className="hidden w-20 flex-col border-r bg-card shadow-sm transition-all duration-300 md:flex lg:w-64">
         <div className="flex h-16 items-center border-b px-6">
-          <h1 className="hidden text-xl font-bold lg:block">Accountant</h1>
+          <h1 className="font-display text-[1.75rem] font-bold leading-tight hidden lg:block">Accountant</h1>
         </div>
 
         <nav className="flex-1 space-y-2 p-4">

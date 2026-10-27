@@ -146,7 +146,7 @@ function ProjectViewersPage() {
   return (
     <div className="fade-in">
       <div>
-        <h1 className="font-display text-2xl font-semibold flex items-center gap-2">
+        <h1 className="font-display text-[1.75rem] font-bold leading-tight flex items-center gap-2">
           <Eye className="h-6 w-6" />
           Project Viewers
         </h1>
@@ -208,7 +208,7 @@ function ProjectViewersPage() {
       </section>
 
       <section className="mt-5">
-        <h2 className="text-lg font-semibold tracking-tight">Existing viewers</h2>
+        <h2 className="font-display text-xl font-bold">Existing viewers</h2>
         {loading ? (
           <p className="text-sm text-muted-foreground mt-2">Loading…</p>
         ) : loadError ? (
@@ -224,7 +224,7 @@ function ProjectViewersPage() {
                   <div className="flex items-start justify-between">
                     <div>
                       <div className="font-medium">{v.full_name || v.email}</div>
-                      <div className="text-xs text-muted-foreground">
+                      <div className="text-sm text-muted-foreground">
                         {v.email} {v.phone && `· ${v.phone}`}
                       </div>
                     </div>
@@ -238,7 +238,7 @@ function ProjectViewersPage() {
                     </Button>
                   </div>
                   <div className="mt-3 text-sm">
-                    <div className="text-xs text-muted-foreground mb-2">
+                    <div className="text-sm text-muted-foreground mb-2">
                       Assigned projects
                     </div>
                     <div className="grid sm:grid-cols-2 gap-1">

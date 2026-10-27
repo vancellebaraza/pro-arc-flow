@@ -173,7 +173,7 @@ function AccountsPage() {
     <div className="mx-auto max-w-7xl p-4 md:p-8">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">Chart of Accounts</h1>
+          <h1 className="font-display text-[1.75rem] font-bold leading-tight">Chart of Accounts</h1>
           <p className="mt-1 text-muted-foreground">
             Manage accounts, assign parent accounts where relevant, and toggle active status without deleting records.
           </p>
@@ -194,7 +194,7 @@ function AccountsPage() {
             return (
               <section key={type} className="rounded-lg border bg-card p-4">
                 <div className="mb-4 flex items-center gap-2">
-                  <h2 className="text-lg font-semibold capitalize">{accountTypeLabels[type] ?? type}</h2>
+                  <h2 className="font-display text-xl font-bold capitalize">{accountTypeLabels[type] ?? type}</h2>
                   <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
                     {groupAccounts.length}
                   </span>

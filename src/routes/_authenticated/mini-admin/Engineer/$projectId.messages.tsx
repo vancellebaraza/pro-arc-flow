@@ -87,7 +87,7 @@ function MessagesPage() {
       </Link>
       <div className="mt-3 flex items-end justify-between flex-wrap gap-2">
         <div>
-          <h1 className="font-display text-2xl font-semibold">Communication</h1>
+          <h1 className="font-display text-[1.75rem] font-bold leading-tight">Communication</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Internal messages and WhatsApp launcher (logged).
           </p>
@@ -106,7 +106,7 @@ function MessagesPage() {
         ) : (
           messages.map((m) => (
             <div key={m.id} className="rounded-lg border bg-card p-3">
-              <div className="text-xs text-muted-foreground">
+              <div className="text-sm text-muted-foreground">
                 {new Date(m.created_at).toLocaleString()}
               </div>
               <div className="mt-1 text-sm whitespace-pre-wrap">{m.body}</div>

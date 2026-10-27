@@ -61,7 +61,7 @@ function EngineerHome() {
     <div className="p-4 md:p-8 fade-in">
       <div className="flex items-end justify-between flex-wrap gap-4 mb-4">
         <div>
-          <h1 className="font-display text-2xl font-semibold">Engineer dashboard</h1>
+          <h1 className="font-display text-[1.75rem] font-bold leading-tight">Engineer dashboard</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Pick a project to open inspection, quotation, worksheet and more.
           </p>
@@ -97,7 +97,7 @@ function EngineerHome() {
                 >
                   <div className={`absolute inset-y-0 left-0 w-[3px] ${colors.dot}`} />
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="text-xs text-muted-foreground">
+                    <span className="text-sm text-muted-foreground">
                       {svc?.label ?? p.service}
                     </span>
                     <StatusChip status={p.status} />

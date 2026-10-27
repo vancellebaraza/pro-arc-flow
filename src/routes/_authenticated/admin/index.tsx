@@ -487,7 +487,7 @@ function AdminHome() {
     <div className="p-4 md:p-8 fade-in">
       <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Admin overview</h1>
+          <h1 className="font-display text-[1.75rem] font-bold leading-tight">Admin overview</h1>
           <p className="text-muted-foreground mt-1">
             Approve quotations, manage vendors, schedule work, export reports.
           </p>
@@ -567,8 +567,8 @@ function AdminHome() {
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         {[{ label: "Total projects", value: rows.length }].map((s) => (
           <div key={s.label} className="rounded-xl border bg-card p-5">
-            <div className="text-xs text-muted-foreground">{s.label}</div>
-            <div className="mt-1 text-3xl font-semibold">{s.value}</div>
+            <div className="text-sm text-muted-foreground">{s.label}</div>
+            <div className="mt-1 text-[2rem] font-bold leading-tight">{s.value}</div>
           </div>
         ))}
         <ProjectCommentSummary projects={rows} />
@@ -576,7 +576,7 @@ function AdminHome() {
 
       {pendingQuotes.length > 0 && (
         <section className="mt-8">
-          <h2 className="text-lg font-semibold tracking-tight">Quotations pending approval</h2>
+          <h2 className="font-display text-xl font-bold">Quotations pending approval</h2>
           <ul className="mt-3 rounded-xl border bg-card divide-y">
             {pendingQuotes.map((q) => (
               <li key={q.id} className="flex items-center justify-between gap-4 p-4">
@@ -608,7 +608,7 @@ function AdminHome() {
         <section className="mt-8">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <h2 className="text-lg font-semibold tracking-tight">
+              <h2 className="font-display text-xl font-bold">
                 Vendor assignments pending approval
               </h2>
               <p className="text-sm text-muted-foreground mt-1">

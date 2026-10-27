@@ -243,7 +243,7 @@ function ReconcilePage() {
   return (
     <div className="mx-auto max-w-7xl p-4 md:p-8">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">Reconcile</h1>
+        <h1 className="font-display text-[1.75rem] font-bold leading-tight">Reconcile</h1>
         <p className="mt-1 text-muted-foreground">
           Match imported bank transactions against ledger entries for the same account.
         </p>

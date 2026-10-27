@@ -174,10 +174,10 @@ function ProjectDetail() {
       </Link>
       <div className="mt-4 flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <span>{svc?.label}</span>·<span>{STATUS_LABEL[project.status] ?? project.status}</span>
           </div>
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight mt-1">
+          <h1 className="font-display text-[1.75rem] font-bold leading-tight mt-1">
             {project.title}
           </h1>
           <p className="text-muted-foreground mt-1">{project.location}</p>
@@ -211,7 +211,7 @@ function ProjectDetail() {
       )}
 
       <section className="mt-10">
-        <h2 className="text-lg font-semibold tracking-tight">Inspection reports</h2>
+        <h2 className="font-display text-xl font-bold">Inspection reports</h2>
         {inspections.length === 0 ? (
           <p className="text-sm text-muted-foreground mt-2">No inspections yet.</p>
         ) : (
@@ -246,7 +246,7 @@ function ProjectDetail() {
 
       <section className="mt-10">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold tracking-tight">Quotation</h2>
+          <h2 className="font-display text-xl font-bold">Quotation</h2>
           {quote && (
             <Button variant="outline" size="sm" onClick={downloadPdf}>
               <FileDown className="h-4 w-4 mr-1" />
@@ -302,7 +302,7 @@ function ProjectDetail() {
               </div>
             )}
             {quote.status !== "sent" && (
-              <div className="border-t p-3 text-xs text-muted-foreground text-right capitalize">
+              <div className="border-t p-3 text-sm text-muted-foreground text-right capitalize">
                 Status: {quote.status}
               </div>
             )}

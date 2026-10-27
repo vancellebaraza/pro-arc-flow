@@ -349,7 +349,7 @@ function AdminAnalysisPage() {
     <div className="p-4 md:p-8 fade-in max-w-7xl mx-auto">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Analysis</h1>
+          <h1 className="font-display text-[1.75rem] font-bold leading-tight">Analysis</h1>
           <p className="text-muted-foreground mt-1">
             Track operational volume, revenue, vendor costs, and service performance.
           </p>
@@ -382,7 +382,7 @@ function AdminAnalysisPage() {
                 </div>
                 <div className={`h-10 w-[3px] rounded-full ${colors.dot}`} />
               </div>
-              <div className="mt-3 text-2xl font-semibold">{loading ? "..." : category.count}</div>
+              <div className="mt-3 text-[2rem] font-bold leading-tight">{loading ? "..." : category.count}</div>
             </button>
           );
         })}
@@ -504,7 +504,7 @@ function AdminAnalysisPage() {
               <div className="text-sm text-muted-foreground">{metric.label}</div>
               <metric.icon className="h-4 w-4 text-muted-foreground" />
             </div>
-            <div className="mt-1 text-2xl font-semibold">{loading ? "..." : metric.value}</div>
+            <div className="mt-1 text-[2rem] font-bold leading-tight">{loading ? "..." : metric.value}</div>
           </div>
         ))}
       </div>
@@ -517,14 +517,14 @@ function AdminAnalysisPage() {
         ].map((metric) => (
           <div key={metric.label} className="rounded-lg border bg-card p-5">
             <div className="text-sm text-muted-foreground">{metric.label}</div>
-            <div className="mt-1 text-2xl font-semibold">{loading ? "..." : metric.value}</div>
+            <div className="mt-1 text-[2rem] font-bold leading-tight">{loading ? "..." : metric.value}</div>
           </div>
         ))}
       </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_1.2fr]">
         <section className="rounded-lg border bg-card p-5">
-          <h2 className="text-lg font-semibold tracking-tight">Project status</h2>
+          <h2 className="font-display text-xl font-bold">Project status</h2>
           <div className="mt-5 space-y-4">
             {analysis.statusCounts.length === 0 && (
               <div className="text-sm text-muted-foreground">No project data available.</div>
@@ -548,7 +548,7 @@ function AdminAnalysisPage() {
         <section className="mt-8 rounded-lg border bg-card p-5 h-[420px] flex flex-col">
   <div className="flex items-center gap-2">
     <BarChart3 className="h-5 w-5 text-muted-foreground" />
-    <h2 className="text-lg font-semibold">
+    <h2 className="font-display text-xl font-bold">
       Most Visited Work Locations
     </h2>
   </div>
@@ -583,7 +583,7 @@ function AdminAnalysisPage() {
         </section>
 
         <section className="rounded-lg border bg-card p-5 lg:col-span-2">
-          <h2 className="text-lg font-semibold tracking-tight">New projects by month</h2>
+          <h2 className="font-display text-xl font-bold">New projects by month</h2>
           <div className="mt-6 flex h-56 items-end gap-3">
             {analysis.monthCounts.map((month) => (
               <div key={month.label} className="flex min-w-0 flex-1 flex-col items-center gap-2">
@@ -594,7 +594,7 @@ function AdminAnalysisPage() {
                     style={{ height: `${Math.max(5, (month.count / maxMonthCount) * 100)}%` }}
                   />
                 </div>
-                <div className="w-full truncate text-center text-xs text-muted-foreground">
+                <div className="w-full truncate text-center text-sm text-muted-foreground">
                   {month.label}
                 </div>
               </div>
@@ -606,7 +606,7 @@ function AdminAnalysisPage() {
       <section className="mt-8 rounded-lg border bg-card p-5">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>
-            <h2 className="text-lg font-semibold tracking-tight">Project Gantt chart</h2>
+            <h2 className="font-display text-xl font-bold">Project Gantt chart</h2>
             <p className="text-sm text-muted-foreground mt-1">
               Latest active project timelines from request date to scheduled or planning date.
             </p>
@@ -618,7 +618,7 @@ function AdminAnalysisPage() {
 
         <div className="mt-5 overflow-x-auto">
           <div className="min-w-[760px]">
-            <div className="grid grid-cols-[220px_1fr] gap-4 border-b pb-2 text-xs text-muted-foreground">
+            <div className="grid grid-cols-[220px_1fr] gap-4 border-b pb-2 text-sm text-muted-foreground">
               <div>Project</div>
               <div className="grid grid-cols-5">
                 {analysis.ganttTicks.map((tick) => (
@@ -642,7 +642,7 @@ function AdminAnalysisPage() {
                   <div key={project.id} className="grid grid-cols-[220px_1fr] gap-4 py-3">
                     <div className="min-w-0">
                       <div className="truncate text-sm font-medium">{project.title}</div>
-                      <div className="text-xs text-muted-foreground">
+                      <div className="text-sm text-muted-foreground">
                         {STATUS_LABEL[project.status] ?? project.status}
                       </div>
                     </div>
@@ -679,10 +679,10 @@ function AdminAnalysisPage() {
       </section>
 
       <section className="mt-8 rounded-lg border bg-card p-5">
-        <h2 className="text-lg font-semibold tracking-tight">Service Gantt chart</h2>
+        <h2 className="font-display text-xl font-bold">Service Gantt chart</h2>
         <div className="mt-5 overflow-x-auto">
           <div className="min-w-[760px]">
-            <div className="grid grid-cols-[220px_1fr] gap-4 border-b pb-2 text-xs text-muted-foreground">
+            <div className="grid grid-cols-[220px_1fr] gap-4 border-b pb-2 text-sm text-muted-foreground">
               <div>Service</div>
               <div className="grid grid-cols-5">
                 {analysis.ganttTicks.map((tick) => (
@@ -706,7 +706,7 @@ function AdminAnalysisPage() {
                   <div key={service.key} className="grid grid-cols-[220px_1fr] gap-4 py-3">
                     <div className="min-w-0">
                       <div className="truncate text-sm font-medium">{service.label}</div>
-                      <div className="text-xs text-muted-foreground">
+                      <div className="text-sm text-muted-foreground">
                         {service.count} project{service.count === 1 ? "" : "s"}
                       </div>
                     </div>
@@ -740,7 +740,7 @@ function AdminAnalysisPage() {
       <section className="mt-8 rounded-lg border bg-card p-5">
         <div className="flex items-center gap-2">
           <BriefcaseBusiness className="h-5 w-5 text-muted-foreground" />
-          <h2 className="text-lg font-semibold tracking-tight">Service performance</h2>
+          <h2 className="font-display text-xl font-bold">Service performance</h2>
         </div>
         <div className="mt-4 overflow-x-auto">
           <Table>
@@ -776,7 +776,7 @@ function AdminAnalysisPage() {
       </section>
 
       <section className="mt-8 rounded-lg border bg-card p-5">
-        <h2 className="text-lg font-semibold tracking-tight">Highest quoted projects</h2>
+        <h2 className="font-display text-xl font-bold">Highest quoted projects</h2>
         <div className="mt-4 overflow-x-auto">
           <Table>
             <TableHeader>

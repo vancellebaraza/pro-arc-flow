@@ -256,7 +256,7 @@ function JournalPage() {
     <div className="p-4 md:p-8 fade-in">
       <div className="flex items-end justify-between flex-wrap gap-4 mb-6">
         <div>
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Journal</h1>
+          <h1 className="font-display text-[1.75rem] font-bold leading-tight">Journal</h1>
           <p className="text-muted-foreground mt-1">
             Every double-entry posting to the general ledger, most recent first. Click an entry to
             see its debit and credit lines.
@@ -345,7 +345,7 @@ function JournalPage() {
                         <td colSpan={7} className="p-0">
                           <table className="w-full text-sm">
                             <thead>
-                              <tr className="text-xs text-muted-foreground">
+                              <tr className="text-sm text-muted-foreground">
                                 <th className="p-2 pl-12 text-left font-normal">Account</th>
                                 <th className="p-2 text-left font-normal">Memo</th>
                                 <th className="p-2 text-right font-normal">Debit</th>

@@ -157,7 +157,7 @@ if (uploadError) throw uploadError;
     <div className="p-4 md:p-8 fade-in max-w-6xl mx-auto">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Vendor Management</h1>
+          <h1 className="font-display text-[1.75rem] font-bold leading-tight">Vendor Management</h1>
           <p className="text-muted-foreground mt-1">
             Create, edit, and review vendors available for project assignments.
           </p>
@@ -174,7 +174,7 @@ if (uploadError) throw uploadError;
         <div className="rounded-xl border bg-card p-5">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <h2 className="text-lg font-semibold tracking-tight">Vendor details</h2>
+              <h2 className="font-display text-xl font-bold">Vendor details</h2>
               <p className="text-sm text-muted-foreground mt-1">
                 Required fields are Vendor Name, Contact Person, Telephone, and Category of Works.
               </p>
@@ -284,7 +284,7 @@ if (uploadError) throw uploadError;
     }}
   />
 
-  <p className="mt-1 text-xs text-muted-foreground">
+  <p className="mt-1 text-sm text-muted-foreground">
     Accepted formats: PDF, DOC, DOCX
   </p>
 </div>
@@ -298,7 +298,7 @@ if (uploadError) throw uploadError;
         </div>
 
         <div className="rounded-xl border bg-card p-5">
-          <h2 className="text-lg font-semibold tracking-tight">Vendor list</h2>
+          <h2 className="font-display text-xl font-bold">Vendor list</h2>
           <p className="text-sm text-muted-foreground mt-1">
             Tap a vendor row to load it into the form.
           </p>

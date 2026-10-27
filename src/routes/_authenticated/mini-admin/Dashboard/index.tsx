@@ -421,7 +421,7 @@ function AdminHome() {
     <div className="fade-in space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-2xl font-semibold">Admin overview</h1>
+          <h1 className="font-display text-[1.75rem] font-bold leading-tight">Admin overview</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Manage vendors, schedule work, and export reports.
           </p>
@@ -501,8 +501,8 @@ function AdminHome() {
       <div className="grid gap-5 md:grid-cols-2">
         {[{ label: "Total projects", value: rows.length }].map((s) => (
           <div key={s.label} className="rounded-xl border bg-card p-5">
-            <div className="text-xs text-muted-foreground">{s.label}</div>
-            <div className="font-display mt-1 text-3xl font-semibold">{s.value}</div>
+            <div className="text-sm text-muted-foreground">{s.label}</div>
+            <div className="font-display mt-1 text-[2rem] font-bold leading-tight">{s.value}</div>
           </div>
         ))}
         <ProjectCommentSummary projects={rows} />
@@ -510,7 +510,7 @@ function AdminHome() {
 
       {pendingQuotes.length > 0 && (
         <section className="mt-5">
-          <h2 className="font-display text-lg font-semibold">Quotations pending approval</h2>
+          <h2 className="font-display text-xl font-bold">Quotations pending approval</h2>
           <ul className="mt-3 divide-y rounded-xl border bg-card">
             {pendingQuotes.map((quotation) => (
               <li key={quotation.id} className="flex items-center justify-between gap-4 px-4 py-3">

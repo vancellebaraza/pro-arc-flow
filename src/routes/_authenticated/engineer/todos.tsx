@@ -168,7 +168,7 @@ function EngineerTodos() {
   return (
     <div className="p-4 md:p-8 fade-in">
       <div className="mb-6">
-        <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">To Do List</h1>
+        <h1 className="font-display text-[1.75rem] font-bold leading-tight">To Do List</h1>
         <p className="text-muted-foreground mt-1">
           Add your weekly activity row here. Admin will see these entries in Staff To Do.
         </p>
@@ -256,7 +256,7 @@ function EngineerTodos() {
                           {todo ? (
                             <>
                               <div className="text-sm font-semibold">{todo.activity}</div>
-                              <div className="mt-1 text-xs text-muted-foreground">
+                              <div className="mt-1 text-sm text-muted-foreground">
                                 {todo.location ?? "No location"}
                               </div>
                               <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-white/80 px-2 py-1 text-xs font-semibold text-slate-700">

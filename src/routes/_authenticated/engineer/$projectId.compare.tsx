@@ -71,7 +71,7 @@ function ComparePage() {
         <ArrowLeft className="h-4 w-4 mr-1" />
         Back to project
       </Link>
-      <h1 className="mt-3 text-2xl md:text-3xl font-semibold tracking-tight">Quoted vs Actual</h1>
+      <h1 className="font-display text-[1.75rem] font-bold leading-tight mt-3">Quoted vs Actual</h1>
       <p className="text-muted-foreground mt-1">Update actual costs as work progresses.</p>
 
       {loading ? (

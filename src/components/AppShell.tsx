@@ -130,7 +130,7 @@ export function AppShell({
       <div className="fixed inset-x-3 top-3 z-50 flex h-14 items-center justify-between rounded-2xl border bg-card pl-4 pr-2 shadow-[var(--shadow-card)] md:hidden">
         <div className="flex items-center gap-3">
           <Logo className="h-7 w-auto" />
-          <h1 className="font-display text-base font-semibold">{title}</h1>
+          <h1 className="font-display text-[1.75rem] font-bold leading-tight text-base">{title}</h1>
         </div>
 
         <DropdownMenu>

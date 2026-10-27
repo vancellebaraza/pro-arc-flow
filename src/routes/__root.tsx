@@ -18,8 +18,8 @@ function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold">404</h1>
-        <h2 className="mt-4 text-xl font-semibold">Page not found</h2>
+        <h1 className="font-display text-[1.75rem] font-bold leading-tight text-7xl">404</h1>
+        <h2 className="font-display text-xl font-bold mt-4">Page not found</h2>
         <p className="mt-2 text-sm text-muted-foreground">This page doesn't exist.</p>
         <div className="mt-6">
           <Link
@@ -43,7 +43,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight">Something went wrong</h1>
+        <h1 className="font-display text-[1.75rem] font-bold leading-tight">Something went wrong</h1>
         <p className="mt-2 text-sm text-muted-foreground">Please try again.</p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
@@ -112,13 +112,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       // so the font stylesheets do not block first render.
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
-        media: "print",
-        "data-font-swap": "",
-      },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap",
         media: "print",
         "data-font-swap": "",
       },

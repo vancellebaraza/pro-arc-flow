@@ -167,7 +167,7 @@ function SidePicker({
     <div>
       <div className="flex items-center justify-between">
         <Label className="text-sm font-medium">{label} photos or videos</Label>
-        <span className="text-xs text-muted-foreground">
+        <span className="text-sm text-muted-foreground">
           {files.length}/{MAX_PER_SIDE}
         </span>
       </div>
@@ -191,7 +191,7 @@ function SidePicker({
         >
           <UploadCloud className="h-6 w-6 text-muted-foreground" />
           <p className="text-sm font-medium">Drag photos or videos here, or click to browse</p>
-          <p className="text-xs text-muted-foreground">Videos: MP4, WebM or MOV, up to 200 MB</p>
+          <p className="text-sm text-muted-foreground">Videos: MP4, WebM or MOV, up to 200 MB</p>
           <input
             ref={inputRef}
             type="file"
@@ -448,7 +448,7 @@ export default function GalleryManager() {
 
   return (
     <section className="mt-5 rounded-xl border bg-card p-5">
-      <h2 className="text-lg font-semibold tracking-tight">Photo gallery</h2>
+      <h2 className="font-display text-xl font-bold">Photo gallery</h2>
       <p className="text-sm text-muted-foreground">
         Each project shows on the public gallery page as one before/after slide. Add 1 to 3 photos
         or videos for each side (3 in total per side) and a short description under each.
@@ -610,7 +610,7 @@ export default function GalleryManager() {
                   <Thumb url={set.before_images[0]} alt="Before" />
                   <Thumb url={set.after_images[0]} alt="After" />
                 </div>
-                <div className="space-y-1 p-3 text-xs text-muted-foreground">
+                <div className="space-y-1 p-3 text-sm text-muted-foreground">
                   {set.title && (
                     <p className="truncate text-sm font-medium text-foreground">{set.title}</p>
                   )}

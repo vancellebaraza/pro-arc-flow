@@ -211,7 +211,7 @@ const deleteTodo = async () => {
           <section className="mb-4 rounded-xl border bg-card p-5">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
               <div>
-                <h2 className="text-lg font-semibold tracking-tight">My Staff To Do Row</h2>
+                <h2 className="font-display text-xl font-bold">My Staff To Do Row</h2>
                 <p className="text-sm text-muted-foreground mt-1">
                   Add your weekly activity row here. Admin will see these entries in Staff To Do.
                 </p>
@@ -271,7 +271,7 @@ const deleteTodo = async () => {
   <div className="font-medium">{engineerName}</div>
 
   {firstTodo && (
-    <div className="mt-1 text-xs text-muted-foreground">
+    <div className="mt-1 text-sm text-muted-foreground">
       Created:
       {" "}
       {format(new Date(firstTodo.created_at), "dd MMM yyyy")}
@@ -303,7 +303,7 @@ const deleteTodo = async () => {
                               {todo ? (
                                 <>
                                   <div className="text-sm font-semibold">{todo.activity}</div>
-                                  <div className="mt-1 text-xs text-muted-foreground">
+                                  <div className="mt-1 text-sm text-muted-foreground">
                                     {todo.location ?? "No location"}
                                   </div>
                                   <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-white/80 px-2 py-1 text-xs font-semibold text-slate-700">

@@ -92,7 +92,7 @@ function ClientHome() {
     <div className="fade-in">
       <div className="flex items-end justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="font-display text-2xl font-semibold">
+          <h1 className="font-display text-[1.75rem] font-bold leading-tight">
             Client Projects
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -136,7 +136,7 @@ function ClientHome() {
                   >
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-sm text-muted-foreground">
                           {svc?.label ?? p.service}
                         </span>
 
@@ -153,7 +153,7 @@ function ClientHome() {
                         Client: {p.profiles?.full_name ?? "Unknown"}
                       </div>
 
-                      <div className="text-xs text-muted-foreground truncate">
+                      <div className="text-sm text-muted-foreground truncate">
                         {p.location || "—"}
                       </div>
                     </div>

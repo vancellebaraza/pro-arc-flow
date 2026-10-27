@@ -264,7 +264,7 @@ function InvoicesPage() {
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-6 p-4 md:p-8">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Invoices</h1>
+        <h1 className="font-display text-[1.75rem] font-bold leading-tight">Invoices</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Create invoices from approved quotations. A draft invoice does not affect the ledger —
           only sending it does.

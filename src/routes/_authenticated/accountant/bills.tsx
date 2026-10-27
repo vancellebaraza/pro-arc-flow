@@ -198,7 +198,7 @@ function BillsPage() {
     <div className="mx-auto flex max-w-6xl flex-col gap-6 p-4 md:p-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Bills</h1>
+          <h1 className="font-display text-[1.75rem] font-bold leading-tight">Bills</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Record vendor bills. A draft bill does not affect the ledger — only approving it does.
           </p>
