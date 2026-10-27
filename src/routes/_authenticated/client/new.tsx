@@ -61,12 +61,12 @@ function NewRequest() {
   }
 
   return (
-    <div className="p-6 md:p-10 max-w-2xl mx-auto fade-in">
+    <div className="fade-in max-w-2xl">
       <h1 className="font-display text-[1.75rem] font-bold leading-tight">New service request</h1>
-      <p className="text-muted-foreground mt-1">
+      <p className="mt-1 text-sm text-muted-foreground">
         Tell us what you need. An engineer will follow up shortly.
       </p>
-      <form onSubmit={submit} className="mt-8 space-y-5">
+      <form onSubmit={submit} className="mt-5 space-y-5">
         <div>
           <Label htmlFor="service">Service</Label>
           <select

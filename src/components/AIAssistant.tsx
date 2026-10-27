@@ -41,7 +41,7 @@ export function AIAssistant() {
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="fixed bottom-5 right-5 z-50 h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg grid place-items-center hover:scale-105 transition"
+          className="fixed bottom-5 right-5 z-50 h-12 w-12 tile-brand press rounded-full grid place-items-center"
           aria-label="Open FusionPro AI"
         >
           <Bot className="h-5 w-5" />

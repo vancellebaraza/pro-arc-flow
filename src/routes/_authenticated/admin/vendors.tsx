@@ -154,11 +154,11 @@ if (uploadError) throw uploadError;
   }
 
   return (
-    <div className="p-4 md:p-8 fade-in max-w-6xl mx-auto">
+    <div className="fade-in">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <h1 className="font-display text-[1.75rem] font-bold leading-tight">Vendor Management</h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="mt-1 text-sm text-muted-foreground">
             Create, edit, and review vendors available for project assignments.
           </p>
         </div>
@@ -170,7 +170,7 @@ if (uploadError) throw uploadError;
         </Link>
       </div>
 
-      <section className="mt-8 grid gap-4 lg:grid-cols-[1.2fr_1fr]">
+      <section className="mt-5 grid gap-4 lg:grid-cols-[1.2fr_1fr]">
         <div className="rounded-xl border bg-card p-5">
           <div className="flex items-center justify-between gap-3">
             <div>
@@ -184,7 +184,7 @@ if (uploadError) throw uploadError;
             </Button>
           </div>
 
-          <div className="mt-6 grid gap-4">
+          <div className="mt-5 grid gap-4">
             <div>
               <Label>Vendor Name</Label>
               <Input

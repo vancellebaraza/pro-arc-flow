@@ -489,7 +489,7 @@ function AdminAnalysisPage() {
         </DialogContent>
       </Dialog>
 
-      <div className="mt-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="mt-5 grid gap-px overflow-hidden rounded-2xl border bg-border shadow-[var(--shadow-card)] sm:grid-cols-2 2xl:grid-cols-4">
         {[
           { label: "Quoted value", value: money(analysis.totalQuoted), icon: CircleDollarSign },
           {
@@ -500,7 +500,7 @@ function AdminAnalysisPage() {
           { label: "Gross margin", value: money(analysis.grossMargin), icon: TrendingUp },
           { label: "Margin rate", value: `${analysis.marginRate.toFixed(1)}%`, icon: Percent },
         ].map((metric) => (
-          <div key={metric.label} className="rounded-lg border bg-card p-5">
+          <div key={metric.label} className="min-w-0 bg-card p-5">
             <div className="flex items-center justify-between gap-3">
               <div className="text-sm text-muted-foreground">{metric.label}</div>
               <metric.icon className="h-4 w-4 text-muted-foreground" />
@@ -510,13 +510,13 @@ function AdminAnalysisPage() {
         ))}
       </div>
 
-      <div className="mt-5 grid gap-5 md:grid-cols-3">
+      <div className="mt-5 grid gap-px overflow-hidden rounded-2xl border bg-border shadow-[var(--shadow-card)] md:grid-cols-3">
         {[
           { label: "Average quote", value: money(analysis.averageQuote) },
           { label: "Outstanding quoted", value: money(analysis.outstandingQuoted) },
           { label: "Completion rate", value: `${analysis.completionRate.toFixed(1)}%` },
         ].map((metric) => (
-          <div key={metric.label} className="rounded-lg border bg-card p-5">
+          <div key={metric.label} className="min-w-0 bg-card p-5">
             <div className="text-sm text-muted-foreground">{metric.label}</div>
             <div className="mt-1 text-[2rem] font-bold leading-tight">{loading ? "..." : metric.value}</div>
           </div>

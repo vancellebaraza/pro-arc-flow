@@ -269,7 +269,7 @@ const grandTotal = vatableAmount + vatAmount;
   }
 
   return (
-    <div className="p-4 md:p-8 fade-in max-w-5xl mx-auto pb-24">
+    <div className="fade-in pb-24">
       <Link
         to="/engineer/$projectId"
         params={{ projectId }}
@@ -279,9 +279,9 @@ const grandTotal = vatableAmount + vatAmount;
         Back to project
       </Link>
       <h1 className="font-display text-[1.75rem] font-bold leading-tight mt-3">Quotation</h1>
-      <p className="text-muted-foreground mt-1">Project: {projectTitle}</p>
+      <p className="mt-1 text-sm text-muted-foreground">Project: {projectTitle}</p>
 
-      <section className="mt-6 grid md:grid-cols-2 gap-4">
+      <section className="mt-5 grid md:grid-cols-2 gap-4">
         <div>
           <Label>Bill To</Label>
           <Input
@@ -316,7 +316,7 @@ const grandTotal = vatableAmount + vatAmount;
         </div>
       </section>
 
-      <section className="mt-8">
+      <section className="mt-5">
         <div className="flex items-center justify-between">
           <h2 className="font-display text-xl font-bold">Line Items</h2>
           <Button
@@ -461,7 +461,7 @@ const grandTotal = vatableAmount + vatAmount;
         </div>
       </section>
 
-      <section className="mt-6 grid md:grid-cols-2 gap-4">
+      <section className="mt-5 grid md:grid-cols-2 gap-4">
         <div>
           <Label>Notes</Label>
           <Textarea rows={4} value={notes} onChange={(e) => setNotes(e.target.value)} />
@@ -525,7 +525,7 @@ const grandTotal = vatableAmount + vatAmount;
 </div>
       </section>
 
-      <section className="mt-8 rounded-lg border bg-card p-5">
+      <section className="mt-5 rounded-lg border bg-card p-5">
         <h3 className="font-medium">Payment Option — Bank Details</h3>
         <div className="mt-3 grid sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
           <div>
@@ -555,7 +555,7 @@ const grandTotal = vatableAmount + vatAmount;
         </div>
       </section>
 
-      <div className="mt-8 flex flex-wrap justify-end gap-2">
+      <div className="mt-5 flex flex-wrap justify-end gap-2">
         <Button variant="outline" onClick={exportPdf}>
           <FileDown className="h-4 w-4 mr-1" />
           Export PDF

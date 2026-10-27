@@ -282,7 +282,7 @@ function InspectionPage() {
   }
 
   return (
-    <div className="p-4 md:p-8 fade-in max-w-5xl mx-auto pb-24">
+    <div className="fade-in pb-24">
       <Link
         to="/engineer/$projectId"
         params={{ projectId }}
@@ -292,11 +292,11 @@ function InspectionPage() {
         Back to project
       </Link>
       <h1 className="font-display text-[1.75rem] font-bold leading-tight mt-3">Inspection Report</h1>
-      <p className="text-muted-foreground mt-1">
+      <p className="mt-1 text-sm text-muted-foreground">
         Complete the checklist, photo evidence and sign-off.
       </p>
 
-      <section className="mt-8 grid md:grid-cols-2 gap-4">
+      <section className="mt-5 grid md:grid-cols-2 gap-4">
         <div>
           <Label>Work Category</Label>
           <select
@@ -357,7 +357,7 @@ function InspectionPage() {
         </div>
       </section>
 
-      <section className="mt-10">
+      <section className="mt-5">
         <div className="flex items-center justify-between">
           <h2 className="font-display text-xl font-bold">Inspection Checklist</h2>
           <Button
@@ -432,7 +432,7 @@ function InspectionPage() {
         </div>
       </section>
 
-      <section className="mt-10">
+      <section className="mt-5">
         <div className="flex items-center justify-between">
           <h2 className="font-display text-xl font-bold">Photo Evidence</h2>
           <Button
@@ -504,7 +504,7 @@ function InspectionPage() {
         </div>
       </section>
 
-      <section className="mt-10">
+      <section className="mt-5">
         <h2 className="font-display text-xl font-bold">Sign-off</h2>
         <div className="mt-3 grid md:grid-cols-3 gap-4">
           <div className="rounded-lg border p-4 bg-card">
@@ -525,12 +525,12 @@ function InspectionPage() {
         </div>
       </section>
 
-      <section className="mt-8">
+      <section className="mt-5">
         <Label>General remarks</Label>
         <Textarea rows={3} value={remarks} onChange={(e) => setRemarks(e.target.value)} />
       </section>
 
-      <div className="mt-8 flex flex-wrap justify-end gap-2">
+      <div className="mt-5 flex flex-wrap justify-end gap-2">
         <Button variant="outline" onClick={exportPdf}>
           <FileDown className="h-4 w-4 mr-1" />
           Export PDF

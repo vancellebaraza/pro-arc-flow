@@ -58,8 +58,8 @@ function EngineerProjectHub() {
     load();
   }
 
-  if (loading) return <div className="p-8 text-sm text-muted-foreground">Loading…</div>;
-  if (!project) return <div className="p-8 text-sm">Project not found.</div>;
+  if (loading) return <div className="p-6 text-sm text-muted-foreground">Loading…</div>;
+  if (!project) return <div className="p-6 text-sm">Project not found.</div>;
 
   const svc = SERVICES.find((s) => s.key === project.service);
   const waText = `FusionPro engineer here regarding "${project.title}" (Ref ${project.id.slice(0, 8)}). `;
@@ -118,7 +118,7 @@ function EngineerProjectHub() {
   ];
 
   return (
-    <div className="p-4 md:p-8 fade-in max-w-5xl mx-auto">
+    <div className="fade-in">
       <Link
         to="/engineer"
         className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
@@ -135,7 +135,7 @@ function EngineerProjectHub() {
           <h1 className="font-display text-[1.75rem] font-bold leading-tight mt-1 truncate">
             {project.title}
           </h1>
-          <p className="text-muted-foreground mt-1">{project.location ?? "—"}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{project.location ?? "—"}</p>
         </div>
         <div className="flex gap-2 flex-wrap">
           {!project.engineer_id && (
@@ -169,7 +169,7 @@ function EngineerProjectHub() {
         </div>
       )}
 
-      <h2 className="font-display text-xl font-bold mt-10">Forms & tools</h2>
+      <h2 className="font-display text-xl font-bold mt-5">Forms & tools</h2>
       <p className="text-sm text-muted-foreground">
         Each form opens in its own page so you have room to work.
       </p>
@@ -194,7 +194,7 @@ function EngineerProjectHub() {
           </li>
         ))}
       </ul>
-      <div className="mt-8">
+      <div className="mt-5">
         <Outlet />
       </div>
     </div>

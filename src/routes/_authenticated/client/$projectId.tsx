@@ -158,13 +158,13 @@ function ProjectDetail() {
     }
   }
 
-  if (loading) return <div className="p-8 text-sm text-muted-foreground">Loading…</div>;
-  if (!project) return <div className="p-8 text-sm">Project not found.</div>;
+  if (loading) return <div className="p-6 text-sm text-muted-foreground">Loading…</div>;
+  if (!project) return <div className="p-6 text-sm">Project not found.</div>;
   const svc = SERVICES.find((s) => s.key === project.service);
   const waText = `FusionPro — Project: ${project.title} (${STATUS_LABEL[project.status] ?? project.status}). Reference: ${project.id.slice(0, 8)}`;
 
   return (
-    <div className="p-6 md:p-10 max-w-4xl mx-auto fade-in">
+    <div className="fade-in max-w-4xl">
       <Link
         to="/client"
         className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
@@ -180,7 +180,7 @@ function ProjectDetail() {
           <h1 className="font-display text-[1.75rem] font-bold leading-tight mt-1">
             {project.title}
           </h1>
-          <p className="text-muted-foreground mt-1">{project.location}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{project.location}</p>
         </div>
         <WhatsAppButton
           projectId={project.id}
@@ -190,12 +190,12 @@ function ProjectDetail() {
         />
       </div>
 
-      <ProjectProgress status={project.status} className="mt-6" />
+      <ProjectProgress status={project.status} className="mt-5" />
 
-      {project.description && <p className="mt-6 text-sm leading-relaxed">{project.description}</p>}
+      {project.description && <p className="mt-5 text-sm leading-relaxed">{project.description}</p>}
 
       {project.image_urls.length > 0 && (
-        <div className="mt-6 grid grid-cols-2 gap-3">
+        <div className="mt-5 grid grid-cols-2 gap-3">
           {project.image_urls.map((u, i) => (
             <a
               key={i}
@@ -210,7 +210,7 @@ function ProjectDetail() {
         </div>
       )}
 
-      <section className="mt-10">
+      <section className="mt-5">
         <h2 className="font-display text-xl font-bold">Inspection reports</h2>
         {inspections.length === 0 ? (
           <p className="text-sm text-muted-foreground mt-2">No inspections yet.</p>
@@ -244,7 +244,7 @@ function ProjectDetail() {
         )}
       </section>
 
-      <section className="mt-10">
+      <section className="mt-5">
         <div className="flex items-center justify-between">
           <h2 className="font-display text-xl font-bold">Quotation</h2>
           {quote && (

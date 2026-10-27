@@ -484,11 +484,11 @@ function AdminHome() {
   });
 
   return (
-    <div className="p-4 md:p-8 fade-in">
-      <div className="flex items-end justify-between flex-wrap gap-4">
+    <div className="fade-in space-y-5">
+      <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="font-display text-[1.75rem] font-bold leading-tight">Admin overview</h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="mt-1 text-sm text-muted-foreground">
             Approve quotations, manage vendors, schedule work, export reports.
           </p>
         </div>
@@ -564,22 +564,22 @@ function AdminHome() {
         </DialogContent>
       </Dialog>
 
-      <div className="mt-6 grid gap-4 md:grid-cols-2">
+      <div className="grid gap-5 md:grid-cols-2">
         {[{ label: "Total projects", value: rows.length }].map((s) => (
           <div key={s.label} className="rounded-xl border bg-card p-5">
             <div className="text-sm text-muted-foreground">{s.label}</div>
-            <div className="mt-1 text-[2rem] font-bold leading-tight">{s.value}</div>
+            <div className="font-display mt-1 text-[2rem] font-bold leading-tight">{s.value}</div>
           </div>
         ))}
         <ProjectCommentSummary projects={rows} />
       </div>
 
       {pendingQuotes.length > 0 && (
-        <section className="mt-8">
+        <section className="mt-5">
           <h2 className="font-display text-xl font-bold">Quotations pending approval</h2>
           <ul className="mt-3 rounded-xl border bg-card divide-y">
             {pendingQuotes.map((q) => (
-              <li key={q.id} className="flex items-center justify-between gap-4 p-4">
+              <li key={q.id} className="flex items-center justify-between gap-4 px-4 py-3">
                 <div className="min-w-0">
                   <div className="font-medium truncate">{q.project?.title ?? "—"}</div>
                   <div className="text-sm text-muted-foreground">
@@ -605,7 +605,7 @@ function AdminHome() {
       )}
 
       {pendingVendorAssignments.length > 0 && (
-        <section className="mt-8">
+        <section className="mt-5">
           <div className="flex items-center justify-between gap-4">
             <div>
               <h2 className="font-display text-xl font-bold">

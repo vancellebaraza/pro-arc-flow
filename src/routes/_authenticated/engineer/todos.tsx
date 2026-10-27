@@ -166,18 +166,18 @@ function EngineerTodos() {
   }
 
   return (
-    <div className="p-4 md:p-8 fade-in">
-      <div className="mb-6">
+    <div className="fade-in">
+      <div className="mb-4">
         <h1 className="font-display text-[1.75rem] font-bold leading-tight">To Do List</h1>
-        <p className="text-muted-foreground mt-1">
+        <p className="mt-1 text-sm text-muted-foreground">
           Add your weekly activity row here. Admin will see these entries in Staff To Do.
         </p>
       </div>
 
       {loading ? (
-        <p className="text-sm text-muted-foreground mb-8">Loading…</p>
+        <p className="text-sm text-muted-foreground mb-4">Loading…</p>
       ) : (
-        <section className="mb-8 rounded-xl border bg-card p-5">
+        <section className="mb-4 rounded-xl border bg-card p-5">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <div className="mt-1 flex flex-wrap gap-3 text-sm text-muted-foreground">

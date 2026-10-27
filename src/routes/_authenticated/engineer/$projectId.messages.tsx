@@ -75,7 +75,7 @@ function MessagesPage() {
   }
 
   return (
-    <div className="p-4 md:p-8 fade-in max-w-3xl mx-auto pb-24">
+    <div className="fade-in pb-24 max-w-3xl">
       <Link
         to="/engineer/$projectId"
         params={{ projectId }}
@@ -87,7 +87,7 @@ function MessagesPage() {
       <div className="mt-3 flex items-end justify-between flex-wrap gap-2">
         <div>
           <h1 className="font-display text-[1.75rem] font-bold leading-tight">Communication</h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="mt-1 text-sm text-muted-foreground">
             Internal messages and WhatsApp launcher (logged).
           </p>
         </div>
@@ -99,7 +99,7 @@ function MessagesPage() {
         </a>
       </div>
 
-      <div className="mt-6 space-y-2">
+      <div className="mt-5 space-y-2">
         {messages.length === 0 ? (
           <p className="text-sm text-muted-foreground">No messages yet.</p>
         ) : (
@@ -114,7 +114,7 @@ function MessagesPage() {
         )}
       </div>
 
-      <div className="mt-6 rounded-lg border bg-card p-3">
+      <div className="mt-5 rounded-lg border bg-card p-3">
         <Textarea
           rows={3}
           value={body}

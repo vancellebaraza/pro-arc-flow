@@ -310,17 +310,17 @@ setEngineers(profiles as StaffMember[]);
   }
 
   if (loading) {
-    return <div className="p-8 text-sm text-muted-foreground">Loading…</div>;
+    return <div className="p-6 text-sm text-muted-foreground">Loading…</div>;
   }
 
   
 
   return (
-    <div className="p-4 md:p-8 fade-in max-w-7xl mx-auto">
+    <div className="fade-in">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <h1 className="font-display text-[1.75rem] font-bold leading-tight">Staff To Do List</h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="mt-1 text-sm text-muted-foreground">
             Track field staff activities by date. Only admins can view and manage these entries.
           </p>
         </div>
@@ -329,7 +329,7 @@ setEngineers(profiles as StaffMember[]);
         </Link>
       </div>
 
-      <div className="mt-8 grid gap-4 lg:grid-cols-[1.2fr_1fr]">
+      <div className="mt-5 grid gap-4 lg:grid-cols-[1.2fr_1fr]">
         <div className="rounded-xl border bg-card p-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -366,7 +366,7 @@ setEngineers(profiles as StaffMember[]);
         </div>
       </div>
 
-      {/* <section className="mt-6 rounded-xl border bg-card p-5">
+      {/* <section className="mt-5 rounded-xl border bg-card p-5">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
             <h2 className="font-display text-xl font-bold">Add staff row</h2>
@@ -399,7 +399,7 @@ setEngineers(profiles as StaffMember[]);
         </div>
       </section> */}
 
-      <section className="mt-6 overflow-x-auto rounded-xl border bg-card">
+      <section className="mt-5 overflow-x-auto rounded-xl border bg-card">
         <table className="min-w-full border-separate border-spacing-0">
           <thead>
             <tr className="bg-background">
@@ -461,7 +461,7 @@ setEngineers(profiles as StaffMember[]);
           </tbody>
         </table>
       </section>
-    <section className="mt-6 rounded-xl border bg-card p-5">
+    <section className="mt-5 rounded-xl border bg-card p-5">
   <div className="flex items-center gap-3 mb-4">
     <Calendar className="h-5 w-5" />
     <h2 className="font-display text-xl font-bold">
@@ -476,7 +476,7 @@ setEngineers(profiles as StaffMember[]);
     className="max-w-xs"
   />
 
-  <div className="mt-6 space-y-3">
+  <div className="mt-5 space-y-3">
     {dailyTodos.length === 0 ? (
       <div className="text-muted-foreground">
         No tasks scheduled for this day.
