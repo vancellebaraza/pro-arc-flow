@@ -39,33 +39,44 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --radius-card: 1.5rem;
+  --radius-pop: 1rem;
+  --radius-pill: 9999px;
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Bricolage Grotesque", "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
 :root {
   --radius: 0.5rem;
-  --background: oklch(0.99 0.002 80); /* soft white */
-  --foreground: oklch(0.18 0.005 260); /* near black */
-  --surface: oklch(0.97 0.003 80); /* light grey UI surface */
+  --ink: oklch(0.18 0.005 260);
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.04), 0 8px 24px rgb(0 0 0 / 0.06);
+  --shadow-raised: 0 1px 2px rgb(0 0 0 / 0.06), 0 4px 10px rgb(0 0 0 / 0.08);
+  --shadow-raised-hover: 0 2px 4px rgb(0 0 0 / 0.08), 0 10px 20px rgb(0 0 0 / 0.12);
+  --shadow-pressed: 0 0 1px rgb(0 0 0 / 0.1), 0 1px 2px rgb(0 0 0 / 0.1);
+  --shadow-pop: 0 2px 6px rgb(0 0 0 / 0.06), 0 16px 40px rgb(0 0 0 / 0.16);
+  --shadow-brand: 0 1px 2px oklch(0.56 0.21 27 / 0.3), 0 6px 16px oklch(0.56 0.21 27 / 0.28);
+  --shadow-brand-hover: 0 2px 4px oklch(0.56 0.21 27 / 0.3), 0 10px 22px oklch(0.56 0.21 27 / 0.36);
+  --background: oklch(0.972 0.004 80); /* soft warm off-white */
+  --foreground: oklch(0.15 0.005 260); /* near black */
+  --surface: oklch(0.95 0.004 80); /* light grey UI surface */
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.005 260);
+  --card-foreground: oklch(0.15 0.005 260);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.005 260);
+  --popover-foreground: oklch(0.15 0.005 260);
   --primary: oklch(0.56 0.21 27); /* FusionPro red */
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.96 0.003 80);
   --secondary-foreground: oklch(0.22 0.005 260);
   --muted: oklch(0.96 0.003 80);
-  --muted-foreground: oklch(0.5 0.01 260);
-  --accent: oklch(0.95 0.005 80);
+  --muted-foreground: oklch(0.42 0.01 260);
+  --accent: oklch(0.93 0.005 80);
   --accent-foreground: oklch(0.22 0.005 260);
   --brand: oklch(0.56 0.21 27); /* FusionPro red */
   --brand-foreground: oklch(0.99 0 0);
   --destructive: oklch(0.56 0.21 27);
   --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.92 0.004 80);
-  --input: oklch(0.92 0.004 80);
+  --border: oklch(0.89 0.005 80);
+  --input: oklch(0.87 0.005 80);
   --ring: oklch(0.56 0.21 27 / 0.4);
   --chart-1: oklch(0.56 0.21 27);
   --chart-2: oklch(0.45 0.02 260);
@@ -78,7 +89,7 @@
   --sidebar-primary-foreground: oklch(0.99 0 0);
   --sidebar-accent: oklch(0.95 0.005 80);
   --sidebar-accent-foreground: oklch(0.22 0.005 260);
-  --sidebar-border: oklch(0.92 0.004 80);
+  --sidebar-border: oklch(0.89 0.005 80);
   --sidebar-ring: oklch(0.56 0.21 27 / 0.4);
 }
 
@@ -125,6 +136,16 @@
     color: var(--color-foreground);
     -webkit-font-smoothing: antialiased;
   }
+  /* Very faint large tint of the brand red in the top corner (light mode only). */
+  html:not(.dark) body {
+    background-image: radial-gradient(
+      70rem 46rem at 0% -12%,
+      oklch(0.56 0.21 27 / 0.045),
+      transparent 70%
+    );
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
 }
 
 @layer components {
@@ -148,6 +169,142 @@
 
 
 @layer utilities {
+  /* Raised surface: tiles, round icon buttons, secondary buttons. */
+  .raised {
+    box-shadow: var(--shadow-raised);
+  }
+  /* Hover lifts 1px and grows the shadow; pressing scales down and flattens the shadow. */
+  .press {
+    transition:
+      transform 150ms ease-out,
+      box-shadow 150ms ease-out,
+      background-color 150ms ease-out,
+      border-color 150ms ease-out,
+      color 150ms ease-out;
+  }
+  .press:where(:not(:disabled, [aria-disabled="true"])):hover {
+    transform: translateY(-1px);
+  }
+  .press.raised:where(:not(:disabled, [aria-disabled="true"])):hover {
+    box-shadow: var(--shadow-raised-hover);
+  }
+  .press:where(:not(:disabled, [aria-disabled="true"])):active {
+    transform: scale(0.97);
+    transition-duration: 100ms;
+  }
+  .press.raised:where(:not(:disabled, [aria-disabled="true"])):active {
+    box-shadow: var(--shadow-pressed);
+  }
+
+  /* Button looks */
+  .btn-primary {
+    color: var(--primary-foreground);
+    background-image: linear-gradient(to bottom, oklch(0.6 0.21 27), oklch(0.53 0.21 27));
+    box-shadow: var(--shadow-brand);
+  }
+  .btn-primary:where(:not(:disabled)):hover {
+    box-shadow: var(--shadow-brand-hover);
+  }
+  .btn-primary:where(:not(:disabled)):active {
+    box-shadow: 0 1px 2px oklch(0.56 0.21 27 / 0.3);
+  }
+  .btn-secondary {
+    background-color: var(--card);
+    color: var(--foreground);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-raised);
+  }
+  .btn-secondary:where(:not(:disabled)):hover {
+    box-shadow: var(--shadow-raised-hover);
+    border-color: color-mix(in oklch, var(--foreground) 22%, var(--border));
+  }
+  .btn-secondary:where(:not(:disabled)):active {
+    box-shadow: var(--shadow-pressed);
+  }
+  .btn-ink {
+    color: oklch(0.985 0 0);
+    background-image: linear-gradient(to bottom, oklch(0.3 0.005 260), oklch(0.2 0.005 260));
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.12),
+      var(--shadow-raised);
+  }
+  .btn-ink:where(:not(:disabled)):hover {
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.12),
+      var(--shadow-raised-hover);
+  }
+
+  /* Icon tiles: raised ink tile, and the brand-red active tile with a soft glow. */
+  .tile-ink {
+    color: oklch(0.96 0 0);
+    background-image: linear-gradient(to bottom, oklch(0.34 0.005 260), oklch(0.24 0.005 260));
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.14),
+      0 2px 6px rgb(0 0 0 / 0.35);
+  }
+  .tile-brand {
+    color: var(--primary-foreground);
+    background-image: linear-gradient(to bottom, oklch(0.62 0.21 27), oklch(0.5 0.21 27));
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.28),
+      0 4px 14px oklch(0.56 0.21 27 / 0.45);
+  }
+  /* Light-surface icon tile for section headers inside pages. */
+  .tile-light {
+    color: var(--foreground);
+    background-image: linear-gradient(to bottom, oklch(1 0 0), oklch(0.96 0.004 80));
+    border: 1px solid var(--border);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.9),
+      var(--shadow-raised);
+  }
+
+  /* Popups: fade + scale in from 0.96. Uses the `scale` property so it does not fight
+     the translate-based centering used by dialogs. */
+  .pop-dialog[data-state="open"] {
+    animation: pop-in 180ms ease-out both;
+  }
+  .pop-dialog[data-state="closed"] {
+    animation: pop-out 120ms ease-in both;
+  }
+  .pop-menu[data-state="open"] {
+    animation: pop-in 120ms ease-out both;
+  }
+  .pop-menu[data-state="closed"] {
+    animation: pop-out 90ms ease-in both;
+  }
+  @keyframes pop-in {
+    from {
+      opacity: 0;
+      scale: 0.96;
+    }
+    to {
+      opacity: 1;
+      scale: 1;
+    }
+  }
+  @keyframes pop-out {
+    from {
+      opacity: 1;
+      scale: 1;
+    }
+    to {
+      opacity: 0;
+      scale: 0.96;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .press:hover,
+    .press:active {
+      transform: none !important;
+    }
+    .pop-dialog[data-state],
+    .pop-menu[data-state] {
+      animation-name: none !important;
+    }
+  }
+
   .tabular {
     font-variant-numeric: tabular-nums;
   }

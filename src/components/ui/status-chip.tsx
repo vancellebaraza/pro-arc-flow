@@ -7,7 +7,7 @@ export function StatusChip({ status, className }: { status: string; className?: 
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-2 rounded-full px-2 py-0.5 text-xs",
+        "inline-flex items-center gap-2 whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-medium",
         colors.badge,
         className,
       )}
