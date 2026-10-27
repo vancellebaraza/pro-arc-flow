@@ -10,6 +10,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { toast } from "sonner";
 import { MessageCircle, Pencil, Save, Plus } from "lucide-react";
+import { getUserCached } from "@/lib/auth-cache";
 
 const CATEGORY_OPTIONS = [
   "Electrical",
@@ -91,7 +92,7 @@ function VendorManagementPage() {
 
     setSaving(true);
     try {
-      const { data: userData } = await supabase.auth.getUser();
+      const { data: userData } = await getUserCached();
       const parsedCost = form.cost.trim() === "" ? null : parseFloat(form.cost);
       const payload = {
         ...form,

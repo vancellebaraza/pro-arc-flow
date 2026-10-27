@@ -18,6 +18,7 @@ import { generateWorksheetPdf } from "@/lib/pdf";
 import { toast } from "sonner";
 import { jsPDF } from "jspdf";
 import { ArrowLeft, Plus, Trash2, Save, FileDown, UploadCloud, MessageCircle } from "lucide-react";
+import { getUserCached } from "@/lib/auth-cache";
 
 export const Route = createFileRoute("/_authenticated/mini-admin/Engineer/$projectId/worksheet")({
   component: WorksheetPage,
@@ -139,7 +140,7 @@ function WorksheetPage() {
     }
     setAssignmentLoading(true);
     try {
-      const { data: userData } = await supabase.auth.getUser();
+      const { data: userData } = await getUserCached();
       if (!userData?.user) throw new Error("Not signed in");
       const { error } = await supabase.from("project_vendor_assignments").insert({
         project_id: projectId,
@@ -159,7 +160,7 @@ function WorksheetPage() {
 
   async function uploadImages(files: FileList | null) {
     if (!files) return;
-    const { data: u } = await supabase.auth.getUser();
+    const { data: u } = await getUserCached();
     if (!u.user) return;
     for (const file of Array.from(files)) {
       const path = `${u.user.id}/ws/${projectId}/${Date.now()}-${file.name}`;
@@ -176,7 +177,7 @@ function WorksheetPage() {
   async function save() {
     setSaving(true);
     try {
-      const { data: u } = await supabase.auth.getUser();
+      const { data: u } = await getUserCached();
       if (!u.user) throw new Error("Not signed in");
       const payload = {
         project_id: projectId,

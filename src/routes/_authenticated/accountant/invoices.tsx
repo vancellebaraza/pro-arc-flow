@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { logAudit } from "@/lib/auditLog";
 import { AlertTriangle } from "lucide-react";
+import { getUserCached } from "@/lib/auth-cache";
 
 export const Route = createFileRoute("/_authenticated/accountant/invoices")({
   component: InvoicesPage,
@@ -161,7 +162,7 @@ function InvoicesPage() {
 
     setSaving(true);
     try {
-      const { data: userData } = await supabase.auth.getUser();
+      const { data: userData } = await getUserCached();
 
       const { data: generatedNumber, error: numberError } = await supabase.rpc(
         "next_invoice_number",

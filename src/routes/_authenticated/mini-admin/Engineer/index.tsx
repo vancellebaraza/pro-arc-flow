@@ -21,6 +21,7 @@ import {
 import { toast } from "sonner";
 import ProgressButton from "@/components/ProgressButton";
 import type { ProgressCategory } from "@/lib/progress";
+import { getUserCached } from "@/lib/auth-cache";
 
 export const Route = createFileRoute("/_authenticated/mini-admin/Engineer/")({
   component: EngineerHome,
@@ -81,7 +82,7 @@ function EngineerHome() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const { data: userData, error: userError } = await supabase.auth.getUser();
+      const { data: userData, error: userError } = await getUserCached();
       if (userError || !userData.user) {
         toast.error("Unable to verify current engineer.");
         return;
@@ -164,7 +165,7 @@ function EngineerHome() {
       return copy;
     });
 
-    const { data: userData } = await supabase.auth.getUser();
+    const { data: userData } = await getUserCached();
     const query = next
       ? (supabase as any).from("project_progress").upsert(
           {

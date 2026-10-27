@@ -17,6 +17,7 @@ import {
 import { toast } from "sonner";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { generateProjectPdf } from "@/lib/pdf";
+import { getUserCached } from "@/lib/auth-cache";
 
 export const Route = createFileRoute("/_authenticated/mini-admin/Engineer/$projectId")({
   component: EngineerProjectHub,
@@ -52,7 +53,7 @@ function EngineerProjectHub() {
   }, [load]);
 
   async function claim() {
-    const { data: u } = await supabase.auth.getUser();
+    const { data: u } = await getUserCached();
     if (!u.user || !project) return;
     await supabase.from("projects").update({ engineer_id: u.user.id }).eq("id", project.id);
     toast.success("Assigned to you");
@@ -66,7 +67,7 @@ function EngineerProjectHub() {
   const waText = `FusionPro engineer here regarding "${project.title}" (Ref ${project.id.slice(0, 8)}). `;
 
   async function logWa() {
-    const { data: u } = await supabase.auth.getUser();
+    const { data: u } = await getUserCached();
     if (!u.user) return;
     await supabase.from("whatsapp_logs").insert({
       sender_id: u.user.id,

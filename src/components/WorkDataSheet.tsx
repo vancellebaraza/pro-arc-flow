@@ -16,6 +16,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { getUserCached } from "@/lib/auth-cache";
 
 interface Row {
   id: string;
@@ -351,7 +352,7 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
       setSavingVendor(false);
       if (error) return toast.error(error.message);
     } else {
-      const { data: userData } = await supabase.auth.getUser();
+      const { data: userData } = await getUserCached();
       if (!userData?.user) {
         setSavingVendor(false);
         toast.error("Not signed in");

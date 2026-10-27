@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { ArrowLeft, ArrowRight, Calendar, Plus, Check } from "lucide-react";
+import { getRolesCached, getUserCached } from "@/lib/auth-cache";
 
 interface StaffTodo {
   id: string;
@@ -57,16 +58,13 @@ const emptyTodoForm = {
 export const Route = createFileRoute("/_authenticated/admin/todos")({
   component: StaffTodosPage,
   beforeLoad: async () => {
-    const { data: userData, error } = await supabase.auth.getUser();
+    const { data: userData, error } = await getUserCached();
     if (error || !userData.user) throw redirect({ to: "/auth" });
 
-    const { data: rolesData, error: rolesError } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userData.user.id);
+    const roleNames = await getRolesCached(userData.user.id);
 
-    if (rolesError) throw redirect({ to: "/dashboard" });
-    const isAdmin = (rolesData ?? []).some((role) => role.role === "admin");
+    if (!roleNames) throw redirect({ to: "/dashboard" });
+    const isAdmin = roleNames.some((role) => role === "admin");
     if (!isAdmin) throw redirect({ to: "/dashboard" });
 
     return { user: userData.user };
@@ -222,7 +220,7 @@ setEngineers(profiles as StaffMember[]);
 
     setSaving(true);
     try {
-      const { data: userData, error: userError } = await supabase.auth.getUser();
+      const { data: userData, error: userError } = await getUserCached();
       if (userError || !userData.user) {
         toast.error("Unable to verify current user.");
         return;

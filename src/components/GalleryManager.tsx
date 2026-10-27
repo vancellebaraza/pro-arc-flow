@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Film, Trash2, UploadCloud, X } from "lucide-react";
+import { getUserCached } from "@/lib/auth-cache";
 
 const BUCKET = "gallery-images";
 const MAX_PER_SIDE = 3;
@@ -368,7 +369,7 @@ export default function GalleryManager() {
     const uploaded: string[] = [];
     const uploadedVideos: string[] = [];
     try {
-      const { data: userData } = await supabase.auth.getUser();
+      const { data: userData } = await getUserCached();
       if (!userData.user) throw new Error("You must be signed in.");
 
       const { before: beforeUrls, after: afterUrls } = await uploadMedia(

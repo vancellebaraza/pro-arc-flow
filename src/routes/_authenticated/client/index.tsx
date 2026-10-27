@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { STATUS_LABEL, SERVICES, statusColorClasses } from "@/lib/services";
 import { ArrowRight, Plus } from "lucide-react";
+import { getUserCached } from "@/lib/auth-cache";
 
 export const Route = createFileRoute("/_authenticated/client/")({
   component: ClientHome,
@@ -29,7 +30,7 @@ function ClientHome() {
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     (async () => {
-      // const { data: u } = await supabase.auth.getUser();
+      // const { data: u } = await getUserCached();
       // if (!u.user) return;
 
       setLoading(true)

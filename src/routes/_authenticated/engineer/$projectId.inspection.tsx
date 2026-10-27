@@ -12,6 +12,7 @@ import { generateInspectionPdf } from "@/lib/pdf";
 import { toast } from "sonner";
 import { jsPDF } from "jspdf";
 import { ArrowLeft, Plus, Trash2, Save, FileDown, UploadCloud } from "lucide-react";
+import { getUserCached } from "@/lib/auth-cache";
 
 export const Route = createFileRoute("/_authenticated/engineer/$projectId/inspection")({
   component: InspectionPage,
@@ -81,7 +82,7 @@ function InspectionPage() {
   }, [stage, projectId]);
 
   async function uploadImage(file: File): Promise<string> {
-    const { data: u } = await supabase.auth.getUser();
+    const { data: u } = await getUserCached();
     if (!u.user) throw new Error("Not signed in");
     const path = `${u.user.id}/insp/${projectId}/${Date.now()}-${file.name}`;
     const { error: uploadError } = await supabase.storage.from("project-images").upload(path, file);
@@ -185,7 +186,7 @@ function InspectionPage() {
   async function save() {
     setSaving(true);
     try {
-      const { data: u } = await supabase.auth.getUser();
+      const { data: u } = await getUserCached();
       if (!u.user) throw new Error("Not signed in");
       const checklistJson = checklist.map((c) => ({
         item: c.item,

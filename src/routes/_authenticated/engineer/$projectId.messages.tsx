@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Send, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
+import { getUserCached } from "@/lib/auth-cache";
 
 export const Route = createFileRoute("/_authenticated/engineer/$projectId/messages")({
   component: MessagesPage,
@@ -46,7 +47,7 @@ function MessagesPage() {
   async function send() {
     if (!body.trim() || sending) return;
     setSending(true);
-    const { data: u } = await supabase.auth.getUser();
+    const { data: u } = await getUserCached();
     if (!u.user) return;
     const { error } = await supabase.from("messages").insert({
       project_id: projectId,
@@ -63,7 +64,7 @@ function MessagesPage() {
   const waMsg = encodeURIComponent(`FusionPro — Project: ${projectTitle}. `);
 
   async function logWa() {
-    const { data: u } = await supabase.auth.getUser();
+    const { data: u } = await getUserCached();
     if (!u.user) return;
     await supabase.from("whatsapp_logs").insert({
       sender_id: u.user.id,

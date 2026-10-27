@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { SERVICES } from "@/lib/services";
 import { toast } from "sonner";
 import { Loader2, UploadCloud, X } from "lucide-react";
+import { getUserCached } from "@/lib/auth-cache";
 
 export const Route = createFileRoute("/_authenticated/client/new")({
   component: NewRequest,
@@ -29,7 +30,7 @@ function NewRequest() {
     const fd = new FormData(e.currentTarget);
     setSubmitting(true);
     try {
-      const { data: u } = await supabase.auth.getUser();
+      const { data: u } = await getUserCached();
       if (!u.user) throw new Error("Not signed in");
       const service = SERVICES.find((option) => option.key === fd.get("service"))?.key;
       if (!service) throw new Error("Please select a valid service");

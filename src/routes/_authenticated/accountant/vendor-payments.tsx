@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { logAudit } from "@/lib/auditLog";
+import { getUserCached } from "@/lib/auth-cache";
 
 export const Route = createFileRoute("/_authenticated/accountant/vendor-payments")({
   component: VendorPaymentsPage,
@@ -153,7 +154,7 @@ function VendorPaymentsPage() {
 
     setSaving(true);
     try {
-      const { data: userData } = await supabase.auth.getUser();
+      const { data: userData } = await getUserCached();
 
       const { data: paymentData, error: paymentError } = await supabase
         .from("vendor_payments")

@@ -10,6 +10,7 @@ import { generateQuotationPdf } from "@/lib/pdf";
 import { SERVICES, BANK_DETAILS } from "@/lib/services";
 import { toast } from "sonner";
 import { ArrowLeft, Plus, Trash2, Save, FileDown, Send } from "lucide-react";
+import { getUserCached } from "@/lib/auth-cache";
 
 export const Route = createFileRoute("/_authenticated/mini-admin/Engineer/$projectId/quotation")({
   component: QuotationPage,
@@ -166,7 +167,7 @@ function QuotationPage() {
   async function save(newStatus?: "draft" | "sent") {
     setSaving(true);
     try {
-      const { data: u } = await supabase.auth.getUser();
+      const { data: u } = await getUserCached();
       if (!u.user) throw new Error("Not signed in");
       const meta = {
         bill_to: billTo,

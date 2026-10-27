@@ -31,6 +31,7 @@ import autoTable from "jspdf-autotable";
 import { toast } from "sonner";
 import { FileDown, Check, Calendar, Trash2 } from "lucide-react";
 import DeleteProjectDialog from "@/components/DeleteProjectDialog";
+import { getRolesCached, getUserCached } from "@/lib/auth-cache";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminHome,
@@ -255,19 +256,14 @@ function AdminHome() {
     let mounted = true;
 
     async function loadRoles() {
-      const { data: userData, error } = await supabase.auth.getUser();
+      const { data: userData, error } = await getUserCached();
       if (!mounted || error || !userData.user) return;
 
-      const { data: rolesData, error: rolesError } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", userData.user.id);
+      const roleNames = await getRolesCached(userData.user.id);
 
-      if (!mounted || rolesError) return;
+      if (!mounted || !roleNames) return;
 
-      const isManageRole = (rolesData ?? []).some(
-        (role: { role: string }) => role.role === "admin" || role.role === "mini_admin",
-      );
+      const isManageRole = roleNames.some((role) => role === "admin" || role === "mini_admin");
       setCanManage(isManageRole);
     }
 

@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { ArrowLeft, ArrowRight, Check, Plus } from "lucide-react";
 import { toast } from "sonner";
+import { getUserCached } from "@/lib/auth-cache";
 
 export const Route = createFileRoute('/_authenticated/mini-admin/Todo/todo')({
   component: RouteComponent,
@@ -84,7 +85,7 @@ const doneCount = todos.filter((t) => t.is_done).length;
 const notDoneCount = todos.filter((t) => !t.is_done).length;
 
 const load = useCallback(async () => {
-  const { data: userData } = await supabase.auth.getUser();
+  const { data: userData } = await getUserCached();
 
   if (!userData.user) return;
 
