@@ -108,13 +108,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      // Loaded with media="print" and switched to "all" by the script in RootShell,
+      // so the font stylesheets do not block first render.
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        media: "print",
+        "data-font-swap": "",
       },
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Ballet&display=swap",
+        media: "print",
+        "data-font-swap": "",
       },
     ],
   }),
@@ -129,6 +135,11 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `document.querySelectorAll('link[data-font-swap]').forEach(function(l){function s(){l.media='all'}if(l.sheet)s();else l.addEventListener('load',s)})`,
+          }}
+        />
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-FSTY56BXZE" />
         <script
           dangerouslySetInnerHTML={{
