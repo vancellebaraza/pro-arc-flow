@@ -23,14 +23,16 @@ import {
   BarChart3,
   Bell,
 } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { AIAssistant } from "@/components/AIAssistant";
+const AIAssistant = lazy(() =>
+  import("@/components/AIAssistant").then((m) => ({ default: m.AIAssistant })),
+);
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -242,7 +244,9 @@ function AuthedLayout() {
           {loading ? <div className="p-8 text-sm text-muted-foreground">Loading…</div> : <Outlet />}
         </main>
       </div>
-      <AIAssistant />
+      <Suspense fallback={null}>
+        <AIAssistant />
+      </Suspense>
     </div>
   );
 }
