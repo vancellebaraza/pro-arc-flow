@@ -32,58 +32,63 @@ function AccountantDashboardPage() {
   async function loadDashboard() {
     setLoading(true);
 
-    const { data: cashAccounts, error: cashAcctError } = await supabase
-      .from("accounts")
-      .select("id,code")
-      .in("code", CASH_ACCOUNT_CODES);
+    const today = new Date().toISOString().slice(0, 10);
 
-    if (cashAcctError) {
-      toast.error(cashAcctError.message);
-      setLoading(false);
-      return;
-    }
+    // All five reads are independent, so they run in parallel. Errors are still
+    // reported in the same order as before.
+    const [cashResult, invoiceResult, allocResult, billResult, vendorAllocResult] =
+      await Promise.all([
+        (async () => {
+          const { data: cashAccounts, error: cashAcctError } = await supabase
+            .from("accounts")
+            .select("id,code")
+            .in("code", CASH_ACCOUNT_CODES);
+          if (cashAcctError) return { position: 0, error: cashAcctError };
 
-    const cashAccountIds = (cashAccounts ?? []).map((a) => a.id);
-    let cashPosition = 0;
+          const cashAccountIds = (cashAccounts ?? []).map((a) => a.id);
+          if (cashAccountIds.length === 0) return { position: 0, error: null };
 
-    if (cashAccountIds.length > 0) {
-      const { data: cashLines, error: cashLineError } = await supabase
-        .from("journal_lines")
-        .select("debit,credit")
-        .in("account_id", cashAccountIds);
+          const { data: cashLines, error: cashLineError } = await supabase
+            .from("journal_lines")
+            .select("debit,credit")
+            .in("account_id", cashAccountIds);
+          if (cashLineError) return { position: 0, error: cashLineError };
 
-      if (cashLineError) {
-        toast.error(cashLineError.message);
+          const position = (cashLines ?? []).reduce(
+            (sum, l) => sum + (Number(l.debit) || 0) - (Number(l.credit) || 0),
+            0,
+          );
+          return { position, error: null };
+        })(),
+        supabase.from("invoices").select("id,total,status").in("status", ["sent", "partially_paid"]),
+        supabase.from("payment_allocations").select("invoice_id,amount_applied"),
+        supabase
+          .from("bills")
+          .select("id,amount,status,due_date")
+          .in("status", ["approved", "partially_paid"])
+          .lt("due_date", today),
+        supabase.from("vendor_payment_allocations").select("bill_id,amount_applied"),
+      ]);
+
+    for (const failure of [
+      cashResult.error,
+      invoiceResult.error,
+      allocResult.error,
+      billResult.error,
+      vendorAllocResult.error,
+    ]) {
+      if (failure) {
+        toast.error(failure.message);
         setLoading(false);
         return;
       }
-
-      cashPosition = (cashLines ?? []).reduce(
-        (sum, l) => sum + (Number(l.debit) || 0) - (Number(l.credit) || 0),
-        0,
-      );
     }
 
-    const { data: invoices, error: invError } = await supabase
-      .from("invoices")
-      .select("id,total,status")
-      .in("status", ["sent", "partially_paid"]);
-
-    if (invError) {
-      toast.error(invError.message);
-      setLoading(false);
-      return;
-    }
-
-    const { data: paymentAllocs, error: allocError } = await supabase
-      .from("payment_allocations")
-      .select("invoice_id,amount_applied");
-
-    if (allocError) {
-      toast.error(allocError.message);
-      setLoading(false);
-      return;
-    }
+    const cashPosition = cashResult.position;
+    const invoices = invoiceResult.data;
+    const paymentAllocs = allocResult.data;
+    const bills = billResult.data;
+    const vendorAllocs = vendorAllocResult.data;
 
     const paidMap = new Map<string, number>();
     for (const a of paymentAllocs ?? []) {
@@ -99,30 +104,6 @@ function AccountantDashboardPage() {
 
     const unpaidInvoicesCount = openInvoices.length;
     const unpaidInvoicesTotal = openInvoices.reduce((sum, inv) => sum + inv.remaining, 0);
-
-    const today = new Date().toISOString().slice(0, 10);
-
-    const { data: bills, error: billError } = await supabase
-      .from("bills")
-      .select("id,amount,status,due_date")
-      .in("status", ["approved", "partially_paid"])
-      .lt("due_date", today);
-
-    if (billError) {
-      toast.error(billError.message);
-      setLoading(false);
-      return;
-    }
-
-    const { data: vendorAllocs, error: vAllocError } = await supabase
-      .from("vendor_payment_allocations")
-      .select("bill_id,amount_applied");
-
-    if (vAllocError) {
-      toast.error(vAllocError.message);
-      setLoading(false);
-      return;
-    }
 
     const vendorPaidMap = new Map<string, number>();
     for (const a of vendorAllocs ?? []) {

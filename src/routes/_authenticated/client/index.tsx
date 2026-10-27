@@ -30,7 +30,7 @@ function ClientHome() {
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     (async () => {
-      // const { data: u } = await getUserCached();
+      // const { data: u } = await supabase.auth.getUser();
       // if (!u.user) return;
 
       setLoading(true)
