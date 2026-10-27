@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { jsPDF } from "jspdf";
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -151,6 +150,7 @@ function ProjectViewerDetail() {
     if (error) return toast.error(error.message);
     if (!ws) return toast.error("No job worksheet has been created for this project yet");
     try {
+      const { jsPDF } = await import("jspdf");
       const doc = new jsPDF();
       await generateWorksheetPdf(doc, {
         clientName: ws.client_name ?? "",
@@ -175,6 +175,7 @@ function ProjectViewerDetail() {
     if (!quote || !project) return;
     try {
       const labour = items.reduce((sum, it) => sum + Number(it.amount), 0);
+      const { jsPDF } = await import("jspdf");
       const doc = new jsPDF();
       await generateQuotationPdf(doc, {
         projectTitle: project.title,

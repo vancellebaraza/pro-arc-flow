@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { jsPDF } from "jspdf";
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -235,8 +234,10 @@ function QuotationPage() {
   }
 
   async function exportPdf() {
+    const { jsPDF } = await import("jspdf");
     const doc = new jsPDF();
     try {
+      const { jsPDF } = await import("jspdf");
       const doc = new jsPDF();
       await generateQuotationPdf(doc, {
         projectTitle,

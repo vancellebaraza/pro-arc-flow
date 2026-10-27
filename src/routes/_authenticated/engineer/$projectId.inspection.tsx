@@ -10,7 +10,6 @@ import SignaturePad from "@/components/SignaturePad";
 import { SERVICES } from "@/lib/services";
 import { generateInspectionPdf } from "@/lib/pdf";
 import { toast } from "sonner";
-import { jsPDF } from "jspdf";
 import { ArrowLeft, Plus, Trash2, Save, FileDown, UploadCloud } from "lucide-react";
 import { getUserCached } from "@/lib/auth-cache";
 
@@ -260,6 +259,7 @@ function InspectionPage() {
       "Exporting inspection PDF photoEvidence summary:",
       photos.map((p) => ({ before: p.before?.slice(0, 80), during: p.during?.slice(0, 80), after: p.after?.slice(0, 80) })),
     );
+    const { jsPDF } = await import("jspdf");
     const doc = new jsPDF();
     await generateInspectionPdf(doc,{
       workCategory: SERVICES.find((s) => s.key === workCategory)?.label ?? workCategory,

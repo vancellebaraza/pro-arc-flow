@@ -8,7 +8,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { generateQuotationPdf } from "@/lib/pdf";
 import { SERVICES, BANK_DETAILS } from "@/lib/services";
 import { toast } from "sonner";
-import { jsPDF } from "jspdf";
 import { ArrowLeft, Plus, Trash2, Save, FileDown, Send } from "lucide-react";
 import { getUserCached } from "@/lib/auth-cache";
 
@@ -233,6 +232,7 @@ const grandTotal = vatableAmount + vatAmount;
   }
 
   async function exportPdf() {
+    const { jsPDF } = await import("jspdf");
     const doc = new jsPDF();
     try {
       

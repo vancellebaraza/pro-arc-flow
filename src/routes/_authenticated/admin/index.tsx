@@ -26,8 +26,6 @@ import {
 import { STATUS_LABEL, SERVICES, type ServiceKey } from "@/lib/services";
 import { downloadCsv } from "@/lib/pdf";
 import { exportHistoricalProjectsPdf } from "@/lib/historicalProjects";
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
 import { toast } from "sonner";
 import { FileDown, Check, Calendar, Trash2 } from "lucide-react";
 import DeleteProjectDialog from "@/components/DeleteProjectDialog";
@@ -383,7 +381,8 @@ function AdminHome() {
     downloadCsv(`fusionpro-work-data-sheet-${Date.now()}.csv`, data);
   }
 
-  function exportPdf() {
+  async function exportPdf() {
+    const { jsPDF } = await import("jspdf");
     const doc = new jsPDF();
     const date = new Date().toISOString().slice(0, 10);
 
@@ -392,6 +391,7 @@ function AdminHome() {
     doc.setFontSize(9);
     doc.text(`Export date: ${date}`, 14, 26);
 
+    const { default: autoTable } = await import("jspdf-autotable");
     autoTable(doc, {
       startY: 34,
       head: [

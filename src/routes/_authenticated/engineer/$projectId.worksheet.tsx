@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/select";
 import { generateWorksheetPdf } from "@/lib/pdf";
 import { toast } from "sonner";
-import { jsPDF } from "jspdf";
 import { ArrowLeft, Plus, Trash2, Save, FileDown, UploadCloud, MessageCircle } from "lucide-react";
 import { getUserCached } from "@/lib/auth-cache";
 
@@ -225,6 +224,7 @@ function WorksheetPage() {
   }
 
   async function exportPdf() {
+    const { jsPDF } = await import("jspdf");
     const doc = new jsPDF();
 
     try {

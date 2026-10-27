@@ -1,6 +1,5 @@
 
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { jsPDF } from "jspdf";
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -203,6 +202,7 @@ function ProjectDetail() {
     if (!quote || !project) return;
     try {
       const labour = items.reduce((sum, it) => sum + Number(it.amount), 0);
+      const { jsPDF } = await import("jspdf");
       const doc = new jsPDF();
       await generateQuotationPdf(doc, {
         projectTitle: project.title,
