@@ -2,7 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { SERVICES, STATUS_LABEL, statusColorClasses } from "@/lib/services";
+import { StatusChip } from "@/components/ui/status-chip";
+import { SERVICES, statusColorClasses } from "@/lib/services";
 import { ArrowRight, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -99,10 +100,7 @@ function EngineerHome() {
                     <span className="text-xs uppercase tracking-wider text-muted-foreground">
                       {svc?.label ?? p.service}
                     </span>
-                    <span className={`inline-flex items-center gap-2 rounded-full px-2 py-0.5 text-xs ${colors.badge}`}>
-                      <span className={`h-1.5 w-1.5 rounded-full ${colors.dot}`} />
-                      {STATUS_LABEL[p.status] ?? p.status}
-                    </span>
+                    <StatusChip status={p.status} />
                   </div>
                   <h3 className="mt-2 font-medium truncate">{p.title}</h3>
                   <p className="text-xs text-muted-foreground truncate">{p.location ?? "—"}</p>

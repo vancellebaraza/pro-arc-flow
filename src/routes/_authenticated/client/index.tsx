@@ -2,7 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { STATUS_LABEL, SERVICES, statusColorClasses } from "@/lib/services";
+import { StatusChip } from "@/components/ui/status-chip";
+import { SERVICES, statusColorClasses } from "@/lib/services";
 import { ArrowRight, Plus } from "lucide-react";
 import { getUserCached } from "@/lib/auth-cache";
 
@@ -127,10 +128,7 @@ function ClientHome() {
                         <span className="text-xs uppercase tracking-wider text-muted-foreground">
                           {svc?.label ?? p.service}
                         </span>
-                        <span className={`inline-flex items-center gap-2 rounded-full px-2 py-0.5 text-xs ${colors.badge}`}>
-                          <span className={`h-1.5 w-1.5 rounded-full ${colors.dot}`} />
-                          {STATUS_LABEL[p.status] ?? p.status}
-                        </span>
+                        <StatusChip status={p.status} />
                       </div>
                       <div className="mt-1 font-medium truncate">{p.title}</div>
                       <div className="text-sm text-muted-foreground">
