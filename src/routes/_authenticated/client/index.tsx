@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { STATUS_LABEL, SERVICES, statusColorClasses } from "@/lib/services";
@@ -25,15 +25,15 @@ interface Project {
   };
 }
 
-function ClientHome() {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    (async () => {
-      // const { data: u } = await supabase.auth.getUser();
-      // if (!u.user) return;
+const NO_PROJECTS: Project[] = [];
 
-      setLoading(true)
+function ClientHome() {
+  // Cached list is shown straight away on return visits and always refreshed on mount.
+  const { data: cachedProjects, isPending: loading } = useQuery<Project[]>({
+    queryKey: ["client-projects"],
+    staleTime: 30_000,
+    refetchOnMount: "always",
+    queryFn: async () => {
       const { data:projectsData, error:projectsError } = await supabase
         .from("projects")
         .select("id,client_id,title,service,status,location,created_at")
@@ -42,14 +42,11 @@ function ClientHome() {
 
         if (projectsError) {
         console.error(projectsError);
-        setLoading(false);
-        return;
+        return [];
       }
 
       if (!projectsData) {
-        setProjects([]);
-        setLoading(false);
-        return;
+        return [];
       }
 
       // Get unique client ids
@@ -77,10 +74,10 @@ function ClientHome() {
         ...project,
         profiles: profileMap.get(project.client_id),
       }));
-      setProjects((mergedProjects as Project[]));
-      setLoading(false);
-    })();
-  }, []);
+      return mergedProjects as Project[];
+    },
+  });
+  const projects = cachedProjects ?? NO_PROJECTS;
 
   return (
     <div className="p-6 md:p-10 max-w-5xl mx-auto fade-in">

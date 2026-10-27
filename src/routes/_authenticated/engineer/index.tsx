@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState, useCallback } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SERVICES, STATUS_LABEL, statusColorClasses } from "@/lib/services";
 import { ArrowRight, Search } from "lucide-react";
@@ -21,31 +22,32 @@ interface Project {
   scheduled_date: string | null;
 }
 
+const NO_PROJECTS: Project[] = [];
+
 function EngineerHome() {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    try {
-      const { data: projectRows } = await supabase
-        .from("projects")
-        .select("id,title,service,status,location,engineer_id,created_at,scheduled_date")
-        .eq("archived", false)
-        .order("created_at", { ascending: false });
+  // Cached list is shown straight away on return visits and always refreshed on mount.
+  const { data: cachedProjects, isPending: loading } = useQuery<Project[]>({
+    queryKey: ["engineer-projects"],
+    staleTime: 30_000,
+    refetchOnMount: "always",
+    queryFn: async () => {
+      try {
+        const { data: projectRows } = await supabase
+          .from("projects")
+          .select("id,title,service,status,location,engineer_id,created_at,scheduled_date")
+          .eq("archived", false)
+          .order("created_at", { ascending: false });
 
-      setProjects((projectRows ?? []) as Project[]);
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Unable to load engineer dashboard");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    load();
-  }, [load]);
+        return (projectRows ?? []) as Project[];
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "Unable to load engineer dashboard");
+        return [];
+      }
+    },
+  });
+  const projects = cachedProjects ?? NO_PROJECTS;
 
   const filtered = projects.filter(
     (p) =>
