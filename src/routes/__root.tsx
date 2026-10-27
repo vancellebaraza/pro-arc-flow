@@ -177,8 +177,9 @@ function RootComponent() {
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
       currentUserId = userId;
       router.invalidate();
-      if (event === "SIGNED_OUT") queryClient.clear();
-      else queryClient.invalidateQueries();
+      // Cached data belongs to the previous user, so drop it rather than just marking it stale.
+      if (event === "USER_UPDATED") queryClient.invalidateQueries();
+      else queryClient.clear();
     });
     return () => sub.subscription.unsubscribe();
   }, [router, queryClient]);
