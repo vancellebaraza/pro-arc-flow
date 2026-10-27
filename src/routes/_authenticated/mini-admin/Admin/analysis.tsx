@@ -350,8 +350,8 @@ function AdminAnalysisPage() {
     <div className="fade-in">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Analysis</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="font-display text-2xl font-semibold">Analysis</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Track operational volume, revenue, vendor costs, and service performance.
           </p>
         </div>
@@ -363,7 +363,7 @@ function AdminAnalysisPage() {
         </Button>
       </div>
 
-      <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="mt-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-5">
         {categoryCards.map((category) => {
           const colors = statusColorClasses(category.key);
           return (
@@ -489,7 +489,7 @@ function AdminAnalysisPage() {
         </DialogContent>
       </Dialog>
 
-      <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="mt-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
         {[
           { label: "Quoted value", value: money(analysis.totalQuoted), icon: CircleDollarSign },
           {
@@ -510,7 +510,7 @@ function AdminAnalysisPage() {
         ))}
       </div>
 
-      <div className="mt-4 grid gap-4 md:grid-cols-3">
+      <div className="mt-5 grid gap-5 md:grid-cols-3">
         {[
           { label: "Average quote", value: money(analysis.averageQuote) },
           { label: "Outstanding quoted", value: money(analysis.outstandingQuoted) },

@@ -472,9 +472,9 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
     totals.amountPayable !== 0 ? (totals.margin / totals.amountPayable) * 100 : null;
 
   return (
-    <section className="mt-8">
+    <section className="mt-5">
       <div className="flex items-center justify-between mb-3 gap-3 flex-wrap">
-        <h2 className="text-lg font-semibold tracking-tight">Work Data Sheet</h2>
+        <h2 className="font-display text-lg font-semibold">Work Data Sheet</h2>
         <div className="flex flex-wrap items-center gap-2">
           <Input
             value={projectSearch}

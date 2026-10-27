@@ -92,10 +92,10 @@ function ClientHome() {
     <div className="fade-in">
       <div className="flex items-end justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">
+          <h1 className="font-display text-2xl font-semibold">
             Client Projects
           </h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="mt-1 text-sm text-muted-foreground">
             Track requests, view inspections and approve quotations.
           </p>
         </div>

@@ -244,10 +244,10 @@ function ProjectDetail() {
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <span>{svc?.label}</span>·<span>{STATUS_LABEL[project.status] ?? project.status}</span>
           </div>
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight mt-1">
+          <h1 className="font-display text-2xl font-semibold mt-1">
             {project.title}
           </h1>
-          <p className="text-muted-foreground mt-1">{project.location}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{project.location}</p>
         </div>
         <div className="flex items-center gap-2">
           {canManage && (

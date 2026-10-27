@@ -280,8 +280,8 @@ function QuotationPage() {
         <ArrowLeft className="h-4 w-4 mr-1" />
         Back to project
       </Link>
-      <h1 className="mt-3 text-2xl md:text-3xl font-semibold tracking-tight">Quotation</h1>
-      <p className="text-muted-foreground mt-1">Project: {projectTitle}</p>
+      <h1 className="mt-3 font-display text-2xl font-semibold">Quotation</h1>
+      <p className="mt-1 text-sm text-muted-foreground">Project: {projectTitle}</p>
 
       <section className="mt-5 grid md:grid-cols-2 gap-4">
         <div>

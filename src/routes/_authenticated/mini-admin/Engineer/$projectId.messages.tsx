@@ -87,8 +87,8 @@ function MessagesPage() {
       </Link>
       <div className="mt-3 flex items-end justify-between flex-wrap gap-2">
         <div>
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Communication</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="font-display text-2xl font-semibold">Communication</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Internal messages and WhatsApp launcher (logged).
           </p>
         </div>

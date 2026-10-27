@@ -146,11 +146,11 @@ function ProjectViewersPage() {
   return (
     <div className="fade-in">
       <div>
-        <h1 className="text-2xl md:text-3xl font-semibold tracking-tight flex items-center gap-2">
+        <h1 className="font-display text-2xl font-semibold flex items-center gap-2">
           <Eye className="h-6 w-6" />
           Project Viewers
         </h1>
-        <p className="text-muted-foreground mt-1">
+        <p className="mt-1 text-sm text-muted-foreground">
           Create view-only accounts and assign which projects they can see. They get no
           approval or edit rights anywhere.
         </p>

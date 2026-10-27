@@ -418,11 +418,11 @@ function AdminHome() {
   });
 
   return (
-    <div className="fade-in">
-      <div className="flex items-end justify-between flex-wrap gap-4">
+    <div className="fade-in space-y-5">
+      <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Admin overview</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="font-display text-2xl font-semibold">Admin overview</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Manage vendors, schedule work, and export reports.
           </p>
         </div>
@@ -498,11 +498,11 @@ function AdminHome() {
         </DialogContent>
       </Dialog>
 
-      <div className="mt-5 grid gap-4 md:grid-cols-2">
+      <div className="grid gap-5 md:grid-cols-2">
         {[{ label: "Total projects", value: rows.length }].map((s) => (
           <div key={s.label} className="rounded-xl border bg-card p-5">
             <div className="text-xs text-muted-foreground">{s.label}</div>
-            <div className="mt-1 text-3xl font-semibold">{s.value}</div>
+            <div className="font-display mt-1 text-3xl font-semibold">{s.value}</div>
           </div>
         ))}
         <ProjectCommentSummary projects={rows} />
@@ -510,10 +510,10 @@ function AdminHome() {
 
       {pendingQuotes.length > 0 && (
         <section className="mt-5">
-          <h2 className="text-lg font-semibold tracking-tight">Quotations pending approval</h2>
+          <h2 className="font-display text-lg font-semibold">Quotations pending approval</h2>
           <ul className="mt-3 divide-y rounded-xl border bg-card">
             {pendingQuotes.map((quotation) => (
-              <li key={quotation.id} className="flex items-center justify-between gap-4 p-4">
+              <li key={quotation.id} className="flex items-center justify-between gap-4 px-4 py-3">
                 <div className="min-w-0">
                   <div className="truncate font-medium">{quotation.project?.title ?? "—"}</div>
                   <div className="text-sm text-muted-foreground">

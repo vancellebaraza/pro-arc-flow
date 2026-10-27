@@ -59,10 +59,10 @@ function EngineerHome() {
 
   return (
     <div className="p-4 md:p-8 fade-in">
-      <div className="flex items-end justify-between flex-wrap gap-4 mb-6">
+      <div className="flex items-end justify-between flex-wrap gap-4 mb-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Engineer dashboard</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="font-display text-2xl font-semibold">Engineer dashboard</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Pick a project to open inspection, quotation, worksheet and more.
           </p>
         </div>
@@ -78,13 +78,13 @@ function EngineerHome() {
       </div>
 
       {loading ? (
-        <p className="text-sm text-muted-foreground mb-8">Loading…</p>
+        <p className="text-sm text-muted-foreground mb-5">Loading…</p>
       ) : filtered.length === 0 ? (
-        <div className="rounded-xl border bg-card p-10 text-center text-muted-foreground mb-8">
+        <div className="rounded-xl border bg-card p-6 text-center text-muted-foreground mb-5">
           No projects found.
         </div>
       ) : (
-        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 mb-8">
+        <ul className="mb-5 grid gap-5 [grid-template-columns:repeat(auto-fill,minmax(340px,1fr))]">
           {filtered.map((p) => {
             const svc = SERVICES.find((s) => s.key === p.service);
             const colors = statusColorClasses(p.status);
@@ -93,18 +93,18 @@ function EngineerHome() {
                 <Link
                   to="/engineer/$projectId"
                   params={{ projectId: p.id }}
-                  className="relative block h-full overflow-hidden rounded-xl border bg-card p-5 pl-6 hover:border-foreground/40 hover:shadow-sm transition"
+                  className="relative block h-full overflow-hidden rounded-xl border bg-card p-4 pl-5 md:p-5 md:pl-6 hover:border-foreground/40 hover:shadow-sm transition"
                 >
                   <div className={`absolute inset-y-0 left-0 w-[3px] ${colors.dot}`} />
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
                     <span className="text-xs text-muted-foreground">
                       {svc?.label ?? p.service}
                     </span>
                     <StatusChip status={p.status} />
                   </div>
-                  <h3 className="mt-2 font-medium truncate">{p.title}</h3>
-                  <p className="text-xs text-muted-foreground truncate">{p.location ?? "—"}</p>
-                  <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
+                  <h3 className="mt-3 truncate text-base font-semibold">{p.title}</h3>
+                  <p className="truncate text-sm text-muted-foreground">{p.location ?? "—"}</p>
+                  <div className="mt-4 flex items-center justify-between border-t pt-3 text-[13px] text-muted-foreground">
                     <span>
                       {p.scheduled_date ? `Scheduled ${p.scheduled_date}` : "Unscheduled"}
                     </span>

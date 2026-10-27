@@ -319,10 +319,10 @@ const [
           <div className="text-xs text-muted-foreground">
             {svc?.label} · {STATUS_LABEL[project.status] ?? project.status}
           </div>
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight mt-1 truncate">
+          <h1 className="font-display text-2xl font-semibold mt-1 truncate">
             {project.title}
           </h1>
-          <p className="text-muted-foreground mt-1">{project.location ?? "—"}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{project.location ?? "—"}</p>
         </div>
         <div className="flex gap-2 flex-wrap">
           {!project.engineer_id && (

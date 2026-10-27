@@ -447,7 +447,7 @@ export default function GalleryManager() {
   }
 
   return (
-    <section className="mt-8 rounded-xl border bg-card p-5">
+    <section className="mt-5 rounded-xl border bg-card p-5">
       <h2 className="text-lg font-semibold tracking-tight">Photo gallery</h2>
       <p className="text-sm text-muted-foreground">
         Each project shows on the public gallery page as one before/after slide. Add 1 to 3 photos
