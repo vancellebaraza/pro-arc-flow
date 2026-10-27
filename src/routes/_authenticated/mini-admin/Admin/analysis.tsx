@@ -347,7 +347,7 @@ function AdminAnalysisPage() {
   const selectedProject = selectedProjects.find((project) => project.id === selectedProjectId) ?? null;
 
   return (
-    <div className="p-4 md:p-8 fade-in max-w-7xl mx-auto">
+    <div className="fade-in">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Analysis</h1>
@@ -363,7 +363,7 @@ function AdminAnalysisPage() {
         </Button>
       </div>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {categoryCards.map((category) => {
           const colors = statusColorClasses(category.key);
           return (
@@ -523,7 +523,7 @@ function AdminAnalysisPage() {
         ))}
       </div>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_1.2fr]">
+      <div className="mt-5 grid gap-5 lg:grid-cols-[1fr_1.2fr]">
         <section className="rounded-lg border bg-card p-5">
           <h2 className="text-lg font-semibold tracking-tight">Project status</h2>
           <div className="mt-5 space-y-4">
@@ -546,7 +546,7 @@ function AdminAnalysisPage() {
             ))}
           </div>
         </section>
-        <section className="mt-8 rounded-lg border bg-card p-5">
+        <section className="mt-5 rounded-lg border bg-card p-5">
   <div className="flex items-center gap-2">
     <BarChart3 className="h-5 w-5 text-muted-foreground" />
     <h2 className="text-lg font-semibold">
@@ -554,7 +554,7 @@ function AdminAnalysisPage() {
     </h2>
   </div>
 
-  <div className="mt-6 max-h-[360px] overflow-y-auto pr-2">
+  <div className="mt-5 max-h-[360px] overflow-y-auto pr-2">
     <div className="space-y-4">
     {analysis.topLocations.length === 0 ? (
       <div className="text-sm text-muted-foreground">
@@ -587,7 +587,7 @@ function AdminAnalysisPage() {
 
         <section className="rounded-lg border bg-card p-5 lg:col-span-2">
           <h2 className="text-lg font-semibold tracking-tight">New projects by month</h2>
-          <div className="mt-6 flex h-56 items-end gap-3">
+          <div className="mt-5 flex h-56 items-end gap-3">
             {analysis.monthCounts.map((month) => (
               <div key={month.label} className="flex min-w-0 flex-1 flex-col items-center gap-2">
                 <div className="text-xs font-medium">{month.count}</div>
@@ -606,7 +606,7 @@ function AdminAnalysisPage() {
         </section>
       </div>
 
-      <section className="mt-8 rounded-lg border bg-card p-5">
+      <section className="mt-5 rounded-lg border bg-card p-5">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>
             <h2 className="text-lg font-semibold tracking-tight">Project Gantt chart</h2>
@@ -681,7 +681,7 @@ function AdminAnalysisPage() {
         </div>
       </section>
 
-      <section className="mt-8 rounded-lg border bg-card p-5">
+      <section className="mt-5 rounded-lg border bg-card p-5">
         <h2 className="text-lg font-semibold tracking-tight">Service Gantt chart</h2>
         <div className="mt-5 overflow-x-auto">
           <div className="min-w-[760px]">
@@ -740,7 +740,7 @@ function AdminAnalysisPage() {
         </div>
       </section>
 
-      <section className="mt-8 rounded-lg border bg-card p-5">
+      <section className="mt-5 rounded-lg border bg-card p-5">
         <div className="flex items-center gap-2">
           <BriefcaseBusiness className="h-5 w-5 text-muted-foreground" />
           <h2 className="text-lg font-semibold tracking-tight">Service performance</h2>
@@ -778,7 +778,7 @@ function AdminAnalysisPage() {
         </div>
       </section>
 
-      <section className="mt-8 rounded-lg border bg-card p-5">
+      <section className="mt-5 rounded-lg border bg-card p-5">
         <h2 className="text-lg font-semibold tracking-tight">Highest quoted projects</h2>
         <div className="mt-4 overflow-x-auto">
           <Table>

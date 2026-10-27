@@ -356,11 +356,11 @@ setEngineers(profiles as StaffMember[]);
 
         <div className="rounded-xl border bg-card p-5 grid gap-3 sm:grid-cols-2">
           <div className="rounded-xl border border-emerald-200 bg-emerald-500/10 p-4">
-            <div className="text-xs uppercase tracking-wider text-muted-foreground">Done</div>
+            <div className="text-xs text-muted-foreground">Done</div>
             <div className="mt-1 text-3xl font-semibold text-emerald-900">{doneCount}</div>
           </div>
           <div className="rounded-xl border border-rose-200 bg-rose-500/10 p-4">
-            <div className="text-xs uppercase tracking-wider text-muted-foreground">Not done</div>
+            <div className="text-xs text-muted-foreground">Not done</div>
             <div className="mt-1 text-3xl font-semibold text-rose-900">{notDoneCount}</div>
           </div>
         </div>

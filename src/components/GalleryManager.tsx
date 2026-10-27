@@ -220,7 +220,7 @@ function SidePicker({
                     aria-label={`${label} video preview ${i + 1}`}
                     className="aspect-square w-full object-cover"
                   />
-                  <span className="absolute bottom-1.5 left-1.5 inline-flex items-center gap-1 rounded bg-black/70 px-1.5 py-0.5 text-[10px] font-medium text-white">
+                  <span className="absolute bottom-1.5 left-1.5 inline-flex items-center gap-1 rounded bg-black/70 px-1.5 py-0.5 text-xs font-medium text-white">
                     <Film className="h-3 w-3" />
                     {formatMB(files[i].size)}
                   </span>
@@ -591,7 +591,7 @@ export default function GalleryManager() {
       </Button>
 
       <div className="mt-8">
-        <h3 className="text-sm font-medium uppercase tracking-[0.12em] text-muted-foreground">
+        <h3 className="text-sm font-medium text-muted-foreground">
           Published projects
         </h3>
 

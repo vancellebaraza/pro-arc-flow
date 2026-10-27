@@ -92,7 +92,7 @@ export default function ProjectProgress({ status, className = "" }: Props) {
                     <div className="w-2 h-2 rounded-full" />
                   )}
                 </div>
-                <div className="mt-2 text-[11px] leading-tight text-muted-foreground max-w-[80px]">
+                <div className="mt-2 text-xs leading-tight text-muted-foreground max-w-[80px]">
                   {s.label}
                 </div>
               </div>

@@ -273,7 +273,7 @@ function InspectionPage() {
   }
 
   return (
-    <div className="p-4 md:p-8 fade-in max-w-5xl mx-auto pb-24">
+    <div className="fade-in pb-24">
       <Link
         to="/mini-admin/Engineer/$projectId"
         params={{ projectId }}
@@ -287,7 +287,7 @@ function InspectionPage() {
         Complete the checklist, photo evidence and sign-off.
       </p>
 
-      <section className="mt-8 grid md:grid-cols-2 gap-4">
+      <section className="mt-5 grid md:grid-cols-2 gap-4">
         <div>
           <Label>Work Category</Label>
           <select
@@ -348,7 +348,7 @@ function InspectionPage() {
         </div>
       </section>
 
-      <section className="mt-10">
+      <section className="mt-5">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold tracking-tight">Inspection Checklist</h2>
           <Button
@@ -423,7 +423,7 @@ function InspectionPage() {
         </div>
       </section>
 
-      <section className="mt-10">
+      <section className="mt-5">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold tracking-tight">Photo Evidence</h2>
           <Button
@@ -443,7 +443,7 @@ function InspectionPage() {
             >
               {(["before", "during", "after"] as const).map((field) => (
                 <div key={field} className="space-y-1">
-                  <Label className="text-xs uppercase tracking-wider text-muted-foreground">
+                  <Label className="text-xs text-muted-foreground">
                     {field}
                   </Label>
                   {p[field] ? (
@@ -495,7 +495,7 @@ function InspectionPage() {
         </div>
       </section>
 
-      <section className="mt-10">
+      <section className="mt-5">
         <h2 className="text-lg font-semibold tracking-tight">Sign-off</h2>
         <div className="mt-3 grid md:grid-cols-3 gap-4">
           <div className="rounded-lg border p-4 bg-card">
@@ -516,12 +516,12 @@ function InspectionPage() {
         </div>
       </section>
 
-      <section className="mt-8">
+      <section className="mt-5">
         <Label>General remarks</Label>
         <Textarea rows={3} value={remarks} onChange={(e) => setRemarks(e.target.value)} />
       </section>
 
-      <div className="mt-8 flex flex-wrap justify-end gap-2">
+      <div className="mt-5 flex flex-wrap justify-end gap-2">
         <Button variant="outline" onClick={exportPdf}>
           <FileDown className="h-4 w-4 mr-1" />
           Export PDF

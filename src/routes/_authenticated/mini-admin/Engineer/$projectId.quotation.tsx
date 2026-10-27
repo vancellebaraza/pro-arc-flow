@@ -271,7 +271,7 @@ function QuotationPage() {
   }
 
   return (
-    <div className="p-4 md:p-8 fade-in max-w-5xl mx-auto pb-24">
+    <div className="fade-in pb-24">
       <Link
         to="/mini-admin/Engineer/$projectId"
         params={{ projectId }}
@@ -283,7 +283,7 @@ function QuotationPage() {
       <h1 className="mt-3 text-2xl md:text-3xl font-semibold tracking-tight">Quotation</h1>
       <p className="text-muted-foreground mt-1">Project: {projectTitle}</p>
 
-      <section className="mt-6 grid md:grid-cols-2 gap-4">
+      <section className="mt-5 grid md:grid-cols-2 gap-4">
         <div>
           <Label>Bill To</Label>
           <Input
@@ -318,7 +318,7 @@ function QuotationPage() {
         </div>
       </section>
 
-      <section className="mt-8">
+      <section className="mt-5">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold tracking-tight">Line Items</h2>
           <Button
@@ -451,7 +451,7 @@ function QuotationPage() {
         </div>
       </section>
 
-      <section className="mt-6 grid md:grid-cols-2 gap-4">
+      <section className="mt-5 grid md:grid-cols-2 gap-4">
         <div>
           <Label>Notes</Label>
           <Textarea rows={4} value={notes} onChange={(e) => setNotes(e.target.value)} />
@@ -513,9 +513,9 @@ function QuotationPage() {
         </div>
       </section>
 
-      <section className="mt-8 rounded-lg border bg-card p-5">
+      <section className="mt-5 rounded-lg border bg-card p-5">
         <h3 className="font-medium">Payment Details</h3>
-        <div className="mt-4 grid gap-6 md:grid-cols-2 text-sm">
+        <div className="mt-4 grid gap-5 md:grid-cols-2 text-sm">
           <div className="rounded-md border bg-surface p-4">
             <h4 className="mb-3 font-medium text-foreground">Paybill Payments</h4>
             <div className="space-y-2">
@@ -562,7 +562,7 @@ function QuotationPage() {
         </div>
       </section>
 
-      <div className="mt-8 flex flex-wrap justify-end gap-2">
+      <div className="mt-5 flex flex-wrap justify-end gap-2">
         <Button variant="outline" onClick={exportPdf}>
           <FileDown className="h-4 w-4 mr-1" />
           Export PDF

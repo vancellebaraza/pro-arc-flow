@@ -526,7 +526,7 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
       <div className="rounded-xl border bg-card overflow-x-auto">
         <table className="w-full text-sm border-collapse">
           <thead>
-            <tr className="text-xs uppercase tracking-wide">
+            <tr className="text-xs">
               <th colSpan={6} className="p-2 text-center bg-violet-100 border">
                 Project
               </th>
@@ -784,7 +784,7 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
           ) : (
             <div className="max-h-[60vh] overflow-y-auto rounded-md border">
               <table className="w-full text-sm">
-                <thead className="bg-muted/50 text-left text-xs uppercase tracking-wide">
+                <thead className="bg-muted/50 text-left text-xs">
                   <tr>
                     <th className="p-2">Project</th>
                     <th className="p-2">Job No.</th>

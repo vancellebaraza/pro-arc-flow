@@ -452,7 +452,7 @@ function InspectionPage() {
             >
               {(["before", "during", "after"] as const).map((field) => (
                 <div key={field} className="space-y-1">
-                  <Label className="text-xs uppercase tracking-wider text-muted-foreground">
+                  <Label className="text-xs text-muted-foreground">
                     {field}
                   </Label>
                   {p[field] ? (

@@ -174,7 +174,7 @@ function ProjectDetail() {
       </Link>
       <div className="mt-4 flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground uppercase tracking-wider">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <span>{svc?.label}</span>·<span>{STATUS_LABEL[project.status] ?? project.status}</span>
           </div>
           <h1 className="text-2xl md:text-3xl font-semibold tracking-tight mt-1">

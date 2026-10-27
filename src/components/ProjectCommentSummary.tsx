@@ -94,7 +94,7 @@ export default function ProjectCommentSummary({ projects }: Props) {
           className="flex w-full items-center justify-between gap-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <div>
-            <div className="text-xs uppercase tracking-wider text-muted-foreground">
+            <div className="text-xs text-muted-foreground">
               Project comments
             </div>
             <div className="mt-1 text-3xl font-semibold">

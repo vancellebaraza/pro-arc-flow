@@ -256,8 +256,8 @@ function EngineerHome() {
   }
 
   return (
-    <div className="p-4 md:p-8 fade-in">
-      <div className="flex items-end justify-between flex-wrap gap-4 mb-6">
+    <div className="fade-in">
+      <div className="flex items-end justify-between flex-wrap gap-4 mb-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Engineer dashboard</h1>
           <p className="text-muted-foreground mt-1">
@@ -276,13 +276,13 @@ function EngineerHome() {
       </div>
 
       {loading ? (
-        <p className="text-sm text-muted-foreground mb-8">Loading…</p>
+        <p className="text-sm text-muted-foreground mb-4">Loading…</p>
       ) : filtered.length === 0 ? (
-        <div className="rounded-xl border bg-card p-10 text-center text-muted-foreground mb-8">
+        <div className="rounded-xl border bg-card p-6 text-center text-muted-foreground mb-4">
           No projects found.
         </div>
       ) : (
-        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 mb-8">
+        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 mb-4">
           {filtered.map((p) => {
             const svc = SERVICES.find((s) => s.key === p.service);
             const colors = statusColorClasses(p.status);
@@ -301,7 +301,7 @@ function EngineerHome() {
                 <div className={`absolute inset-y-0 left-0 w-[3px] ${colors.dot}`} />
                 <div className="pointer-events-none relative z-10">
                   <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1.5">
-                    <span className="text-xs uppercase tracking-wider text-muted-foreground">
+                    <span className="text-xs text-muted-foreground">
                       {svc?.label ?? p.service}
                     </span>
                     <div className="flex items-center gap-1.5">
@@ -330,7 +330,7 @@ function EngineerHome() {
         </ul>
       )}
 
-      <section className="mb-8 rounded-xl border bg-card p-5">
+      <section className="mb-4 rounded-xl border bg-card p-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <h2 className="text-lg font-semibold tracking-tight">My Staff To Do Row</h2>
@@ -418,7 +418,7 @@ function EngineerHome() {
                               <div className="mt-1 text-xs text-muted-foreground">
                                 {todo.location ?? "No location"}
                               </div>
-                              <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-white/80 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.15em] text-slate-700">
+                              <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-white/80 px-2 py-1 text-xs font-semibold text-slate-700">
                                 <span
                                   className={todo.is_done ? "text-emerald-700" : "text-rose-700"}
                                 >

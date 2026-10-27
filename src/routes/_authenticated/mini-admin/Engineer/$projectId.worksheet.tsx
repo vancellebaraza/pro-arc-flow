@@ -241,7 +241,7 @@ function WorksheetPage() {
   }
 
   return (
-    <div className="p-4 md:p-8 fade-in max-w-5xl mx-auto pb-24">
+    <div className="fade-in pb-24">
       <Link
         to="/mini-admin/Engineer/$projectId"
         params={{ projectId }}
@@ -255,7 +255,7 @@ function WorksheetPage() {
       </h1>
       <p className="text-muted-foreground mt-1">Document 2 — site assessment & sign-off.</p>
 
-      <section className="mt-6 grid md:grid-cols-2 gap-4">
+      <section className="mt-5 grid md:grid-cols-2 gap-4">
         <div>
           <Label>Client Name</Label>
           <Input value={clientName} onChange={(e) => setClientName(e.target.value)} />
@@ -286,7 +286,7 @@ function WorksheetPage() {
         </div>
       </section>
 
-      <section className="mt-6">
+      <section className="mt-5">
         <Label>Job Description</Label>
         <Textarea
           rows={4}
@@ -295,7 +295,7 @@ function WorksheetPage() {
         />
       </section>
 
-      <section className="mt-8 rounded-xl border bg-card p-5">
+      <section className="mt-5 rounded-xl border bg-card p-5">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
             <h2 className="text-lg font-semibold tracking-tight">Assign Vendor</h2>
@@ -406,7 +406,7 @@ function WorksheetPage() {
         ) : null}
       </section>
 
-      <section className="mt-8">
+      <section className="mt-5">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold tracking-tight">Site Visit & Scope Assessment</h2>
           <Button
@@ -469,7 +469,7 @@ function WorksheetPage() {
         </div>
       </section>
 
-      <section className="mt-8">
+      <section className="mt-5">
         <h2 className="text-lg font-semibold tracking-tight">Images Before</h2>
         <label className="mt-3 flex items-center justify-center rounded-md border border-dashed bg-surface px-4 py-6 text-sm text-muted-foreground cursor-pointer hover:bg-accent transition">
           <UploadCloud className="h-4 w-4 mr-2" /> Click to upload before-images
@@ -503,7 +503,7 @@ function WorksheetPage() {
         )}
       </section>
 
-      <section className="mt-8">
+      <section className="mt-5">
         <h2 className="text-lg font-semibold tracking-tight">Signatures</h2>
         <div className="mt-3 grid md:grid-cols-3 gap-4">
           <div className="rounded-lg border p-4 bg-card">
@@ -521,7 +521,7 @@ function WorksheetPage() {
         </div>
       </section>
 
-      <div className="mt-8 flex flex-wrap justify-end gap-2">
+      <div className="mt-5 flex flex-wrap justify-end gap-2">
         <Button variant="outline" onClick={exportPdf}>
           <FileDown className="h-4 w-4 mr-1" />
           Export PDF

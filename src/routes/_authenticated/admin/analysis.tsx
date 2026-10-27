@@ -522,7 +522,7 @@ function AdminAnalysisPage() {
         ))}
       </div>
 
-      <div className="mt-8 grid gap-6  lg:grid-cols-[1fr_1.2fr]">
+      <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_1.2fr]">
         <section className="rounded-lg border bg-card p-5">
           <h2 className="text-lg font-semibold tracking-tight">Project status</h2>
           <div className="mt-5 space-y-4">
@@ -545,7 +545,7 @@ function AdminAnalysisPage() {
             ))}
           </div>
         </section>
-        <section className="mt-8 rounded-lg border bg-card p-5  h-[420px] flex flex-col">
+        <section className="mt-8 rounded-lg border bg-card p-5 h-[420px] flex flex-col">
   <div className="flex items-center gap-2">
     <BarChart3 className="h-5 w-5 text-muted-foreground" />
     <h2 className="text-lg font-semibold">

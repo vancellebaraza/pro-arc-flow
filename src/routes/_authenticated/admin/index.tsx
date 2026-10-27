@@ -567,7 +567,7 @@ function AdminHome() {
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         {[{ label: "Total projects", value: rows.length }].map((s) => (
           <div key={s.label} className="rounded-xl border bg-card p-5">
-            <div className="text-xs uppercase tracking-wider text-muted-foreground">{s.label}</div>
+            <div className="text-xs text-muted-foreground">{s.label}</div>
             <div className="mt-1 text-3xl font-semibold">{s.value}</div>
           </div>
         ))}

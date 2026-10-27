@@ -225,13 +225,13 @@ function ProjectDetail() {
     }
   }
 
-  if (loading) return <div className="p-8 text-sm text-muted-foreground">Loading…</div>;
-  if (!project) return <div className="p-8 text-sm">Project not found.</div>;
+  if (loading) return <div className="p-6 text-sm text-muted-foreground">Loading…</div>;
+  if (!project) return <div className="p-6 text-sm">Project not found.</div>;
   const svc = SERVICES.find((s) => s.key === project.service);
   const waText = `FusionPro — Project: ${project.title} (${STATUS_LABEL[project.status] ?? project.status}). Reference: ${project.id.slice(0, 8)}`;
 
   return (
-    <div className="p-6 md:p-10 max-w-4xl mx-auto fade-in">
+    <div className="max-w-4xl fade-in">
       <Link
         to="/mini-admin/Admin/Clients"
         className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
@@ -241,7 +241,7 @@ function ProjectDetail() {
       </Link>
       <div className="mt-4 flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground uppercase tracking-wider">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <span>{svc?.label}</span>·<span>{STATUS_LABEL[project.status] ?? project.status}</span>
           </div>
           <h1 className="text-2xl md:text-3xl font-semibold tracking-tight mt-1">
@@ -313,12 +313,12 @@ function ProjectDetail() {
         </div>
       </div>
 
-      <ProjectProgress status={project.status} className="mt-6" />
+      <ProjectProgress status={project.status} className="mt-5" />
 
-      {project.description && <p className="mt-6 text-sm leading-relaxed">{project.description}</p>}
+      {project.description && <p className="mt-5 text-sm leading-relaxed">{project.description}</p>}
 
       {project.image_urls.length > 0 && (
-        <div className="mt-6 grid grid-cols-2 gap-3">
+        <div className="mt-5 grid grid-cols-2 gap-3">
           {project.image_urls.map((u, i) => (
             <a
               key={i}
@@ -333,7 +333,7 @@ function ProjectDetail() {
         </div>
       )}
 
-      <section className="mt-10">
+      <section className="mt-5">
         <h2 className="text-lg font-semibold tracking-tight">Inspection reports</h2>
         {inspections.length === 0 ? (
           <p className="text-sm text-muted-foreground mt-2">No inspections yet.</p>
@@ -367,7 +367,7 @@ function ProjectDetail() {
         )}
       </section>
 
-      <section className="mt-10">
+      <section className="mt-5">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold tracking-tight">Quotation</h2>
           {quote && (

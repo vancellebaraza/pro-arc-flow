@@ -125,7 +125,7 @@ function ClientHome() {
                     <div className={`absolute inset-y-0 left-0 w-[3px] ${colors.dot}`} />
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs uppercase tracking-wider text-muted-foreground">
+                        <span className="text-xs text-muted-foreground">
                           {svc?.label ?? p.service}
                         </span>
                         <StatusChip status={p.status} />

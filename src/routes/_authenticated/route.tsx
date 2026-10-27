@@ -213,7 +213,7 @@ function AuthedLayout() {
                 <button className="relative rounded-full p-2 text-muted-foreground hover:bg-accent">
                   <Bell className="h-5 w-5" />
                   {notifications.length > 0 && (
-                    <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-medium text-white">
+                    <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs font-medium text-white">
                       {notifications.length}
                     </span>
                   )}

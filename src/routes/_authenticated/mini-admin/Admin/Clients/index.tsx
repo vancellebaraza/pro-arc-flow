@@ -89,7 +89,7 @@ function ClientHome() {
   }, []);
 
   return (
-    <div className="p-6 md:p-10 max-w-5xl mx-auto fade-in">
+    <div className="fade-in">
       <div className="flex items-end justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">
@@ -108,11 +108,11 @@ function ClientHome() {
         </Button>
       </div>
 
-      <div className="mt-8">
+      <div className="mt-5">
         {loading ? (
           <p className="text-sm text-muted-foreground">Loading...</p>
         ) : projects.length === 0 ? (
-          <div className="rounded-xl border bg-card p-10 text-center">
+          <div className="rounded-xl border bg-card p-6 text-center">
             <p className="text-muted-foreground">No projects yet.</p>
 
             <Button asChild className="mt-4">
@@ -136,7 +136,7 @@ function ClientHome() {
                   >
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs uppercase tracking-wider text-muted-foreground">
+                        <span className="text-xs text-muted-foreground">
                           {svc?.label ?? p.service}
                         </span>
 

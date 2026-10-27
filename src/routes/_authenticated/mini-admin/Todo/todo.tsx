@@ -208,7 +208,7 @@ const deleteTodo = async () => {
   resetTodoEditor();
 };
   return <div>
-          <section className="mb-8 rounded-xl border bg-card p-5">
+          <section className="mb-4 rounded-xl border bg-card p-5">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
               <div>
                 <h2 className="text-lg font-semibold tracking-tight">My Staff To Do Row</h2>
@@ -306,7 +306,7 @@ const deleteTodo = async () => {
                                   <div className="mt-1 text-xs text-muted-foreground">
                                     {todo.location ?? "No location"}
                                   </div>
-                                  <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-white/80 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.15em] text-slate-700">
+                                  <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-white/80 px-2 py-1 text-xs font-semibold text-slate-700">
                                     <span
                                       className={todo.is_done ? "text-emerald-700" : "text-rose-700"}
                                     >

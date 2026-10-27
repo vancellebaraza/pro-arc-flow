@@ -129,7 +129,7 @@ function EngineerProjectHub() {
 
       <div className="mt-4 flex items-start justify-between gap-4 flex-wrap">
         <div className="min-w-0">
-          <div className="text-xs uppercase tracking-wider text-muted-foreground">
+          <div className="text-xs text-muted-foreground">
             {svc?.label} · {STATUS_LABEL[project.status] ?? project.status}
           </div>
           <h1 className="text-2xl md:text-3xl font-semibold tracking-tight mt-1 truncate">

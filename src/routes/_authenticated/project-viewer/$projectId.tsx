@@ -214,7 +214,7 @@ function ProjectViewerDetail() {
         </Link>
       </div>
       <div className="mt-4">
-        <div className="flex items-center gap-2 text-xs text-muted-foreground uppercase tracking-wider">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <span>{svc?.label}</span>·<span>{STATUS_LABEL[project.status] ?? project.status}</span>
         </div>
         <h1 className="text-2xl md:text-3xl font-semibold tracking-tight mt-1">{project.title}</h1>

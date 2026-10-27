@@ -60,8 +60,8 @@ function EngineerProjectHub() {
     load();
   }
 
-  if (loading) return <div className="p-8 text-sm text-muted-foreground">Loading…</div>;
-  if (!project) return <div className="p-8 text-sm">Project not found.</div>;
+  if (loading) return <div className="p-6 text-sm text-muted-foreground">Loading…</div>;
+  if (!project) return <div className="p-6 text-sm">Project not found.</div>;
 
   const svc = SERVICES.find((s) => s.key === project.service);
   const waText = `FusionPro engineer here regarding "${project.title}" (Ref ${project.id.slice(0, 8)}). `;
@@ -305,7 +305,7 @@ const [
   ];
 
   return (
-    <div className="p-4 md:p-8 fade-in max-w-5xl mx-auto">
+    <div className="fade-in">
       <Link
         to="/engineer"
         className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
@@ -316,7 +316,7 @@ const [
 
       <div className="mt-4 flex items-start justify-between gap-4 flex-wrap">
         <div className="min-w-0">
-          <div className="text-xs uppercase tracking-wider text-muted-foreground">
+          <div className="text-xs text-muted-foreground">
             {svc?.label} · {STATUS_LABEL[project.status] ?? project.status}
           </div>
           <h1 className="text-2xl md:text-3xl font-semibold tracking-tight mt-1 truncate">
@@ -359,7 +359,7 @@ const [
     <FileText className="mr-2 h-4 w-4" />
     Download Project Report
 </Button>
-      <h2 className="mt-10 text-lg font-semibold tracking-tight">Forms & tools</h2>
+      <h2 className="mt-5 text-lg font-semibold tracking-tight">Forms & tools</h2>
       <p className="text-sm text-muted-foreground">
         Each form opens in its own page so you have room to work.
       </p>
@@ -384,7 +384,7 @@ const [
           </li>
         ))}
       </ul>
-      <div className="mt-8">
+      <div className="mt-5">
         <Outlet />
       </div>
     </div>

@@ -97,7 +97,7 @@ function EngineerHome() {
                 >
                   <div className={`absolute inset-y-0 left-0 w-[3px] ${colors.dot}`} />
                   <div className="flex items-center justify-between">
-                    <span className="text-xs uppercase tracking-wider text-muted-foreground">
+                    <span className="text-xs text-muted-foreground">
                       {svc?.label ?? p.service}
                     </span>
                     <StatusChip status={p.status} />
