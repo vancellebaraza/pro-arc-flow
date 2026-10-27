@@ -137,13 +137,21 @@ function AdminHome() {
   const [savingEdit, setSavingEdit] = useState(false);
 
   const load = useCallback(async () => {
-    const { data } = await supabase
-      .from("projects")
-      .select(
-        `id,title,service,status,location,scheduled_date,scheduled_end_date,created_at,job_number,client_id,engineer_id,work_comment,quotations(project_id,grand_total,payment_status,created_at)`,
-      )
-      .eq("archived", false)
-      .order("created_at", { ascending: false });
+    // The independent queries run in parallel; only the profile lookup needs the project rows.
+    const [{ data }, { data: vendorCosts }, { data: quotations }] = await Promise.all([
+      supabase
+        .from("projects")
+        .select(
+          `id,title,service,status,location,scheduled_date,scheduled_end_date,created_at,job_number,client_id,engineer_id,work_comment,quotations(project_id,grand_total,payment_status,created_at)`,
+        )
+        .eq("archived", false)
+        .order("created_at", { ascending: false }),
+      supabase.from("project_vendor_assignments").select("project_id,cost"),
+      supabase
+        .from("quotations")
+        .select("id,project_id,grand_total,status, project:projects(title)")
+        .eq("status", "sent"),
+    ]);
 
     const projectRows = (data ?? []) as ProjectQueryRow[];
 
@@ -182,10 +190,6 @@ function AdminHome() {
       } as Row;
     });
 
-    const { data: vendorCosts } = await supabase
-      .from("project_vendor_assignments")
-      .select("project_id,cost");
-
     const vendorCostMap = (vendorCosts ?? []).reduce<Record<string, number>>(
       (map, assignment: VendorCostRow) => {
         map[assignment.project_id] =
@@ -202,10 +206,6 @@ function AdminHome() {
       })),
     );
 
-    const { data: quotations } = await supabase
-      .from("quotations")
-      .select("id,project_id,grand_total,status, project:projects(title)")
-      .eq("status", "sent");
     setPendingQuotes((quotations ?? []) as PendingQuoteRow[]);
   }, []);
   useEffect(() => {
