@@ -12,7 +12,7 @@ export function AccountantBackdrop() {
   return (
     <div
       aria-hidden="true"
-      className="accountant-backdrop pointer-events-none absolute right-0 top-0 -z-10 h-[300px] w-[min(1100px,100%)] opacity-[0.08]"
+      className="accountant-backdrop pointer-events-none absolute right-0 top-0 -z-10 h-[300px] w-[min(1100px,100%)] opacity-[0.18]"
     >
       <picture>
         <source media="(min-width: 768px)" type="image/avif" srcSet={bg735Avif} />
