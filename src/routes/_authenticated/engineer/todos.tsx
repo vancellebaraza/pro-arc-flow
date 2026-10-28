@@ -183,11 +183,11 @@ function EngineerTodos() {
               <div className="mt-1 flex flex-wrap gap-3 text-sm text-muted-foreground">
                 <span>Week starting: {format(weekStart, "MMM d, yyyy")}</span>
                 <div className="flex gap-2">
-                  <span className="bg-green-500 text-white px-3 py-1 rounded-md">
+                  <span className="bg-green-600 text-white px-3 py-1 rounded-full">
                     Done: {doneCount}
                   </span>
 
-                  <span className="bg-red-500 text-white px-3 py-1 rounded-md">
+                  <span className="bg-primary text-primary-foreground px-3 py-1 rounded-full">
                     Not done: {notDoneCount}
                   </span>
                 </div>
@@ -251,7 +251,7 @@ function EngineerTodos() {
                         <button
                           type="button"
                           onClick={() => openTodoEditor(date, todo)}
-                          className={`w-full rounded-xl border p-3 text-left transition hover:shadow-sm ${statusClasses}`}
+                          className={`w-full rounded-xl border p-3 text-left transition hover:shadow-[var(--shadow-raised)] ${statusClasses}`}
                         >
                           {todo ? (
                             <>

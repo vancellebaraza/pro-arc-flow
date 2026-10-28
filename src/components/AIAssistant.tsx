@@ -48,7 +48,7 @@ export function AIAssistant() {
         </button>
       )}
       {open && (
-        <div className="fixed bottom-5 right-5 z-50 w-[min(380px,calc(100vw-2rem))] h-[min(580px,calc(100vh-2rem))] rounded-xl border bg-card shadow-2xl flex flex-col overflow-hidden">
+        <div className="fixed bottom-5 right-5 z-50 w-[min(380px,calc(100vw-2rem))] h-[min(580px,calc(100vh-2rem))] rounded-3xl border bg-card shadow-[var(--shadow-pop)] flex flex-col overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b bg-primary text-primary-foreground">
             <div className="flex items-center gap-2">
               <Bot className="h-4 w-4" />

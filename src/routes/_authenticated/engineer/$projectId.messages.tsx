@@ -75,7 +75,7 @@ function MessagesPage() {
   }
 
   return (
-    <div className="fade-in pb-24 max-w-3xl">
+    <div className="fade-in pb-24">
       <Link
         to="/engineer/$projectId"
         params={{ projectId }}
@@ -104,7 +104,7 @@ function MessagesPage() {
           <p className="text-sm text-muted-foreground">No messages yet.</p>
         ) : (
           messages.map((m) => (
-            <div key={m.id} className="rounded-lg border bg-card p-3">
+            <div key={m.id} className="rounded-card border bg-card shadow-[var(--shadow-card)] p-3">
               <div className="text-sm text-muted-foreground">
                 {new Date(m.created_at).toLocaleString()}
               </div>
@@ -114,7 +114,7 @@ function MessagesPage() {
         )}
       </div>
 
-      <div className="mt-5 rounded-lg border bg-card p-3">
+      <div className="mt-5 rounded-card border bg-card shadow-[var(--shadow-card)] p-3">
         <Textarea
           rows={3}
           value={body}

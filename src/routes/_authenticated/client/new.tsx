@@ -73,7 +73,7 @@ function NewRequest() {
             id="service"
             name="service"
             required
-            className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+            className="mt-1 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm"
           >
             {SERVICES.map((s) => (
               <option key={s.key} value={s.key}>
@@ -113,7 +113,7 @@ function NewRequest() {
         </div>
         <div>
           <Label>Images (max 2)</Label>
-          <label className="mt-1 flex items-center justify-center rounded-md border border-dashed bg-surface px-4 py-6 text-sm text-muted-foreground cursor-pointer hover:bg-accent transition">
+          <label className="mt-1 flex items-center justify-center rounded-2xl border border-dashed bg-surface px-4 py-6 text-sm text-muted-foreground cursor-pointer hover:bg-accent transition">
             <UploadCloud className="h-4 w-4 mr-2" /> Click to upload
             <input
               type="file"

@@ -353,7 +353,7 @@ const grandTotal = vatableAmount + vatAmount;
   Add Subtitle
 </Button>
         </div>
-        <div className="mt-3 overflow-x-auto rounded-lg border">
+        <div className="mt-3 overflow-x-auto rounded-2xl border">
           <table className="w-full text-sm">
             <thead className="bg-surface text-left">
               <tr>
@@ -369,7 +369,7 @@ const grandTotal = vatableAmount + vatAmount;
 {items.map((it, i) => {
   if (it.type === "subtitle") {
     return (
-      <tr key={i} className="bg-gray-100">
+      <tr key={i} className="bg-muted">
         <td colSpan={6} className="p-2">
           <div className="flex items-center gap-2">
             <Input
@@ -474,7 +474,7 @@ const grandTotal = vatableAmount + vatAmount;
             />
           </div>
         </div>
-    <div className="rounded-lg border bg-surface p-4 self-start space-y-3">
+    <div className="rounded-2xl border bg-surface p-4 self-start space-y-3">
   <div className="flex items-center gap-2">
     <Label className="flex-1">Labour (KES)</Label>
     <Input
@@ -525,7 +525,7 @@ const grandTotal = vatableAmount + vatAmount;
 </div>
       </section>
 
-      <section className="mt-5 rounded-lg border bg-card p-5">
+      <section className="mt-5 rounded-card border bg-card shadow-[var(--shadow-card)] p-5">
         <h3 className="font-medium">Payment Option — Bank Details</h3>
         <div className="mt-3 grid sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
           <div>

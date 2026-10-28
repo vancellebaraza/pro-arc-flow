@@ -164,7 +164,7 @@ function ProjectDetail() {
   const waText = `FusionPro — Project: ${project.title} (${STATUS_LABEL[project.status] ?? project.status}). Reference: ${project.id.slice(0, 8)}`;
 
   return (
-    <div className="fade-in max-w-4xl">
+    <div className="fade-in">
       <Link
         to="/client"
         className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
@@ -202,7 +202,7 @@ function ProjectDetail() {
               href={u}
               target="_blank"
               rel="noreferrer"
-              className="block rounded-md overflow-hidden border bg-card"
+              className="block rounded-2xl overflow-hidden border bg-card"
             >
               <img src={u} alt={`attachment ${i + 1}`} className="w-full h-40 object-cover" />
             </a>
@@ -217,7 +217,7 @@ function ProjectDetail() {
         ) : (
           <ul className="mt-3 space-y-3">
             {inspections.map((ins) => (
-              <li key={ins.id} className="rounded-lg border bg-card p-4">
+              <li key={ins.id} className="rounded-card border bg-card shadow-[var(--shadow-card)] p-4">
                 <div className="flex justify-between text-sm">
                   <span className="font-medium capitalize">{ins.stage} inspection</span>
                   <span className="text-muted-foreground">
@@ -257,7 +257,7 @@ function ProjectDetail() {
         {!quote ? (
           <p className="text-sm text-muted-foreground mt-2">No quotation yet.</p>
         ) : (
-          <div className="mt-3 rounded-lg border bg-card overflow-hidden">
+          <div className="mt-3 rounded-card border bg-card shadow-[var(--shadow-card)] overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-surface text-left">
                 <tr>

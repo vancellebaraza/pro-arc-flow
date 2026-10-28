@@ -180,9 +180,9 @@ function EngineerProjectHub() {
             <Link
               to={t.to}
               params={{ projectId: project.id }}
-              className="flex items-start gap-3 rounded-xl border bg-card p-5 hover:border-foreground/40 hover:shadow-sm transition"
+              className="flex items-start gap-3 rounded-xl border bg-card p-5 hover:border-foreground/40 hover:shadow-[var(--shadow-raised)] transition"
             >
-              <div className="grid h-10 w-10 place-items-center rounded-md bg-foreground/5 shrink-0">
+              <div className="grid h-10 w-10 place-items-center rounded-xl bg-foreground/5 shrink-0">
                 <t.icon className="h-5 w-5" />
               </div>
               <div className="min-w-0 flex-1">

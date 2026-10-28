@@ -432,7 +432,7 @@ setEngineers(profiles as StaffMember[]);
                         <button
                           type="button"
                           onClick={() => openCellEditor(staff, date, todo)}
-                          className={`w-full rounded-xl border p-3 text-left transition hover:shadow-sm ${statusClasses}`}
+                          className={`w-full rounded-xl border p-3 text-left transition hover:shadow-[var(--shadow-raised)] ${statusClasses}`}
                         >
                           {todo ? (
     <div className="flex h-full items-center justify-center">

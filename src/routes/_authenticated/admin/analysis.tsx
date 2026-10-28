@@ -373,7 +373,7 @@ function AdminAnalysisPage() {
                 setSelectedCategory(category.key);
                 setSelectedProjectId(null);
               }}
-              className={`rounded-lg border p-5 text-left transition hover:border-foreground/40 hover:shadow-sm ${category.key === "scope" ? "bg-fuchsia-100" : "bg-card"}`}
+              className={`rounded-card border p-5 text-left transition hover:border-foreground/40 hover:shadow-[var(--shadow-raised)] ${category.key === "scope" ? "bg-[color-mix(in_oklch,var(--primary)_10%,var(--card))]" : "bg-card"}`}
             >
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
@@ -418,7 +418,7 @@ function AdminAnalysisPage() {
               >
                 Back to list
               </Button>
-              <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
+              <div className="rounded-2xl border bg-muted/30 p-4 space-y-3">
                 <div>
                   <div className="text-sm text-muted-foreground">Title</div>
                   <div className="font-semibold">{selectedProject.title}</div>
@@ -456,7 +456,7 @@ function AdminAnalysisPage() {
           ) : (
             <div className="max-h-[60vh] space-y-3 overflow-y-auto pr-1">
               {selectedProjects.length === 0 ? (
-                <div className="rounded-lg border p-4 text-sm text-muted-foreground">
+                <div className="rounded-2xl border p-4 text-sm text-muted-foreground">
                   No projects in this category.
                 </div>
               ) : (
@@ -467,7 +467,7 @@ function AdminAnalysisPage() {
                       key={project.id}
                       type="button"
                       onClick={() => setSelectedProjectId(project.id)}
-                      className="flex w-full items-start justify-between gap-3 rounded-lg border bg-background/50 p-4 text-left transition hover:border-foreground/40"
+                      className="flex w-full items-start justify-between gap-3 rounded-2xl border bg-background/50 p-4 text-left transition hover:border-foreground/40"
                     >
                       <div className="min-w-0">
                         <div className="font-medium">{project.title}</div>
@@ -523,7 +523,7 @@ function AdminAnalysisPage() {
       </div>
 
       <div className="mt-5 grid gap-5 lg:grid-cols-[1fr_1.2fr]">
-        <section className="rounded-lg border bg-card p-5">
+        <section className="rounded-card border bg-card shadow-[var(--shadow-card)] p-5">
           <h2 className="font-display text-xl font-bold">Project status</h2>
           <div className="mt-5 space-y-4">
             {analysis.statusCounts.length === 0 && (
@@ -545,7 +545,7 @@ function AdminAnalysisPage() {
             ))}
           </div>
         </section>
-        <section className="mt-5 rounded-lg border bg-card p-5 h-[420px] flex flex-col">
+        <section className="mt-5 rounded-card border bg-card shadow-[var(--shadow-card)] p-5 h-[420px] flex flex-col">
   <div className="flex items-center gap-2">
     <BarChart3 className="h-5 w-5 text-muted-foreground" />
     <h2 className="font-display text-xl font-bold">
@@ -570,7 +570,7 @@ function AdminAnalysisPage() {
 
           <div className="h-5 rounded-full bg-muted overflow-hidden">
             <div
-              className="h-full rounded-full bg-blue-600"
+              className="h-full rounded-full bg-primary"
               style={{
                 width: `${(count / maxLocationCount) * 100}%`,
               }}
@@ -582,7 +582,7 @@ function AdminAnalysisPage() {
   </div>
         </section>
 
-        <section className="rounded-lg border bg-card p-5 lg:col-span-2">
+        <section className="rounded-card border bg-card shadow-[var(--shadow-card)] p-5 lg:col-span-2">
           <h2 className="font-display text-xl font-bold">New projects by month</h2>
           <div className="mt-5 flex h-56 items-end gap-3">
             {analysis.monthCounts.map((month) => (
@@ -603,7 +603,7 @@ function AdminAnalysisPage() {
         </section>
       </div>
 
-      <section className="mt-5 rounded-lg border bg-card p-5">
+      <section className="mt-5 rounded-card border bg-card shadow-[var(--shadow-card)] p-5">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>
             <h2 className="font-display text-xl font-bold">Project Gantt chart</h2>
@@ -678,7 +678,7 @@ function AdminAnalysisPage() {
         </div>
       </section>
 
-      <section className="mt-5 rounded-lg border bg-card p-5">
+      <section className="mt-5 rounded-card border bg-card shadow-[var(--shadow-card)] p-5">
         <h2 className="font-display text-xl font-bold">Service Gantt chart</h2>
         <div className="mt-5 overflow-x-auto">
           <div className="min-w-[760px]">
@@ -737,7 +737,7 @@ function AdminAnalysisPage() {
         </div>
       </section>
 
-      <section className="mt-5 rounded-lg border bg-card p-5">
+      <section className="mt-5 rounded-card border bg-card shadow-[var(--shadow-card)] p-5">
         <div className="flex items-center gap-2">
           <BriefcaseBusiness className="h-5 w-5 text-muted-foreground" />
           <h2 className="font-display text-xl font-bold">Service performance</h2>
@@ -775,7 +775,7 @@ function AdminAnalysisPage() {
         </div>
       </section>
 
-      <section className="mt-5 rounded-lg border bg-card p-5">
+      <section className="mt-5 rounded-card border bg-card shadow-[var(--shadow-card)] p-5">
         <h2 className="font-display text-xl font-bold">Highest quoted projects</h2>
         <div className="mt-4 overflow-x-auto">
           <Table>

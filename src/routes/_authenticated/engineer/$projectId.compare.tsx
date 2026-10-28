@@ -62,7 +62,7 @@ function ComparePage() {
   const diff = totalA - totalQ;
 
   return (
-    <div className="fade-in pb-24 max-w-4xl">
+    <div className="fade-in pb-24">
       <Link
         to="/engineer/$projectId"
         params={{ projectId }}
