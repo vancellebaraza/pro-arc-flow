@@ -28,12 +28,15 @@ function NewRequest() {
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
+    const service = SERVICES.find((option) => option.key === fd.get("service"));
+    if (!service) {
+      toast.error("Please select a valid service");
+      return;
+    }
     setSubmitting(true);
     try {
       const { data: u } = await getUserCached();
       if (!u.user) throw new Error("Not signed in");
-      const service = SERVICES.find((option) => option.key === fd.get("service"))?.key;
-      if (!service) throw new Error("Please select a valid service");
       const urls: string[] = [];
       for (const file of files) {
         const path = `${u.user.id}/${Date.now()}-${file.name}`;
@@ -44,7 +47,7 @@ function NewRequest() {
       }
       const { error } = await supabase.from("projects").insert({
         client_id: u.user.id,
-        service,
+        service: service.key,
         title: String(fd.get("title")),
         description: String(fd.get("description") || ""),
         location: String(fd.get("location") || ""),
