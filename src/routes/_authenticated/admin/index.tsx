@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import WorkDataSheet from "@/components/WorkDataSheet";
+import { CollapsibleSection } from "@/components/CollapsibleSection";
 import ProjectCommentSummary from "@/components/ProjectCommentSummary";
 import ApproveEvidenceDialog from "@/components/ApproveEvidenceDialog";
 import QuotationDetailsDialog from "@/components/QuotationDetailsDialog";
@@ -575,9 +576,13 @@ function AdminHome() {
       </div>
 
       {pendingQuotes.length > 0 && (
-        <section className="mt-5">
-          <h2 className="font-display text-xl font-bold">Quotations pending approval</h2>
-          <ul className="mt-3 rounded-xl border bg-card divide-y">
+        <CollapsibleSection
+          className="mt-5"
+          title="Quotations pending approval"
+          count={pendingQuotes.length}
+          storageKey="admin-dashboard:pending-quotations"
+        >
+          <ul className="rounded-xl border bg-card divide-y">
             {pendingQuotes.map((q) => (
               <li key={q.id} className="flex items-center justify-between gap-4 px-4 py-3">
                 <div className="min-w-0">
@@ -601,7 +606,7 @@ function AdminHome() {
               </li>
             ))}
           </ul>
-        </section>
+        </CollapsibleSection>
       )}
 
       {pendingVendorAssignments.length > 0 && (
