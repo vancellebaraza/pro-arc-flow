@@ -4,7 +4,8 @@ import { Logo } from "@/components/Logo";
 import { ArrowRight, Menu, ShieldCheck, ClipboardList, BarChart3 } from "lucide-react";
 import Footer from "@/components/ui/footer";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useHeroParallax } from "@/lib/useHeroParallax";
 import {
   Dialog,
   DialogContent,
@@ -42,6 +43,14 @@ export const Route = createFileRoute("/")({
 });
 
 function Landing() {
+  const heroRef = useRef<HTMLElement>(null);
+  const heroBgRef = useRef<HTMLDivElement>(null);
+  const heroTextRef = useRef<HTMLDivElement>(null);
+  useHeroParallax(heroRef, [
+    { ref: heroBgRef, rate: 0.18, cap: 60 },
+    { ref: heroTextRef, rate: -0.06, cap: 24 },
+  ]);
+
   const [selectedService, setSelectedService] = useState<(typeof SERVICES)[number] | null>(null);
 
   const [open, setOpen] = useState(false);
@@ -161,20 +170,23 @@ function Landing() {
         </div>
       </header>
 
-      <section className="relative overflow-hidden bg-white fade-in">
+      <section ref={heroRef} className="relative overflow-hidden bg-white fade-in">
         <div className="pointer-events-none absolute inset-0">
-          <img
-            src="/images/hero-engineer.png"
-            alt="Engineer on site"
-            className="absolute inset-0 h-full w-full object-cover object-[right_center]"
-          />
+          {/* Extends 64px above the hero so the layer never shows an edge as it shifts down. */}
+          <div ref={heroBgRef} className="absolute inset-x-0 -top-16 bottom-0">
+            <img
+              src="/images/hero-engineer.png"
+              alt="Engineer on site"
+              className="absolute inset-0 h-full w-full object-cover object-[right_center]"
+            />
+          </div>
           <div className="absolute inset-0 hidden md:block bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.98),transparent_24%),radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.96),transparent_28%),linear-gradient(90deg,rgba(255,255,255,0.98),rgba(255,255,255,0.6)_35%,transparent_65%),linear-gradient(180deg,rgba(255,255,255,0.95),transparent_42%)]" />
           <div className="absolute inset-0 block md:hidden bg-[linear-gradient(180deg,rgba(255,255,255,0.97)_0%,rgba(255,255,255,0.97)_55%,rgba(255,255,255,0.8)_75%,rgba(255,255,255,0.55)_100%)]" />
         </div>
 
         <div className="relative mx-auto max-w-6xl px-6 pt-24 pb-20 z-10">
           <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center">
-            <div className="relative">
+            <div ref={heroTextRef} className="relative">
               <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
                 FusionPro limited · Repairs & Renovations
               </p>
