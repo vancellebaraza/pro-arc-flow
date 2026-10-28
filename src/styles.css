@@ -340,3 +340,38 @@
     scrollbar-color: rgb(156 163 175) transparent;
   }
 }
+
+/* Page transitions (View Transitions API, enabled in router.tsx). Opacity and transform only. */
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root),
+  ::view-transition-new(root),
+  ::view-transition-group(hero-visual) {
+    animation-duration: 300ms;
+    animation-timing-function: ease-out;
+  }
+  ::view-transition-old(login-card) {
+    animation: vt-card-out 300ms ease-out both;
+  }
+  ::view-transition-new(login-card) {
+    animation: vt-card-in 300ms ease-out both;
+  }
+  @keyframes vt-card-in {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 12px, 0);
+    }
+  }
+  @keyframes vt-card-out {
+    to {
+      opacity: 0;
+      transform: translate3d(0, 12px, 0);
+    }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

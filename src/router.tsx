@@ -13,6 +13,10 @@ export const getRouter = () => {
     scrollRestoration: true,
     defaultPreload: "intent",
     defaultPreloadStaleTime: 30_000,
+    // Falls back to an instant navigation where the View Transitions API is missing.
+    defaultViewTransition:
+      typeof window === "undefined" ||
+      !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
   });
 
   return router;

@@ -6,6 +6,7 @@ import Footer from "@/components/ui/footer";
 
 import { useRef, useState } from "react";
 import { useHeroParallax } from "@/lib/useHeroParallax";
+import { warmLoginHero } from "@/lib/loginHero";
 import {
   Dialog,
   DialogContent,
@@ -123,6 +124,9 @@ function Landing() {
 
             <Link
               to="/auth"
+              onPointerEnter={warmLoginHero}
+              onFocus={warmLoginHero}
+              onTouchStart={warmLoginHero}
               className="inline-flex items-center gap-1 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90"
             >
               Sign in
@@ -159,7 +163,13 @@ function Landing() {
                 </DropdownMenuItem>
 
                 <DropdownMenuItem asChild>
-                  <Link to="/auth" className="flex w-full items-center justify-between">
+                  <Link
+                    to="/auth"
+                    onPointerEnter={warmLoginHero}
+                    onFocus={warmLoginHero}
+                    onTouchStart={warmLoginHero}
+                    className="flex w-full items-center justify-between"
+                  >
                     Sign in
                     <ArrowRight className="h-4 w-4" />
                   </Link>
@@ -177,7 +187,7 @@ function Landing() {
             <img
               src="/images/hero-engineer.png"
               alt="Engineer on site"
-              className="absolute inset-0 h-full w-full object-cover object-[right_center]"
+              className="absolute inset-0 h-full w-full [view-transition-name:hero-visual] object-cover object-[right_center]"
             />
           </div>
           <div className="absolute inset-0 hidden md:block bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.98),transparent_24%),radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.96),transparent_28%),linear-gradient(90deg,rgba(255,255,255,0.98),rgba(255,255,255,0.6)_35%,transparent_65%),linear-gradient(180deg,rgba(255,255,255,0.95),transparent_42%)]" />
@@ -202,6 +212,9 @@ function Landing() {
               <div className="mt-10 flex flex-wrap gap-3">
                 <Link
                   to="/auth"
+                  onPointerEnter={warmLoginHero}
+                  onFocus={warmLoginHero}
+                  onTouchStart={warmLoginHero}
                   className="inline-flex items-center gap-2 rounded-md bg-primary text-primary-foreground px-5 py-3 text-sm font-medium hover:opacity-90 transition"
                 >
                   Get started <ArrowRight className="h-4 w-4" />

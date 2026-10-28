@@ -10,13 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { ArrowLeft, Loader2 } from "lucide-react";
-import hero640Avif from "@/assets/login/login-engineer-640.avif";
-import hero640Webp from "@/assets/login/login-engineer-640.webp";
-import hero800Avif from "@/assets/login/login-engineer-800.avif";
-import hero800Webp from "@/assets/login/login-engineer-800.webp";
-import hero800Jpg from "@/assets/login/login-engineer-800.jpg";
-import hero1512Avif from "@/assets/login/login-engineer-1512.avif";
-import hero1512Webp from "@/assets/login/login-engineer-1512.webp";
+import { LOGIN_HERO, LOGIN_HERO_SIZES, warmHomeHero } from "@/lib/loginHero";
 import { ensureFixedAccounts } from "@/lib/setup.functions";
 import WhatsAppButton from "@/components/WhatsAppButton2";
 import { getRolesCached, getUserCached } from "@/lib/auth-cache";
@@ -168,7 +162,6 @@ function AuthPage() {
   const inputCls = "h-14 rounded-full bg-card px-6 text-base md:text-base";
   const passwordCls = `${inputCls} pr-14`;
   const labelCls = "mb-2 block text-sm font-semibold";
-  const heroSizes = "max(50vw, 188vh)";
 
   return (
     <div className="min-h-screen bg-muted md:grid md:grid-cols-2">
@@ -177,25 +170,25 @@ function AuthPage() {
           <source
             media="(min-width: 768px)"
             type="image/avif"
-            srcSet={`${hero800Avif} 800w, ${hero1512Avif} 1512w`}
-            sizes={heroSizes}
+            srcSet={LOGIN_HERO.desktop.avif}
+            sizes={LOGIN_HERO_SIZES}
           />
           <source
             media="(min-width: 768px)"
             type="image/webp"
-            srcSet={`${hero800Webp} 800w, ${hero1512Webp} 1512w`}
-            sizes={heroSizes}
+            srcSet={LOGIN_HERO.desktop.webp}
+            sizes={LOGIN_HERO_SIZES}
           />
-          <source media="(max-width: 767px)" type="image/avif" srcSet={hero640Avif} />
-          <source media="(max-width: 767px)" type="image/webp" srcSet={hero640Webp} />
+          <source media="(max-width: 767px)" type="image/avif" srcSet={LOGIN_HERO.mobile.avif} />
+          <source media="(max-width: 767px)" type="image/webp" srcSet={LOGIN_HERO.mobile.webp} />
           <img
-            src={hero800Jpg}
+            src={LOGIN_HERO.fallback}
             width={1512}
             height={803}
             alt="A FusionPro engineer in a hard hat and company overalls"
             fetchPriority="high"
             decoding="async"
-            className="absolute inset-0 h-full w-full object-cover object-[12%_0%] md:object-[14%_30%] lg:object-[10%_30%]"
+            className="absolute inset-0 h-full w-full [view-transition-name:hero-visual] object-cover object-[12%_0%] md:object-[14%_30%] lg:object-[10%_30%]"
           />
         </picture>
         <Button
@@ -203,7 +196,12 @@ function AuthPage() {
           variant="dark"
           className="absolute left-3 top-3 z-10 h-9 px-4 text-xs md:left-6 md:top-6 md:h-11 md:px-5 md:text-sm"
         >
-          <Link to="/">
+          <Link
+            to="/"
+            onPointerEnter={warmHomeHero}
+            onFocus={warmHomeHero}
+            onTouchStart={warmHomeHero}
+          >
             <ArrowLeft aria-hidden="true" />
             Back to home
           </Link>
@@ -214,7 +212,7 @@ function AuthPage() {
       </div>
 
       <div className="flex items-center justify-center p-4 sm:p-6 md:min-h-screen md:p-8">
-        <div className="relative z-10 -mt-6 w-full max-w-[560px] rounded-[2rem] border border-border/60 bg-background p-8 shadow-[var(--shadow-card)] md:mt-0 md:p-10">
+        <div className="relative z-10 -mt-6 w-full [view-transition-name:login-card] max-w-[560px] rounded-[2rem] border border-border/60 bg-background p-8 shadow-[var(--shadow-card)] md:mt-0 md:p-10">
           <Logo className="h-20 w-auto" />
           <Tabs value={mode} onValueChange={(v) => setMode(v as "signin" | "signup")}>
             <TabsContent value="signin" className="mt-0">
