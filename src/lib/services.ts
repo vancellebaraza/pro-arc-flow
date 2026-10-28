@@ -11,17 +11,39 @@ import {
   Warehouse,
 } from "lucide-react";
 
-export type ServiceKey =
+// Mirrors the database enum service_type; a ServiceKey that is not in this list fails typecheck.
+export const DB_SERVICE_TYPES = [
+  "electrical",
+  "plumbing",
+  "landscaping",
+  "painting",
+  "property_management",
+  "tank_cleaning",
+  "renovation",
+  "solar_installation",
+  "cctv_installation",
+  "electric_fence",
+  "civil_works",
+  "property_repairs",
+  "security_systems",
+] as const;
+export type DbServiceType = (typeof DB_SERVICE_TYPES)[number];
+
+// Constraining the parameter makes any key outside the database enum a compile error.
+type OnlyDbServiceTypes<T extends DbServiceType> = T;
+
+export type ServiceKey = OnlyDbServiceTypes<
   | "electrical"
   | "plumbing"
   | "landscaping"
   | "painting"
   | "cctv_installation"
-  | "solar"
+  | "solar_installation"
   | "civil_works"
   | "electric_fence"
   | "renovation"
-  | "tank_cleaning";
+  | "tank_cleaning"
+>;
 
 export const SERVICES: Array<{
   key: ServiceKey;
@@ -80,7 +102,7 @@ export const SERVICES: Array<{
     image: "/plumbing.jpeg",
   },
   {
-    key: "solar",
+    key: "solar_installation",
     label: "Solar Installation",
     icon: Sun,
     desc: " Supply, installation, maintenance, and repair of solar power systems, including solar panels, batteries, inverters, solar lighting, and solar water pumping systems.",
