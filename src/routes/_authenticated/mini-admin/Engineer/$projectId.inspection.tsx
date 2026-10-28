@@ -11,8 +11,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { SERVICES } from "@/lib/services";
 import { generateInspectionPdf } from "@/lib/pdf";
 import { toast } from "sonner";
-import { jsPDF } from "jspdf";
 import { ArrowLeft, Plus, Trash2, Save, FileDown, UploadCloud } from "lucide-react";
+import { getUserCached } from "@/lib/auth-cache";
 
 export const Route = createFileRoute("/_authenticated/mini-admin/Engineer/$projectId/inspection")({
   component: InspectionPage,
@@ -80,7 +80,7 @@ function InspectionPage() {
   }, [stage, projectId]);
 
   async function uploadImage(file: File): Promise<string> {
-    const { data: u } = await supabase.auth.getUser();
+    const { data: u } = await getUserCached();
     if (!u.user) throw new Error("Not signed in");
     const path = `${u.user.id}/insp/${projectId}/${Date.now()}-${file.name}`;
     const { error: uploadError } = await supabase.storage.from("project-images").upload(path, file);
@@ -181,7 +181,7 @@ function InspectionPage() {
   async function save() {
     setSaving(true);
     try {
-      const { data: u } = await supabase.auth.getUser();
+      const { data: u } = await getUserCached();
       if (!u.user) throw new Error("Not signed in");
       const checklistJson = checklist.map((c) => ({
         item: c.item,
@@ -251,6 +251,7 @@ function InspectionPage() {
       "Exporting inspection PDF photoEvidence summary:",
       photos.map((p) => ({ before: p.before?.slice(0, 80), during: p.during?.slice(0, 80), after: p.after?.slice(0, 80) })),
     );
+    const { jsPDF } = await import("jspdf");
     const doc = new jsPDF();
     await generateInspectionPdf(doc, {
       workCategory: SERVICES.find((s) => s.key === workCategory)?.label ?? workCategory,
@@ -272,7 +273,7 @@ function InspectionPage() {
   }
 
   return (
-    <div className="p-4 md:p-8 fade-in max-w-5xl mx-auto pb-24">
+    <div className="fade-in pb-24">
       <Link
         to="/mini-admin/Engineer/$projectId"
         params={{ projectId }}
@@ -281,12 +282,12 @@ function InspectionPage() {
         <ArrowLeft className="h-4 w-4 mr-1" />
         Back to project
       </Link>
-      <h1 className="mt-3 text-2xl md:text-3xl font-semibold tracking-tight">Inspection Report</h1>
-      <p className="text-muted-foreground mt-1">
+      <h1 className="font-display text-[1.75rem] font-bold leading-tight mt-3">Inspection Report</h1>
+      <p className="mt-1 text-sm text-muted-foreground">
         Complete the checklist, photo evidence and sign-off.
       </p>
 
-      <section className="mt-8 grid md:grid-cols-2 gap-4">
+      <section className="mt-5 grid md:grid-cols-2 gap-4">
         <div>
           <Label>Work Category</Label>
           <select
@@ -347,9 +348,9 @@ function InspectionPage() {
         </div>
       </section>
 
-      <section className="mt-10">
+      <section className="mt-5">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold tracking-tight">Inspection Checklist</h2>
+          <h2 className="font-display text-xl font-bold">Inspection Checklist</h2>
           <Button
             variant="outline"
             size="sm"
@@ -422,9 +423,9 @@ function InspectionPage() {
         </div>
       </section>
 
-      <section className="mt-10">
+      <section className="mt-5">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold tracking-tight">Photo Evidence</h2>
+          <h2 className="font-display text-xl font-bold">Photo Evidence</h2>
           <Button
             variant="outline"
             size="sm"
@@ -442,7 +443,7 @@ function InspectionPage() {
             >
               {(["before", "during", "after"] as const).map((field) => (
                 <div key={field} className="space-y-1">
-                  <Label className="text-xs uppercase tracking-wider text-muted-foreground">
+                  <Label className="text-sm text-muted-foreground">
                     {field}
                   </Label>
                   {p[field] ? (
@@ -494,33 +495,33 @@ function InspectionPage() {
         </div>
       </section>
 
-      <section className="mt-10">
-        <h2 className="text-lg font-semibold tracking-tight">Sign-off</h2>
+      <section className="mt-5">
+        <h2 className="font-display text-xl font-bold">Sign-off</h2>
         <div className="mt-3 grid md:grid-cols-3 gap-4">
           <div className="rounded-lg border p-4 bg-card">
             <Label>Client Signature</Label>
             <SignaturePad value={sigClient || null} onChange={(v) => setSigClient(v ?? "")} label="Client signature" />
-            <div className="mt-3 text-xs text-muted-foreground">Client signature collected on site.</div>
+            <div className="mt-3 text-sm text-muted-foreground">Client signature collected on site.</div>
           </div>
           <div className="rounded-lg border p-4 bg-card">
             <Label>Inspector Signature</Label>
             <SignaturePad value={sigInspector || null} onChange={(v) => setSigInspector(v ?? "")} label="Inspector signature" />
-            <div className="mt-3 text-xs text-muted-foreground">Inspector signature collected on site.</div>
+            <div className="mt-3 text-sm text-muted-foreground">Inspector signature collected on site.</div>
           </div>
           <div className="rounded-lg border p-4 bg-card">
             <Label>Technician Signature</Label>
             <SignaturePad value={sigTechnician || null} onChange={(v) => setSigTechnician(v ?? "")} label="Technician signature" />
-            <div className="mt-3 text-xs text-muted-foreground">Technician signature collected on site.</div>
+            <div className="mt-3 text-sm text-muted-foreground">Technician signature collected on site.</div>
           </div>
         </div>
       </section>
 
-      <section className="mt-8">
+      <section className="mt-5">
         <Label>General remarks</Label>
         <Textarea rows={3} value={remarks} onChange={(e) => setRemarks(e.target.value)} />
       </section>
 
-      <div className="mt-8 flex flex-wrap justify-end gap-2">
+      <div className="mt-5 flex flex-wrap justify-end gap-2">
         <Button variant="outline" onClick={exportPdf}>
           <FileDown className="h-4 w-4 mr-1" />
           Export PDF

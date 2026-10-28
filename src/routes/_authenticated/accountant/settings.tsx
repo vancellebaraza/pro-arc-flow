@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import { getUserCached } from "@/lib/auth-cache";
 
 export const Route = createFileRoute("/_authenticated/accountant/settings")({
   component: SettingsPage,
@@ -87,7 +88,7 @@ function SettingsPage() {
 
     setSaving(true);
     try {
-      const { data: userData } = await supabase.auth.getUser();
+      const { data: userData } = await getUserCached();
 
       const { error } = await supabase
         .from("company_settings")
@@ -119,9 +120,9 @@ function SettingsPage() {
   )}`;
 
   return (
-    <div className="p-4 md:p-8 fade-in max-w-2xl">
+    <div className="fade-in max-w-2xl">
       <div className="mb-6">
-        <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Settings</h1>
+        <h1 className="font-display text-[1.75rem] font-bold leading-tight">Settings</h1>
         <p className="text-muted-foreground mt-1">
           Company-wide defaults for VAT, invoice numbering, fiscal year and currency.
         </p>
@@ -204,7 +205,7 @@ function SettingsPage() {
                   value={invoiceNextNumber}
                   onChange={(e) => setInvoiceNextNumber(e.target.value)}
                 />
-                <p className="text-xs text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   Next invoice will be numbered: <span className="font-mono">{previewNumber}</span>
                 </p>
               </div>

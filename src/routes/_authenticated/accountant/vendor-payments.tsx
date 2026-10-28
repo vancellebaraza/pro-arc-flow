@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { logAudit } from "@/lib/auditLog";
+import { getUserCached } from "@/lib/auth-cache";
 
 export const Route = createFileRoute("/_authenticated/accountant/vendor-payments")({
   component: VendorPaymentsPage,
@@ -153,7 +154,7 @@ function VendorPaymentsPage() {
 
     setSaving(true);
     try {
-      const { data: userData } = await supabase.auth.getUser();
+      const { data: userData } = await getUserCached();
 
       const { data: paymentData, error: paymentError } = await supabase
         .from("vendor_payments")
@@ -203,9 +204,9 @@ function VendorPaymentsPage() {
   }
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-6 p-4 md:p-8">
+    <div className="fade-in flex flex-col gap-5">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Vendor Payments</h1>
+        <h1 className="font-display text-[1.75rem] font-bold leading-tight">Vendor Payments</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Record payments to vendors against approved bills. Posts to the ledger immediately.
         </p>

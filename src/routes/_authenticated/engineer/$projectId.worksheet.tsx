@@ -16,8 +16,8 @@ import {
 } from "@/components/ui/select";
 import { generateWorksheetPdf } from "@/lib/pdf";
 import { toast } from "sonner";
-import { jsPDF } from "jspdf";
 import { ArrowLeft, Plus, Trash2, Save, FileDown, UploadCloud, MessageCircle } from "lucide-react";
+import { getUserCached } from "@/lib/auth-cache";
 
 export const Route = createFileRoute("/_authenticated/engineer/$projectId/worksheet")({
   component: WorksheetPage,
@@ -142,7 +142,7 @@ function WorksheetPage() {
     }
     setAssignmentLoading(true);
     try {
-      const { data: userData } = await supabase.auth.getUser();
+      const { data: userData } = await getUserCached();
       if (!userData?.user) throw new Error("Not signed in");
       const assignmentPayload = {
         project_id: projectId,
@@ -165,7 +165,7 @@ function WorksheetPage() {
 
   async function uploadImages(files: FileList | null) {
     if (!files) return;
-    const { data: u } = await supabase.auth.getUser();
+    const { data: u } = await getUserCached();
     if (!u.user) return;
     for (const file of Array.from(files)) {
       const path = `${u.user.id}/ws/${projectId}/${Date.now()}-${file.name}`;
@@ -182,7 +182,7 @@ function WorksheetPage() {
   async function save() {
     setSaving(true);
     try {
-      const { data: u } = await supabase.auth.getUser();
+      const { data: u } = await getUserCached();
       if (!u.user) throw new Error("Not signed in");
       const payload = {
         project_id: projectId,
@@ -224,6 +224,7 @@ function WorksheetPage() {
   }
 
   async function exportPdf() {
+    const { jsPDF } = await import("jspdf");
     const doc = new jsPDF();
 
     try {
@@ -247,7 +248,7 @@ function WorksheetPage() {
   }
 
   return (
-    <div className="p-4 md:p-8 fade-in max-w-5xl mx-auto pb-24">
+    <div className="fade-in pb-24">
       <Link
         to="/engineer/$projectId"
         params={{ projectId }}
@@ -256,12 +257,12 @@ function WorksheetPage() {
         <ArrowLeft className="h-4 w-4 mr-1" />
         Back to project
       </Link>
-      <h1 className="mt-3 text-2xl md:text-3xl font-semibold tracking-tight">
+      <h1 className="font-display text-[1.75rem] font-bold leading-tight mt-3">
         FusionPro Limited Worksheet
       </h1>
-      <p className="text-muted-foreground mt-1">Document 2 — site assessment & sign-off.</p>
+      <p className="mt-1 text-sm text-muted-foreground">Document 2 — site assessment & sign-off.</p>
 
-      <section className="mt-6 grid md:grid-cols-2 gap-4">
+      <section className="mt-5 grid md:grid-cols-2 gap-4">
         <div>
           <Label>Client Name</Label>
           <Input value={clientName} onChange={(e) => setClientName(e.target.value)} />
@@ -292,7 +293,7 @@ function WorksheetPage() {
         </div>
       </section>
 
-      <section className="mt-6">
+      <section className="mt-5">
         <Label>Job Description</Label>
         <Textarea
           rows={4}
@@ -301,10 +302,10 @@ function WorksheetPage() {
         />
       </section>
 
-      <section className="mt-8 rounded-xl border bg-card p-5">
+      <section className="mt-5 rounded-xl border bg-card p-5">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <h2 className="text-lg font-semibold tracking-tight">Assign Vendor</h2>
+            <h2 className="font-display text-xl font-bold">Assign Vendor</h2>
             <p className="text-sm text-muted-foreground mt-1">
               Search vendors and request approval from admin for this project.
             </p>
@@ -419,9 +420,9 @@ function WorksheetPage() {
         ) : null}
       </section>
 
-      <section className="mt-8">
+      <section className="mt-5">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold tracking-tight">Site Visit & Scope Assessment</h2>
+          <h2 className="font-display text-xl font-bold">Site Visit & Scope Assessment</h2>
           <Button
             variant="outline"
             size="sm"
@@ -482,8 +483,8 @@ function WorksheetPage() {
         </div>
       </section>
 
-      <section className="mt-8">
-        <h2 className="text-lg font-semibold tracking-tight">Images Before</h2>
+      <section className="mt-5">
+        <h2 className="font-display text-xl font-bold">Images Before</h2>
         <label className="mt-3 flex items-center justify-center rounded-md border border-dashed bg-surface px-4 py-6 text-sm text-muted-foreground cursor-pointer hover:bg-accent transition">
           <UploadCloud className="h-4 w-4 mr-2" /> Click to upload before-images
           <input
@@ -516,8 +517,8 @@ function WorksheetPage() {
         )}
       </section>
 
-      <section className="mt-8">
-        <h2 className="text-lg font-semibold tracking-tight">Signatures</h2>
+      <section className="mt-5">
+        <h2 className="font-display text-xl font-bold">Signatures</h2>
         <div className="mt-3 grid md:grid-cols-3 gap-4">
           <div className="rounded-lg border p-4 bg-card">
             <Label>Technician Signature (Name)</Label>
@@ -534,7 +535,7 @@ function WorksheetPage() {
         </div>
       </section>
 
-      <div className="mt-8 flex flex-wrap justify-end gap-2">
+      <div className="mt-5 flex flex-wrap justify-end gap-2">
         <Button variant="outline" onClick={exportPdf}>
           <FileDown className="h-4 w-4 mr-1" />
           Export PDF

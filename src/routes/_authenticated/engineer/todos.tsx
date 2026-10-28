@@ -17,6 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { getUserCached } from "@/lib/auth-cache";
 
 export const Route = createFileRoute("/_authenticated/engineer/todos")({
   component: EngineerTodos,
@@ -62,7 +63,7 @@ function EngineerTodos() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const { data: userData, error: userError } = await supabase.auth.getUser();
+      const { data: userData, error: userError } = await getUserCached();
       if (userError || !userData.user) {
         toast.error("Unable to verify current engineer.");
         return;
@@ -165,28 +166,28 @@ function EngineerTodos() {
   }
 
   return (
-    <div className="p-4 md:p-8 fade-in">
-      <div className="mb-6">
-        <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">To Do List</h1>
-        <p className="text-muted-foreground mt-1">
+    <div className="fade-in">
+      <div className="mb-4">
+        <h1 className="font-display text-[1.75rem] font-bold leading-tight">To Do List</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
           Add your weekly activity row here. Admin will see these entries in Staff To Do.
         </p>
       </div>
 
       {loading ? (
-        <p className="text-sm text-muted-foreground mb-8">Loading…</p>
+        <p className="text-sm text-muted-foreground mb-4">Loading…</p>
       ) : (
-        <section className="mb-8 rounded-xl border bg-card p-5">
+        <section className="mb-4 rounded-xl border bg-card p-5">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <div className="mt-1 flex flex-wrap gap-3 text-sm text-muted-foreground">
                 <span>Week starting: {format(weekStart, "MMM d, yyyy")}</span>
                 <div className="flex gap-2">
-                  <span className="bg-green-500 text-white px-3 py-1 rounded-md">
+                  <span className="bg-green-600 text-white px-3 py-1 rounded-full">
                     Done: {doneCount}
                   </span>
 
-                  <span className="bg-red-500 text-white px-3 py-1 rounded-md">
+                  <span className="bg-primary text-primary-foreground px-3 py-1 rounded-full">
                     Not done: {notDoneCount}
                   </span>
                 </div>
@@ -250,15 +251,15 @@ function EngineerTodos() {
                         <button
                           type="button"
                           onClick={() => openTodoEditor(date, todo)}
-                          className={`w-full rounded-xl border p-3 text-left transition hover:shadow-sm ${statusClasses}`}
+                          className={`w-full rounded-xl border p-3 text-left transition hover:shadow-[var(--shadow-raised)] ${statusClasses}`}
                         >
                           {todo ? (
                             <>
                               <div className="text-sm font-semibold">{todo.activity}</div>
-                              <div className="mt-1 text-xs text-muted-foreground">
+                              <div className="mt-1 text-sm text-muted-foreground">
                                 {todo.location ?? "No location"}
                               </div>
-                              <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-white/80 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.15em] text-slate-700">
+                              <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-white/80 px-2 py-1 text-xs font-semibold text-slate-700">
                                 <span
                                   className={todo.is_done ? "text-emerald-700" : "text-rose-700"}
                                 >

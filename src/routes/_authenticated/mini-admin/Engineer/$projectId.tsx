@@ -17,6 +17,7 @@ import {
 import { toast } from "sonner";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { generateProjectPdf } from "@/lib/pdf";
+import { getUserCached } from "@/lib/auth-cache";
 
 export const Route = createFileRoute("/_authenticated/mini-admin/Engineer/$projectId")({
   component: EngineerProjectHub,
@@ -52,21 +53,21 @@ function EngineerProjectHub() {
   }, [load]);
 
   async function claim() {
-    const { data: u } = await supabase.auth.getUser();
+    const { data: u } = await getUserCached();
     if (!u.user || !project) return;
     await supabase.from("projects").update({ engineer_id: u.user.id }).eq("id", project.id);
     toast.success("Assigned to you");
     load();
   }
 
-  if (loading) return <div className="p-8 text-sm text-muted-foreground">Loading…</div>;
-  if (!project) return <div className="p-8 text-sm">Project not found.</div>;
+  if (loading) return <div className="p-6 text-sm text-muted-foreground">Loading…</div>;
+  if (!project) return <div className="p-6 text-sm">Project not found.</div>;
 
   const svc = SERVICES.find((s) => s.key === project.service);
   const waText = `FusionPro engineer here regarding "${project.title}" (Ref ${project.id.slice(0, 8)}). `;
 
   async function logWa() {
-    const { data: u } = await supabase.auth.getUser();
+    const { data: u } = await getUserCached();
     if (!u.user) return;
     await supabase.from("whatsapp_logs").insert({
       sender_id: u.user.id,
@@ -304,7 +305,7 @@ const [
   ];
 
   return (
-    <div className="p-4 md:p-8 fade-in max-w-5xl mx-auto">
+    <div className="fade-in">
       <Link
         to="/engineer"
         className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
@@ -315,13 +316,13 @@ const [
 
       <div className="mt-4 flex items-start justify-between gap-4 flex-wrap">
         <div className="min-w-0">
-          <div className="text-xs uppercase tracking-wider text-muted-foreground">
+          <div className="text-sm text-muted-foreground">
             {svc?.label} · {STATUS_LABEL[project.status] ?? project.status}
           </div>
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight mt-1 truncate">
+          <h1 className="font-display text-[1.75rem] font-bold leading-tight mt-1 truncate">
             {project.title}
           </h1>
-          <p className="text-muted-foreground mt-1">{project.location ?? "—"}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{project.location ?? "—"}</p>
         </div>
         <div className="flex gap-2 flex-wrap">
           {!project.engineer_id && (
@@ -358,7 +359,7 @@ const [
     <FileText className="mr-2 h-4 w-4" />
     Download Project Report
 </Button>
-      <h2 className="mt-10 text-lg font-semibold tracking-tight">Forms & tools</h2>
+      <h2 className="font-display text-xl font-bold mt-5">Forms & tools</h2>
       <p className="text-sm text-muted-foreground">
         Each form opens in its own page so you have room to work.
       </p>
@@ -383,7 +384,7 @@ const [
           </li>
         ))}
       </ul>
-      <div className="mt-8">
+      <div className="mt-5">
         <Outlet />
       </div>
     </div>

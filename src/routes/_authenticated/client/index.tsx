@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { STATUS_LABEL, SERVICES, statusColorClasses } from "@/lib/services";
+import { StatusChip } from "@/components/ui/status-chip";
+import { SERVICES, statusColorClasses } from "@/lib/services";
 import { ArrowRight, Plus } from "lucide-react";
+import { getUserCached } from "@/lib/auth-cache";
 
 export const Route = createFileRoute("/_authenticated/client/")({
   component: ClientHome,
@@ -24,15 +26,15 @@ interface Project {
   };
 }
 
-function ClientHome() {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    (async () => {
-      // const { data: u } = await supabase.auth.getUser();
-      // if (!u.user) return;
+const NO_PROJECTS: Project[] = [];
 
-      setLoading(true)
+function ClientHome() {
+  // Cached list is shown straight away on return visits and always refreshed on mount.
+  const { data: cachedProjects, isPending: loading } = useQuery<Project[]>({
+    queryKey: ["client-projects"],
+    staleTime: 30_000,
+    refetchOnMount: "always",
+    queryFn: async () => {
       const { data:projectsData, error:projectsError } = await supabase
         .from("projects")
         .select("id,client_id,title,service,status,location,created_at")
@@ -41,14 +43,11 @@ function ClientHome() {
 
         if (projectsError) {
         console.error(projectsError);
-        setLoading(false);
-        return;
+        return [];
       }
 
       if (!projectsData) {
-        setProjects([]);
-        setLoading(false);
-        return;
+        return [];
       }
 
       // Get unique client ids
@@ -76,17 +75,17 @@ function ClientHome() {
         ...project,
         profiles: profileMap.get(project.client_id),
       }));
-      setProjects((mergedProjects as Project[]));
-      setLoading(false);
-    })();
-  }, []);
+      return mergedProjects as Project[];
+    },
+  });
+  const projects = cachedProjects ?? NO_PROJECTS;
 
   return (
-    <div className="p-6 md:p-10 max-w-5xl mx-auto fade-in">
+    <div className="fade-in">
       <div className="flex items-end justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">My projects</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="font-display text-[1.75rem] font-bold leading-tight">My projects</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Track requests, view inspections and approve quotations.
           </p>
         </div>
@@ -98,11 +97,11 @@ function ClientHome() {
         </Button>
       </div>
 
-      <div className="mt-8">
+      <div className="mt-5">
         {loading ? (
           <p className="text-sm text-muted-foreground">Loading…</p>
         ) : projects.length === 0 ? (
-          <div className="rounded-xl border bg-card p-10 text-center">
+          <div className="rounded-xl border bg-card p-6 text-center">
             <p className="text-muted-foreground">No projects yet.</p>
             <Button asChild className="mt-4">
               <Link to="/client/new">
@@ -126,19 +125,16 @@ function ClientHome() {
                     <div className={`absolute inset-y-0 left-0 w-[3px] ${colors.dot}`} />
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs uppercase tracking-wider text-muted-foreground">
+                        <span className="text-sm text-muted-foreground">
                           {svc?.label ?? p.service}
                         </span>
-                        <span className={`inline-flex items-center gap-2 rounded-full px-2 py-0.5 text-xs ${colors.badge}`}>
-                          <span className={`h-1.5 w-1.5 rounded-full ${colors.dot}`} />
-                          {STATUS_LABEL[p.status] ?? p.status}
-                        </span>
+                        <StatusChip status={p.status} />
                       </div>
                       <div className="mt-1 font-medium truncate">{p.title}</div>
                       <div className="text-sm text-muted-foreground">
                         Client: {p.profiles?.full_name ?? "Unknown"}
                       </div>
-                      <div className="text-xs text-muted-foreground truncate">
+                      <div className="text-sm text-muted-foreground truncate">
                         Location:{p.location ?? "—"}
                       </div>
                     </div>

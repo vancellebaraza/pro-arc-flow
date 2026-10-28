@@ -1,5 +1,5 @@
 import { redirect } from "@tanstack/react-router";
-import { supabase } from "@/integrations/supabase/client";
+import { getRolesCached, getUserCached } from "@/lib/auth-cache";
 import type { AppRole } from "@/lib/auth";
 
 export function resolvePrimaryRole(roles: Array<string | null | undefined>): AppRole {
@@ -31,19 +31,16 @@ export function getRoleHomePath(role: AppRole): string {
 }
 
 export async function requireRole(allowedRoles: AppRole[], fallbackPath = "/auth") {
-  const { data: userData, error } = await supabase.auth.getUser();
+  const { data: userData, error } = await getUserCached();
   if (error || !userData.user) throw redirect({ to: fallbackPath });
 
-  const { data: rolesData, error: rolesError } = await supabase
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", userData.user.id);
+  const roles = await getRolesCached(userData.user.id);
 
-  if (rolesError) {
+  if (!roles) {
     throw redirect({ to: fallbackPath });
   }
 
-  const primaryRole = resolvePrimaryRole((rolesData ?? []).map((role) => role.role));
+  const primaryRole = resolvePrimaryRole(roles);
 
   if (!allowedRoles.includes(primaryRole)) {
     throw redirect({ to: getRoleHomePath(primaryRole) });

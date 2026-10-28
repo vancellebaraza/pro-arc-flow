@@ -94,10 +94,10 @@ export default function ProjectCommentSummary({ projects }: Props) {
           className="flex w-full items-center justify-between gap-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <div>
-            <div className="text-xs uppercase tracking-wider text-muted-foreground">
+            <div className="text-sm text-muted-foreground">
               Project comments
             </div>
-            <div className="mt-1 text-3xl font-semibold">
+            <div className="mt-1 text-[2rem] font-bold leading-tight">
               {projects.filter((project) => project.work_comment?.trim()).length}
             </div>
           </div>
@@ -253,7 +253,7 @@ export default function ProjectCommentSummary({ projects }: Props) {
                 >
                   <span className="min-w-0">
                     <span className="block truncate">{project.title}</span>
-                    <span className="mt-1 block whitespace-normal text-xs text-muted-foreground">
+                    <span className="mt-1 block whitespace-normal text-sm text-muted-foreground">
                       {project.work_comment?.trim() || "No work comment"}
                     </span>
                   </span>

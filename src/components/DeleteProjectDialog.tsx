@@ -13,6 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { getUserCached } from "@/lib/auth-cache";
 
 interface DeleteProjectDialogProps {
   projectId: string;
@@ -40,7 +41,7 @@ function DeleteProjectDialog({
 
   useEffect(() => {
     let mounted = true;
-    supabase.auth.getUser().then(({ data, error }) => {
+    getUserCached().then(({ data, error }) => {
       if (!mounted) return;
       if (!error && data.user) {
         setCurrentUserId(data.user.id);
@@ -61,7 +62,7 @@ function DeleteProjectDialog({
 
     setWorking(true);
     try {
-      const { data: userData, error: userError } = await supabase.auth.getUser();
+      const { data: userData, error: userError } = await getUserCached();
       if (userError || !userData.user) {
         throw new Error("Unable to verify your account.");
       }

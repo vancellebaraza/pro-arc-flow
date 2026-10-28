@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { SERVICES } from "@/lib/services";
 import { toast } from "sonner";
 import { Loader2, UploadCloud, X } from "lucide-react";
+import { getUserCached } from "@/lib/auth-cache";
 
 export const Route = createFileRoute("/_authenticated/client/new")({
   component: NewRequest,
@@ -29,7 +30,7 @@ function NewRequest() {
     const fd = new FormData(e.currentTarget);
     setSubmitting(true);
     try {
-      const { data: u } = await supabase.auth.getUser();
+      const { data: u } = await getUserCached();
       if (!u.user) throw new Error("Not signed in");
       const service = SERVICES.find((option) => option.key === fd.get("service"))?.key;
       if (!service) throw new Error("Please select a valid service");
@@ -60,19 +61,19 @@ function NewRequest() {
   }
 
   return (
-    <div className="p-6 md:p-10 max-w-2xl mx-auto fade-in">
-      <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">New service request</h1>
-      <p className="text-muted-foreground mt-1">
+    <div className="fade-in max-w-2xl">
+      <h1 className="font-display text-[1.75rem] font-bold leading-tight">New service request</h1>
+      <p className="mt-1 text-sm text-muted-foreground">
         Tell us what you need. An engineer will follow up shortly.
       </p>
-      <form onSubmit={submit} className="mt-8 space-y-5">
+      <form onSubmit={submit} className="mt-5 space-y-5">
         <div>
           <Label htmlFor="service">Service</Label>
           <select
             id="service"
             name="service"
             required
-            className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+            className="mt-1 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm"
           >
             {SERVICES.map((s) => (
               <option key={s.key} value={s.key}>
@@ -112,7 +113,7 @@ function NewRequest() {
         </div>
         <div>
           <Label>Images (max 2)</Label>
-          <label className="mt-1 flex items-center justify-center rounded-md border border-dashed bg-surface px-4 py-6 text-sm text-muted-foreground cursor-pointer hover:bg-accent transition">
+          <label className="mt-1 flex items-center justify-center rounded-2xl border border-dashed bg-surface px-4 py-6 text-sm text-muted-foreground cursor-pointer hover:bg-accent transition">
             <UploadCloud className="h-4 w-4 mr-2" /> Click to upload
             <input
               type="file"

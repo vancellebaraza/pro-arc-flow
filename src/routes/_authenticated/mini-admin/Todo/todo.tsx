@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { ArrowLeft, ArrowRight, Check, Plus } from "lucide-react";
 import { toast } from "sonner";
+import { getUserCached } from "@/lib/auth-cache";
 
 export const Route = createFileRoute('/_authenticated/mini-admin/Todo/todo')({
   component: RouteComponent,
@@ -84,7 +85,7 @@ const doneCount = todos.filter((t) => t.is_done).length;
 const notDoneCount = todos.filter((t) => !t.is_done).length;
 
 const load = useCallback(async () => {
-  const { data: userData } = await supabase.auth.getUser();
+  const { data: userData } = await getUserCached();
 
   if (!userData.user) return;
 
@@ -207,10 +208,10 @@ const deleteTodo = async () => {
   resetTodoEditor();
 };
   return <div>
-          <section className="mb-8 rounded-xl border bg-card p-5">
+          <section className="mb-4 rounded-xl border bg-card p-5">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
               <div>
-                <h2 className="text-lg font-semibold tracking-tight">My Staff To Do Row</h2>
+                <h2 className="font-display text-xl font-bold">My Staff To Do Row</h2>
                 <p className="text-sm text-muted-foreground mt-1">
                   Add your weekly activity row here. Admin will see these entries in Staff To Do.
                 </p>
@@ -270,7 +271,7 @@ const deleteTodo = async () => {
   <div className="font-medium">{engineerName}</div>
 
   {firstTodo && (
-    <div className="mt-1 text-xs text-muted-foreground">
+    <div className="mt-1 text-sm text-muted-foreground">
       Created:
       {" "}
       {format(new Date(firstTodo.created_at), "dd MMM yyyy")}
@@ -302,10 +303,10 @@ const deleteTodo = async () => {
                               {todo ? (
                                 <>
                                   <div className="text-sm font-semibold">{todo.activity}</div>
-                                  <div className="mt-1 text-xs text-muted-foreground">
+                                  <div className="mt-1 text-sm text-muted-foreground">
                                     {todo.location ?? "No location"}
                                   </div>
-                                  <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-white/80 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.15em] text-slate-700">
+                                  <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-white/80 px-2 py-1 text-xs font-semibold text-slate-700">
                                     <span
                                       className={todo.is_done ? "text-emerald-700" : "text-rose-700"}
                                     >

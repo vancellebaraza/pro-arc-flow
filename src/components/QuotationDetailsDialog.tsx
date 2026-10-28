@@ -120,7 +120,7 @@ export default function QuotationDetailsDialog({ quotationId, projectTitle }: Pr
             </div>
             {quote.notes && (
               <div>
-                <div className="text-xs text-muted-foreground mb-1">Notes</div>
+                <div className="text-sm text-muted-foreground mb-1">Notes</div>
                 <p className="text-sm">{quote.notes}</p>
               </div>
             )}

@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { ArrowLeft, ArrowRight, Calendar, Plus, Check } from "lucide-react";
+import { getRolesCached, getUserCached } from "@/lib/auth-cache";
 
 interface StaffTodo {
   id: string;
@@ -57,16 +58,13 @@ const emptyTodoForm = {
 export const Route = createFileRoute("/_authenticated/admin/todos")({
   component: StaffTodosPage,
   beforeLoad: async () => {
-    const { data: userData, error } = await supabase.auth.getUser();
+    const { data: userData, error } = await getUserCached();
     if (error || !userData.user) throw redirect({ to: "/auth" });
 
-    const { data: rolesData, error: rolesError } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userData.user.id);
+    const roleNames = await getRolesCached(userData.user.id);
 
-    if (rolesError) throw redirect({ to: "/dashboard" });
-    const isAdmin = (rolesData ?? []).some((role) => role.role === "admin");
+    if (!roleNames) throw redirect({ to: "/dashboard" });
+    const isAdmin = roleNames.some((role) => role === "admin");
     if (!isAdmin) throw redirect({ to: "/dashboard" });
 
     return { user: userData.user };
@@ -222,7 +220,7 @@ setEngineers(profiles as StaffMember[]);
 
     setSaving(true);
     try {
-      const { data: userData, error: userError } = await supabase.auth.getUser();
+      const { data: userData, error: userError } = await getUserCached();
       if (userError || !userData.user) {
         toast.error("Unable to verify current user.");
         return;
@@ -312,17 +310,17 @@ setEngineers(profiles as StaffMember[]);
   }
 
   if (loading) {
-    return <div className="p-8 text-sm text-muted-foreground">Loading…</div>;
+    return <div className="p-6 text-sm text-muted-foreground">Loading…</div>;
   }
 
   
 
   return (
-    <div className="p-4 md:p-8 fade-in max-w-7xl mx-auto">
+    <div className="fade-in">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Staff To Do List</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="font-display text-[1.75rem] font-bold leading-tight">Staff To Do List</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Track field staff activities by date. Only admins can view and manage these entries.
           </p>
         </div>
@@ -331,11 +329,11 @@ setEngineers(profiles as StaffMember[]);
         </Link>
       </div>
 
-      <div className="mt-8 grid gap-4 lg:grid-cols-[1.2fr_1fr]">
+      <div className="mt-5 grid gap-4 lg:grid-cols-[1.2fr_1fr]">
         <div className="rounded-xl border bg-card p-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="text-lg font-semibold tracking-tight">Week view</h2>
+              <h2 className="font-display text-xl font-bold">Week view</h2>
               <p className="text-sm text-muted-foreground mt-1">
                 Use the controls to move between weeks and edit tasks for each staff member.
               </p>
@@ -358,20 +356,20 @@ setEngineers(profiles as StaffMember[]);
 
         <div className="rounded-xl border bg-card p-5 grid gap-3 sm:grid-cols-2">
           <div className="rounded-xl border border-emerald-200 bg-emerald-500/10 p-4">
-            <div className="text-xs uppercase tracking-wider text-muted-foreground">Done</div>
-            <div className="mt-1 text-3xl font-semibold text-emerald-900">{doneCount}</div>
+            <div className="text-sm text-muted-foreground">Done</div>
+            <div className="mt-1 text-[2rem] font-bold leading-tight text-emerald-900">{doneCount}</div>
           </div>
           <div className="rounded-xl border border-rose-200 bg-rose-500/10 p-4">
-            <div className="text-xs uppercase tracking-wider text-muted-foreground">Not done</div>
-            <div className="mt-1 text-3xl font-semibold text-rose-900">{notDoneCount}</div>
+            <div className="text-sm text-muted-foreground">Not done</div>
+            <div className="mt-1 text-[2rem] font-bold leading-tight text-rose-900">{notDoneCount}</div>
           </div>
         </div>
       </div>
 
-      {/* <section className="mt-6 rounded-xl border bg-card p-5">
+      {/* <section className="mt-5 rounded-xl border bg-card p-5">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <h2 className="text-lg font-semibold tracking-tight">Add staff row</h2>
+            <h2 className="font-display text-xl font-bold">Add staff row</h2>
             <p className="text-sm text-muted-foreground mt-1">
               Select an engineer to include in the grid for this week.
             </p>
@@ -401,7 +399,7 @@ setEngineers(profiles as StaffMember[]);
         </div>
       </section> */}
 
-      <section className="mt-6 overflow-x-auto rounded-xl border bg-card">
+      <section className="mt-5 overflow-x-auto rounded-xl border bg-card">
         <table className="min-w-full border-separate border-spacing-0">
           <thead>
             <tr className="bg-background">
@@ -434,7 +432,7 @@ setEngineers(profiles as StaffMember[]);
                         <button
                           type="button"
                           onClick={() => openCellEditor(staff, date, todo)}
-                          className={`w-full rounded-xl border p-3 text-left transition hover:shadow-sm ${statusClasses}`}
+                          className={`w-full rounded-xl border p-3 text-left transition hover:shadow-[var(--shadow-raised)] ${statusClasses}`}
                         >
                           {todo ? (
     <div className="flex h-full items-center justify-center">
@@ -463,10 +461,10 @@ setEngineers(profiles as StaffMember[]);
           </tbody>
         </table>
       </section>
-    <section className="mt-6 rounded-xl border bg-card p-5">
+    <section className="mt-5 rounded-xl border bg-card p-5">
   <div className="flex items-center gap-3 mb-4">
     <Calendar className="h-5 w-5" />
-    <h2 className="text-lg font-semibold">
+    <h2 className="font-display text-xl font-bold">
       Daily Calendar
     </h2>
   </div>
@@ -478,7 +476,7 @@ setEngineers(profiles as StaffMember[]);
     className="max-w-xs"
   />
 
-  <div className="mt-6 space-y-3">
+  <div className="mt-5 space-y-3">
     {dailyTodos.length === 0 ? (
       <div className="text-muted-foreground">
         No tasks scheduled for this day.

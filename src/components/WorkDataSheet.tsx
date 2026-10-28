@@ -16,6 +16,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { getUserCached } from "@/lib/auth-cache";
 
 interface Row {
   id: string;
@@ -351,7 +352,7 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
       setSavingVendor(false);
       if (error) return toast.error(error.message);
     } else {
-      const { data: userData } = await supabase.auth.getUser();
+      const { data: userData } = await getUserCached();
       if (!userData?.user) {
         setSavingVendor(false);
         toast.error("Not signed in");
@@ -471,9 +472,9 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
     totals.amountPayable !== 0 ? (totals.margin / totals.amountPayable) * 100 : null;
 
   return (
-    <section className="mt-8">
+    <section className="mt-5">
       <div className="flex items-center justify-between mb-3 gap-3 flex-wrap">
-        <h2 className="text-lg font-semibold tracking-tight">Work Data Sheet</h2>
+        <h2 className="font-display text-xl font-bold">Work Data Sheet</h2>
         <div className="flex flex-wrap items-center gap-2">
           <Input
             value={projectSearch}
@@ -522,44 +523,116 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
           </Button>
         </div>
       </div>
-      <div className="rounded-xl border bg-card overflow-x-auto">
-        <table className="w-full text-sm border-collapse">
+      <div className="max-h-[calc(100vh-14rem)] min-h-[320px] overflow-auto rounded-2xl border bg-card">
+        <table className="w-full min-w-[3424px] table-fixed border-separate border-spacing-0 text-[15px]">
+          <colgroup>
+            <col style={{ width: 56 }} />
+            <col style={{ width: 120 }} />
+            <col style={{ width: 132 }} />
+            <col style={{ width: 320 }} />
+            <col style={{ width: 250 }} />
+            <col style={{ width: 160 }} />
+            <col style={{ width: 128 }} />
+            <col style={{ width: 128 }} />
+            <col style={{ width: 128 }} />
+            <col style={{ width: 180 }} />
+            <col style={{ width: 128 }} />
+            <col style={{ width: 128 }} />
+            <col style={{ width: 128 }} />
+            <col style={{ width: 128 }} />
+            <col style={{ width: 128 }} />
+            <col style={{ width: 128 }} />
+            <col style={{ width: 96 }} />
+            <col style={{ width: 150 }} />
+            <col style={{ width: 220 }} />
+            <col style={{ width: 210 }} />
+            <col style={{ width: 210 }} />
+            <col style={{ width: 168 }} />
+          </colgroup>
           <thead>
-            <tr className="text-xs uppercase tracking-wide">
-              <th colSpan={6} className="p-2 text-center bg-violet-100 border">
+            <tr className="h-10 text-sm">
+              <th
+                colSpan={6}
+                className="sticky top-0 z-20 whitespace-nowrap border-b bg-[var(--accent)] px-3 text-left font-semibold text-foreground"
+              >
                 Project
               </th>
-              <th colSpan={3} className="p-2 text-center bg-amber-100 border">
+              <th
+                colSpan={3}
+                className="sticky top-0 z-20 whitespace-nowrap border-b bg-[var(--surface)] px-3 text-left font-semibold text-foreground"
+              >
                 Client
               </th>
-              <th colSpan={5} className="p-2 text-center bg-pink-100 border">
+              <th
+                colSpan={8}
+                className="sticky top-0 z-20 whitespace-nowrap border-b bg-[color-mix(in_oklch,var(--primary)_10%,var(--card))] px-3 text-left font-semibold text-foreground"
+              >
                 Vendor
               </th>
-              <th colSpan={4} className="p-2 text-center bg-fuchsia-100 border">
-                Work Done / Date
+              <th
+                colSpan={5}
+                className="sticky top-0 z-20 whitespace-nowrap border-b bg-[var(--accent)] px-3 text-left font-semibold text-foreground"
+              >
+                Work done / date
               </th>
             </tr>
-            <tr className="text-left text-xs">
-              <th className="p-2 border">No.</th>
-              <th className="p-2 border">Date</th>
-              <th className="p-2 border">Project ID</th>
-              <th className="p-2 border">Project Name</th>
-              <th className="p-2 border">Location</th>
-              <th className="p-2 border">Engineer</th>
-              <th className="p-2 border text-right">Quoted Amt</th>
-              <th className="p-2 border text-right">Amt Paid</th>
-              <th className="p-2 border text-right">Amount Due</th>
-              <th className="p-2 border">Name</th>
-              <th className="p-2 border text-right">Amt Quoted</th>
-              <th className="p-2 border text-right">Variance</th>
-              <th className="p-2 border text-right">Amt Payable</th>
-              <th className="p-2 border text-right">Amt Paid</th>
-              <th className="p-2 border text-right">Amt Due</th>
-              <th className="p-2 border text-right">Margin</th>
-              <th className="p-2 border text-right">% Margin</th>
-              <th className="p-2 border">Work Done/Date</th>
-              <th className="p-2 border">
-                <div className="flex items-center gap-1">
+            <tr className="h-11 text-sm">
+              <th className="sticky left-0 top-10 z-30 whitespace-nowrap border-b bg-card px-3 text-left font-semibold text-foreground">
+                No.
+              </th>
+              <th className="sticky top-10 z-20 whitespace-nowrap border-b bg-card px-3 text-left font-semibold text-foreground">
+                Date
+              </th>
+              <th className="sticky top-10 z-20 whitespace-nowrap border-b bg-card px-3 text-left font-semibold text-foreground">
+                Project ID
+              </th>
+              <th className="sticky left-[56px] top-10 z-30 whitespace-nowrap border-b bg-card px-3 text-left font-semibold text-foreground shadow-[6px_0_8px_-6px_rgba(0,0,0,0.18)]">
+                Project Name
+              </th>
+              <th className="sticky top-10 z-20 whitespace-nowrap border-b bg-card px-3 text-left font-semibold text-foreground">
+                Location
+              </th>
+              <th className="sticky top-10 z-20 whitespace-nowrap border-b bg-card px-3 text-left font-semibold text-foreground">
+                Engineer
+              </th>
+              <th className="sticky top-10 z-20 whitespace-nowrap border-b bg-card px-3 text-right font-semibold text-foreground">
+                Quoted Amt
+              </th>
+              <th className="sticky top-10 z-20 whitespace-nowrap border-b bg-card px-3 text-right font-semibold text-foreground">
+                Amt Paid
+              </th>
+              <th className="sticky top-10 z-20 whitespace-nowrap border-b bg-card px-3 text-right font-semibold text-foreground">
+                Amount Due
+              </th>
+              <th className="sticky top-10 z-20 whitespace-nowrap border-b bg-card px-3 text-left font-semibold text-foreground">
+                Name
+              </th>
+              <th className="sticky top-10 z-20 whitespace-nowrap border-b bg-card px-3 text-right font-semibold text-foreground">
+                Amt Quoted
+              </th>
+              <th className="sticky top-10 z-20 whitespace-nowrap border-b bg-card px-3 text-right font-semibold text-foreground">
+                Variance
+              </th>
+              <th className="sticky top-10 z-20 whitespace-nowrap border-b bg-card px-3 text-right font-semibold text-foreground">
+                Amt Payable
+              </th>
+              <th className="sticky top-10 z-20 whitespace-nowrap border-b bg-card px-3 text-right font-semibold text-foreground">
+                Amt Paid
+              </th>
+              <th className="sticky top-10 z-20 whitespace-nowrap border-b bg-card px-3 text-right font-semibold text-foreground">
+                Amt Due
+              </th>
+              <th className="sticky top-10 z-20 whitespace-nowrap border-b bg-card px-3 text-right font-semibold text-foreground">
+                Margin
+              </th>
+              <th className="sticky top-10 z-20 whitespace-nowrap border-b bg-card px-3 text-right font-semibold text-foreground">
+                % Margin
+              </th>
+              <th className="sticky top-10 z-20 whitespace-nowrap border-b bg-card px-3 text-left font-semibold text-foreground">
+                Work Done/Date
+              </th>
+              <th className="sticky top-10 z-20 border-b bg-card px-3 text-left font-semibold text-foreground">
+                <div className="flex items-center gap-1 whitespace-nowrap">
                   <span>Comment</span>
                   <Button
                     type="button"
@@ -579,13 +652,19 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
                     onChange={(e) => setCommentFilter(e.target.value)}
                     placeholder="Filter comments"
                     aria-label="Filter comments"
-                    className="mt-1 h-7 min-w-[140px] text-xs font-normal normal-case tracking-normal"
+                    className="mb-1 h-8 min-w-[140px] text-sm font-normal"
                   />
                 )}
               </th>
-              <th className="p-2 border">Status</th>
-              <th className="p-2 border">Progress</th>
-              <th className="p-2 border">Actions</th>
+              <th className="sticky top-10 z-20 whitespace-nowrap border-b bg-card px-3 text-left font-semibold text-foreground">
+                Status
+              </th>
+              <th className="sticky top-10 z-20 whitespace-nowrap border-b bg-card px-3 text-left font-semibold text-foreground">
+                Progress
+              </th>
+              <th className="sticky top-10 z-20 whitespace-nowrap border-b bg-card px-3 text-left font-semibold text-foreground">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -603,36 +682,67 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
               </tr>
             ) : (
               displayedRows.map((r, i) => (
-                <tr key={r.id} className="border-t">
-                  <td className="p-2 border">{i + 1}</td>
-                  <td className="p-2 border whitespace-nowrap">
+                <tr key={r.id} className="group h-14 transition-colors hover:bg-[color-mix(in_oklch,var(--foreground)_4%,var(--card))]">
+                  <td className="sticky left-0 z-10 border-b bg-card px-3 align-middle tabular-nums group-hover:bg-[color-mix(in_oklch,var(--foreground)_4%,var(--card))]">
+                    {i + 1}
+                  </td>
+                  <td className="whitespace-nowrap border-b px-3 align-middle">
                     {new Date(r.date).toLocaleDateString()}
                   </td>
-                  <td className="p-2 border whitespace-nowrap">{r.jobNo}</td>
-                  <td className="p-2 border">{r.title}</td>
-                  <td className="p-2 border">{r.location}</td>
-                  <td className="p-2 border">{r.engineer ?? "—"}</td>
-                  <td className="p-2 border text-right">{fmt(r.quotedAmt)}</td>
-                  <td className="p-2 border text-right">{fmt(r.paidByClient)}</td>
-                  <td className="p-2 border text-right bg-amber-50">{fmt(r.amountDue)}</td>
-                  <td className="p-2 border">{r.vendorName ?? "—"}</td>
-                  <td className="p-2 border text-right">{fmt(r.vendorQuoted)}</td>
-                  <td className="p-2 border text-right">{fmt(r.variance)}</td>
-                  <td className="p-2 border text-right">{fmt(r.amountPayable)}</td>
-                  <td className="p-2 border text-right">{fmt(r.paidToVendor)}</td>
-                  <td className="p-2 border text-right bg-pink-50">{fmt(r.dueToVendor)}</td>
-                  <td className="p-2 border text-right">{fmt(r.margin)}</td>
-                  <td className="p-2 border text-right">
+                  <td className="whitespace-nowrap border-b px-3 align-middle">{r.jobNo}</td>
+                  <td
+                    className="sticky left-[56px] z-10 truncate whitespace-nowrap border-b bg-card px-3 align-middle font-medium shadow-[6px_0_8px_-6px_rgba(0,0,0,0.18)] group-hover:bg-[color-mix(in_oklch,var(--foreground)_4%,var(--card))]"
+                    title={r.title}
+                  >
+                    {r.title}
+                  </td>
+                  <td className="truncate whitespace-nowrap border-b px-3 align-middle" title={r.location}>
+                    {r.location}
+                  </td>
+                  <td className="truncate whitespace-nowrap border-b px-3 align-middle">
+                    {r.engineer ?? "—"}
+                  </td>
+                  <td className="whitespace-nowrap border-b px-3 text-right align-middle tabular-nums">
+                    {fmt(r.quotedAmt)}
+                  </td>
+                  <td className="whitespace-nowrap border-b px-3 text-right align-middle tabular-nums">
+                    {fmt(r.paidByClient)}
+                  </td>
+                  <td className="whitespace-nowrap border-b px-3 text-right align-middle tabular-nums">
+                    {fmt(r.amountDue)}
+                  </td>
+                  <td className="truncate whitespace-nowrap border-b px-3 align-middle">
+                    {r.vendorName ?? "—"}
+                  </td>
+                  <td className="whitespace-nowrap border-b px-3 text-right align-middle tabular-nums">
+                    {fmt(r.vendorQuoted)}
+                  </td>
+                  <td className="whitespace-nowrap border-b px-3 text-right align-middle tabular-nums">
+                    {fmt(r.variance)}
+                  </td>
+                  <td className="whitespace-nowrap border-b px-3 text-right align-middle tabular-nums">
+                    {fmt(r.amountPayable)}
+                  </td>
+                  <td className="whitespace-nowrap border-b px-3 text-right align-middle tabular-nums">
+                    {fmt(r.paidToVendor)}
+                  </td>
+                  <td className="whitespace-nowrap border-b px-3 text-right align-middle tabular-nums">
+                    {fmt(r.dueToVendor)}
+                  </td>
+                  <td className="whitespace-nowrap border-b px-3 text-right align-middle tabular-nums">
+                    {fmt(r.margin)}
+                  </td>
+                  <td className="whitespace-nowrap border-b px-3 text-right align-middle tabular-nums">
                     {r.marginPercent != null ? `${r.marginPercent}%` : "—"}
                   </td>
-                  <td className="p-2 border whitespace-nowrap">
+                  <td className="whitespace-nowrap border-b px-3 align-middle">
                     {r.workDoneDate ? new Date(r.workDoneDate).toLocaleDateString() : "—"}
                   </td>
-                  <td className="p-2 border min-w-[160px]">
-                    <div className="flex min-w-[190px] items-center gap-1">
+                  <td className="border-b px-3 align-middle">
+                    <div className="flex w-full items-center gap-1">
                       <Input
                         value={r.comment}
-                        className="h-9 min-w-0 flex-1 text-xs"
+                        className="h-9 min-w-0 flex-1 text-sm"
                         onChange={(e) => {
                           const comment = e.target.value;
                           setRows((prev) =>
@@ -656,9 +766,9 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
                       </Button>
                     </div>
                   </td>
-                  <td className="p-2 border">
+                  <td className="border-b px-3 align-middle">
                     <span
-                      className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs ${statusColorClasses(r.status).badge}`}
+                      className={`inline-flex h-7 min-w-[96px] items-center justify-center gap-1.5 whitespace-nowrap rounded-full px-3 text-xs font-medium ${statusColorClasses(r.status).badge}`}
                     >
                       <span
                         className={`h-1.5 w-1.5 rounded-full ${statusColorClasses(r.status).dot}`}
@@ -666,7 +776,7 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
                       {STATUS_LABEL[r.status] ?? r.status}
                     </span>
                   </td>
-                  <td className="p-2 border min-w-[180px]">
+                  <td className="border-b px-3 align-middle">
                     <span
                       title={
                         r.progressSet
@@ -674,34 +784,45 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
                           : "Automatic until a progress is set on the Engineer page"
                       }
                       aria-label={`Progress for ${r.title}: ${r.progress}`}
-                      className={`inline-block rounded-md px-2 py-1 text-xs font-medium ${
+                      className={`inline-flex h-7 min-w-[104px] items-center justify-center whitespace-nowrap rounded-full px-3 text-xs font-medium ${
                         r.progressSet ? "bg-green-100 text-green-800" : "bg-muted text-muted-foreground"
                       }`}
                     >
                       {r.progress}
                     </span>
                   </td>
-                  <td className="p-2 border">
-                    <div className="flex items-center gap-1">
+                  <td className="border-b px-3 align-middle">
+                    <div className="flex items-center gap-1 whitespace-nowrap">
                       <Button
                         size="sm"
                         variant="ghost"
+                        className="h-9 min-w-11 px-2"
                         onClick={() => openVendorDialog(r)}
                         title="Vendor cost"
                       >
-                        <span className="text-xs font-semibold">KES</span>
+                        <span className="text-sm font-semibold">KES</span>
                       </Button>
-                      <Button size="sm" variant="ghost" onClick={() => openEdit(r)}>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-9 w-9 px-0"
+                        onClick={() => openEdit(r)}
+                      >
                         <Pencil className="h-4 w-4" />
                       </Button>
-                      <Button size="sm" variant="ghost" onClick={() => scheduleProject(r)}>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-9 w-9 px-0"
+                        onClick={() => scheduleProject(r)}
+                      >
                         <Calendar className="h-4 w-4" />
                       </Button>
                       <DeleteProjectDialog projectId={r.id} projectTitle={r.title} onDeleted={load}>
                         <Button
                           size="sm"
                           variant="ghost"
-                          className="text-destructive hover:text-destructive"
+                          className="h-9 w-9 px-0 text-destructive hover:text-destructive"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -714,24 +835,42 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
           </tbody>
           {!loading && (
             <tfoot>
-              <tr className="border-t-2 bg-muted/50 font-semibold">
-                <td colSpan={6} className="p-2 border text-right">
+              <tr className="h-12 bg-[var(--surface)] font-semibold">
+                <td colSpan={6} className="border-t px-3 text-right align-middle">
                   Totals
                 </td>
-                <td className="p-2 border text-right">{fmt(totals.quotedAmt)}</td>
-                <td className="p-2 border text-right">{fmt(totals.paidByClient)}</td>
-                <td className="p-2 border text-right">{fmt(totals.amountDue)}</td>
-                <td className="p-2 border" />
-                <td className="p-2 border text-right">{fmt(totals.vendorQuoted)}</td>
-                <td className="p-2 border text-right">{fmt(totals.variance)}</td>
-                <td className="p-2 border text-right">{fmt(totals.amountPayable)}</td>
-                <td className="p-2 border text-right">{fmt(totals.paidToVendor)}</td>
-                <td className="p-2 border text-right">{fmt(totals.dueToVendor)}</td>
-                <td className="p-2 border text-right">{fmt(totals.margin)}</td>
-                <td className="p-2 border text-right">
+                <td className="whitespace-nowrap border-t px-3 text-right align-middle tabular-nums">
+                  {fmt(totals.quotedAmt)}
+                </td>
+                <td className="whitespace-nowrap border-t px-3 text-right align-middle tabular-nums">
+                  {fmt(totals.paidByClient)}
+                </td>
+                <td className="whitespace-nowrap border-t px-3 text-right align-middle tabular-nums">
+                  {fmt(totals.amountDue)}
+                </td>
+                <td className="border-t px-3" />
+                <td className="whitespace-nowrap border-t px-3 text-right align-middle tabular-nums">
+                  {fmt(totals.vendorQuoted)}
+                </td>
+                <td className="whitespace-nowrap border-t px-3 text-right align-middle tabular-nums">
+                  {fmt(totals.variance)}
+                </td>
+                <td className="whitespace-nowrap border-t px-3 text-right align-middle tabular-nums">
+                  {fmt(totals.amountPayable)}
+                </td>
+                <td className="whitespace-nowrap border-t px-3 text-right align-middle tabular-nums">
+                  {fmt(totals.paidToVendor)}
+                </td>
+                <td className="whitespace-nowrap border-t px-3 text-right align-middle tabular-nums">
+                  {fmt(totals.dueToVendor)}
+                </td>
+                <td className="whitespace-nowrap border-t px-3 text-right align-middle tabular-nums">
+                  {fmt(totals.margin)}
+                </td>
+                <td className="whitespace-nowrap border-t px-3 text-right align-middle tabular-nums">
                   {totalMarginPercent != null ? `${totalMarginPercent.toFixed(1)}%` : "—"}
                 </td>
-                <td colSpan={5} className="p-2 border" />
+                <td colSpan={5} className="border-t px-3" />
               </tr>
             </tfoot>
           )}
@@ -783,7 +922,7 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
           ) : (
             <div className="max-h-[60vh] overflow-y-auto rounded-md border">
               <table className="w-full text-sm">
-                <thead className="bg-muted/50 text-left text-xs uppercase tracking-wide">
+                <thead className="bg-muted/50 text-left text-xs">
                   <tr>
                     <th className="p-2">Project</th>
                     <th className="p-2">Job No.</th>
@@ -830,7 +969,7 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
           </DialogHeader>
           <div className="space-y-3">
             <div>
-              <label className="text-xs text-muted-foreground">Vendor</label>
+              <label className="text-sm text-muted-foreground">Vendor</label>
               <select
                 value={vendorPickId}
                 onChange={(e) => setVendorPickId(e.target.value)}
@@ -845,7 +984,7 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
               </select>
             </div>
             <div>
-              <label className="text-xs text-muted-foreground">Amount quoted by vendor</label>
+              <label className="text-sm text-muted-foreground">Amount quoted by vendor</label>
               <Input
                 type="number"
                 value={vendorQuotedInput}
@@ -853,7 +992,7 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
               />
             </div>
             <div>
-              <label className="text-xs text-muted-foreground">
+              <label className="text-sm text-muted-foreground">
                 Amount payable (final agreed amount)
               </label>
               <Input
@@ -864,7 +1003,7 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
               />
             </div>
             <div>
-              <label className="text-xs text-muted-foreground">Amount already paid to vendor</label>
+              <label className="text-sm text-muted-foreground">Amount already paid to vendor</label>
               <Input
                 type="number"
                 value={vendorPaidInput}

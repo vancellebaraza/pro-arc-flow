@@ -241,9 +241,9 @@ function ReconcilePage() {
   const unmatchedTxnTotal = unmatchedTxns.reduce((s, t) => s + t.amount, 0);
 
   return (
-    <div className="mx-auto max-w-7xl p-4 md:p-8">
+    <div className="fade-in">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">Reconcile</h1>
+        <h1 className="font-display text-[1.75rem] font-bold leading-tight">Reconcile</h1>
         <p className="mt-1 text-muted-foreground">
           Match imported bank transactions against ledger entries for the same account.
         </p>
@@ -267,17 +267,17 @@ function ReconcilePage() {
       {selectedBankAccountId && !loading && (
         <>
           <div className="mt-6 grid gap-4 md:grid-cols-3">
-            <div className="rounded-lg border bg-card p-4">
+            <div className="rounded-card border bg-card shadow-[var(--shadow-card)] p-4">
               <div className="text-sm text-muted-foreground">Reconciled balance</div>
               <div className="mt-1 text-lg font-semibold">{formatKes(reconciledBalance)}</div>
             </div>
-            <div className="rounded-lg border bg-card p-4">
+            <div className="rounded-card border bg-card shadow-[var(--shadow-card)] p-4">
               <div className="text-sm text-muted-foreground">Unmatched bank transactions</div>
               <div className="mt-1 text-lg font-semibold">
                 {unmatchedTxns.length} ({formatKes(unmatchedTxnTotal)})
               </div>
             </div>
-            <div className="rounded-lg border bg-card p-4">
+            <div className="rounded-card border bg-card shadow-[var(--shadow-card)] p-4">
               <div className="text-sm text-muted-foreground">Unmatched ledger entries</div>
               <div className="mt-1 text-lg font-semibold">{unmatchedLines.length}</div>
             </div>
@@ -290,7 +290,7 @@ function ReconcilePage() {
           </div>
 
           <div className="mt-3 grid gap-4 md:grid-cols-2">
-            <div className="rounded-lg border bg-card">
+            <div className="rounded-card border bg-card shadow-[var(--shadow-card)]">
               <div className="border-b p-3 text-sm font-medium">Bank transactions ({unmatchedTxns.length})</div>
               <div className="max-h-[420px] divide-y overflow-auto">
                 {unmatchedTxns.length === 0 ? (
@@ -317,7 +317,7 @@ function ReconcilePage() {
               </div>
             </div>
 
-            <div className="rounded-lg border bg-card">
+            <div className="rounded-card border bg-card shadow-[var(--shadow-card)]">
               <div className="border-b p-3 text-sm font-medium">Ledger entries ({unmatchedLines.length})</div>
               <div className="max-h-[420px] divide-y overflow-auto">
                 {unmatchedLines.length === 0 ? (
@@ -353,7 +353,7 @@ function ReconcilePage() {
           </div>
 
           {matchedPairs.length > 0 && (
-            <div className="mt-6 rounded-lg border bg-card">
+            <div className="mt-6 rounded-card border bg-card shadow-[var(--shadow-card)]">
               <div className="border-b p-3 text-sm font-medium">Matched ({matchedPairs.length})</div>
               <div className="max-h-[300px] divide-y overflow-auto">
                 {matchedPairs.map((p) => (

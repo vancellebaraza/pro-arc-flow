@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { SERVICES } from "@/lib/services";
 import { toast } from "sonner";
 import { Loader2, UploadCloud, X } from "lucide-react";
+import { getUserCached } from "@/lib/auth-cache";
 
 export const Route = createFileRoute("/_authenticated/mini-admin/Admin/Clients/new")({
   component: NewRequest,
@@ -30,7 +31,7 @@ function NewRequest() {
     const fd = new FormData(e.currentTarget);
     setSubmitting(true);
     try {
-      const { data: u } = await supabase.auth.getUser();
+      const { data: u } = await getUserCached();
       if (!u.user) throw new Error("Not signed in");
       const service = SERVICES.find((option) => option.key === fd.get("service"))?.key;
       if (!service) throw new Error("Please select a valid service");
@@ -62,12 +63,12 @@ function NewRequest() {
   }
 
   return (
-    <div className="p-6 md:p-10 max-w-2xl mx-auto fade-in">
-      <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">New service request</h1>
-      <p className="text-muted-foreground mt-1">
+    <div className="max-w-2xl fade-in">
+      <h1 className="font-display text-[1.75rem] font-bold leading-tight">New service request</h1>
+      <p className="mt-1 text-sm text-muted-foreground">
         Tell us what you need. An engineer will follow up shortly.
       </p>
-      <form onSubmit={submit} className="mt-8 space-y-5">
+      <form onSubmit={submit} className="mt-5 space-y-5">
         <div>
           <Label htmlFor="customerName">Customer name</Label>
           <Input

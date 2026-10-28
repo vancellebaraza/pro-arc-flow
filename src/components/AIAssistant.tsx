@@ -41,14 +41,14 @@ export function AIAssistant() {
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="fixed bottom-5 right-5 z-50 h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg grid place-items-center hover:scale-105 transition"
+          className="fixed bottom-5 right-5 z-50 h-12 w-12 tile-brand press rounded-full grid place-items-center"
           aria-label="Open FusionPro AI"
         >
           <Bot className="h-5 w-5" />
         </button>
       )}
       {open && (
-        <div className="fixed bottom-5 right-5 z-50 w-[min(380px,calc(100vw-2rem))] h-[min(580px,calc(100vh-2rem))] rounded-xl border bg-card shadow-2xl flex flex-col overflow-hidden">
+        <div className="fixed bottom-5 right-5 z-50 w-[min(380px,calc(100vw-2rem))] h-[min(580px,calc(100vh-2rem))] rounded-3xl border bg-card shadow-[var(--shadow-pop)] flex flex-col overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b bg-primary text-primary-foreground">
             <div className="flex items-center gap-2">
               <Bot className="h-4 w-4" />
@@ -60,7 +60,7 @@ export function AIAssistant() {
           </div>
           <div className="flex-1 overflow-y-auto p-4 space-y-3 text-sm">
             {messages.length === 0 && (
-              <div className="text-muted-foreground text-xs leading-relaxed">
+              <div className="text-muted-foreground text-sm leading-relaxed">
                 Hi — I&apos;m FusionPro AI. I answer using your system data only. Try:
                 <ul className="mt-2 space-y-1 list-disc pl-4">
                   <li>What&apos;s the status of my projects?</li>
@@ -80,7 +80,7 @@ export function AIAssistant() {
               </div>
             ))}
             {loading && (
-              <div className="text-muted-foreground text-xs flex items-center gap-1">
+              <div className="text-muted-foreground text-sm flex items-center gap-1">
                 <Loader2 className="h-3 w-3 animate-spin" /> thinking…
               </div>
             )}

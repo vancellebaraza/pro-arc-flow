@@ -7,26 +7,22 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/PasswordInput";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
+import { LOGIN_HERO, LOGIN_HERO_SIZES, warmHomeHero } from "@/lib/loginHero";
 import { ensureFixedAccounts } from "@/lib/setup.functions";
 import WhatsAppButton from "@/components/WhatsAppButton2";
-
+import { getRolesCached, getUserCached } from "@/lib/auth-cache";
 
 async function redirectToRoleHome(navigate: ReturnType<typeof useNavigate>) {
-  const { data: userData } = await supabase.auth.getUser();
+  const { data: userData } = await getUserCached();
   if (!userData.user) {
     navigate({ to: "/auth", replace: true });
     return;
   }
 
-  const { data: rolesData } = await supabase
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", userData.user.id);
-
-  const roles = (rolesData ?? []).map((role) => role.role as string);
+  const roles = (await getRolesCached(userData.user.id)) ?? [];
   const primaryRole = roles.includes("admin")
     ? "admin"
     : roles.includes("accountant")
@@ -63,6 +59,7 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [resetMode, setResetMode] = useState(false);
   const [resetSent, setResetSent] = useState(false);
   const provision = useServerFn(ensureFixedAccounts);
@@ -95,7 +92,7 @@ function AuthPage() {
       // Provide a clearer message to the user.
       // eslint-disable-next-line no-console
       console.error("signIn error:", err);
-      const msg = (err instanceof Error && err.message) ? err.message : String(err);
+      const msg = err instanceof Error && err.message ? err.message : String(err);
       toast.error(`Sign-in failed: ${msg}`);
       return;
     } finally {
@@ -129,7 +126,7 @@ function AuthPage() {
       // Handle network/fetch errors
       // eslint-disable-next-line no-console
       console.error("signUp error:", err);
-      const msg = (err instanceof Error && err.message) ? err.message : String(err);
+      const msg = err instanceof Error && err.message ? err.message : String(err);
       toast.error(`Sign-up failed: ${msg}`);
       return;
     } finally {
@@ -162,74 +159,146 @@ function AuthPage() {
     }
   }
 
+  const inputCls = "h-14 rounded-full bg-card px-6 text-base md:text-base";
+  const passwordCls = `${inputCls} pr-14`;
+  const labelCls = "mb-2 block text-sm font-semibold";
+
   return (
-    <div className="min-h-screen grid md:grid-cols-2 bg-background">
-      <div className="hidden md:flex flex-col justify-between p-10 surface border-r">
-        <Link to="/">
-          <Logo className="h-29 w-auto" />
-        </Link>
-        <div>
-          <h1 className="text-3xl font-semibold tracking-tight max-w-md leading-tight">
-            FusionPro Limited property operations, unified.
-          </h1>
-          <p className="mt-3 text-muted-foreground max-w-md">
-            Submit requests, run inspections, build quotations, and track every project from one
-            place.
-          </p>
-        </div>
-        <p className="text-xs text-muted-foreground">
-          © {new Date().getFullYear()} FusionPro Limited
+    <div className="min-h-screen bg-muted md:grid md:grid-cols-2">
+      <div className="relative h-52 overflow-hidden bg-secondary md:sticky md:top-0 md:h-screen">
+        <picture>
+          <source
+            media="(min-width: 768px)"
+            type="image/avif"
+            srcSet={LOGIN_HERO.desktop.avif}
+            sizes={LOGIN_HERO_SIZES}
+          />
+          <source
+            media="(min-width: 768px)"
+            type="image/webp"
+            srcSet={LOGIN_HERO.desktop.webp}
+            sizes={LOGIN_HERO_SIZES}
+          />
+          <source media="(max-width: 767px)" type="image/avif" srcSet={LOGIN_HERO.mobile.avif} />
+          <source media="(max-width: 767px)" type="image/webp" srcSet={LOGIN_HERO.mobile.webp} />
+          <img
+            src={LOGIN_HERO.fallback}
+            width={1512}
+            height={803}
+            alt="A FusionPro engineer in a hard hat and company overalls"
+            fetchPriority="high"
+            decoding="async"
+            className="absolute inset-0 h-full w-full [view-transition-name:hero-visual] object-cover object-[12%_0%] md:object-[14%_30%] lg:object-[10%_30%]"
+          />
+        </picture>
+        <Button
+          asChild
+          variant="dark"
+          className="absolute left-3 top-3 z-10 h-9 px-4 text-xs md:left-6 md:top-6 md:h-11 md:px-5 md:text-sm"
+        >
+          <Link
+            to="/"
+            onPointerEnter={warmHomeHero}
+            onFocus={warmHomeHero}
+            onTouchStart={warmHomeHero}
+          >
+            <ArrowLeft aria-hidden="true" />
+            Back to home
+          </Link>
+        </Button>
+        <p className="absolute bottom-6 left-6 z-10 hidden max-w-sm rounded-3xl bg-[var(--ink)]/90 px-5 py-3 text-sm font-medium leading-snug text-white backdrop-blur md:block">
+          Your trusted partner for repairs, renovations, and property improvement.
         </p>
       </div>
-      <div className="flex items-center justify-center p-6">
-        <div className="w-full max-w-sm">
-          <div className="md:hidden mb-6">
-            <Logo className="h-29 w-auto" />
-          </div>
-          <Tabs defaultValue="signin">
-            <TabsList className="grid grid-cols-2 w-full">
-              <TabsTrigger value="signin">Sign in</TabsTrigger>
-              <TabsTrigger value="signup">Create account</TabsTrigger>
-            </TabsList>
-            <TabsContent value="signin">
-              <form onSubmit={signIn} className="space-y-4 mt-4">
+
+      <div className="flex items-center justify-center p-4 sm:p-6 md:min-h-screen md:p-8">
+        <div className="relative z-10 -mt-6 w-full [view-transition-name:login-card] max-w-[560px] rounded-[2rem] border border-border/60 bg-background p-8 shadow-[var(--shadow-card)] md:mt-0 md:p-10">
+          <Logo className="h-20 w-auto" />
+          <Tabs value={mode} onValueChange={(v) => setMode(v as "signin" | "signup")}>
+            <TabsContent value="signin" className="mt-0">
+              <h1 className="mt-6 font-display text-4xl font-bold leading-tight tracking-tight">
+                Welcome back
+              </h1>
+              <p className="mt-2 text-muted-foreground">
+                Submit requests, run inspections, build quotations, and track every project from one
+                place.
+              </p>
+              <form onSubmit={signIn} className="mt-8 space-y-5">
                 <div>
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" name="email" type="email" required />
+                  <Label htmlFor="email" className={labelCls}>
+                    Email
+                  </Label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    className={inputCls}
+                  />
                 </div>
                 <div>
-                  <Label htmlFor="password">Password</Label>
-                  <PasswordInput id="password" name="password" required minLength={6} />
+                  <Label htmlFor="password" className={labelCls}>
+                    Password
+                  </Label>
+                  <PasswordInput
+                    id="password"
+                    name="password"
+                    autoComplete="current-password"
+                    required
+                    minLength={6}
+                    className={passwordCls}
+                  />
+                  <button
+                    type="button"
+                    aria-expanded={resetMode}
+                    onClick={() => {
+                      setResetMode((v) => !v);
+                      setResetSent(false);
+                    }}
+                    className="ml-auto mt-3 block rounded-full px-2 py-1 text-sm font-semibold text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    Forgot password?
+                  </button>
                 </div>
-                <Button type="submit" disabled={loading} className="w-full">
+                <Button
+                  type="submit"
+                  variant="dark"
+                  disabled={loading}
+                  className="h-14 w-full text-base"
+                >
                   {loading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}Sign in
                 </Button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setResetMode((v) => !v);
-                    setResetSent(false);
-                  }}
-                  className="block text-xs text-muted-foreground hover:underline"
-                >
-                  Forgot password?
-                </button>
               </form>
 
               {resetMode && (
-                <div className="mt-4 border-t pt-4">
+                <div className="mt-6 border-t pt-6">
                   {resetSent ? (
                     <p className="text-sm text-muted-foreground">
                       If an account exists for that email, a reset link is on its way. Check your
                       inbox.
                     </p>
                   ) : (
-                    <form onSubmit={sendResetLink} className="space-y-3">
+                    <form onSubmit={sendResetLink} className="space-y-4">
                       <div>
-                        <Label htmlFor="reset_email">Email</Label>
-                        <Input id="reset_email" name="reset_email" type="email" required />
+                        <Label htmlFor="reset_email" className={labelCls}>
+                          Email
+                        </Label>
+                        <Input
+                          id="reset_email"
+                          name="reset_email"
+                          type="email"
+                          autoComplete="email"
+                          required
+                          className={inputCls}
+                        />
                       </div>
-                      <Button type="submit" disabled={loading} className="w-full" variant="outline">
+                      <Button
+                        type="submit"
+                        disabled={loading}
+                        className="h-14 w-full text-base"
+                        variant="outline"
+                      >
                         {loading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}Send reset
                         link
                       </Button>
@@ -238,43 +307,99 @@ function AuthPage() {
                 </div>
               )}
             </TabsContent>
-            <TabsContent value="signup">
-              <p className="mt-4 text-xs text-muted-foreground leading-relaxed">
+            <TabsContent value="signup" className="mt-0">
+              <h1 className="mt-6 font-display text-4xl font-bold leading-tight tracking-tight">
+                Create account
+              </h1>
+              <p className="mt-2 text-muted-foreground leading-relaxed">
                 New accounts are automatically set up as <strong>client portals</strong>. Engineer
                 and admin access is reserved.
               </p>
-              <form onSubmit={signUp} className="space-y-4 mt-4">
+              <form onSubmit={signUp} className="mt-8 space-y-5">
                 <div>
-                  <Label htmlFor="full_name">Full name</Label>
-                  <Input id="full_name" name="full_name" required />
+                  <Label htmlFor="full_name" className={labelCls}>
+                    Full name
+                  </Label>
+                  <Input
+                    id="full_name"
+                    name="full_name"
+                    autoComplete="name"
+                    required
+                    className={inputCls}
+                  />
                 </div>
                 <div>
-                  <Label htmlFor="phone">Phone</Label>
-                  <Input id="phone" name="phone" />
+                  <Label htmlFor="phone" className={labelCls}>
+                    Phone
+                  </Label>
+                  <Input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    autoComplete="tel"
+                    className={inputCls}
+                  />
                 </div>
                 <div>
-                  <Label htmlFor="email2">Email</Label>
-                  <Input id="email2" name="email" type="email" required />
+                  <Label htmlFor="email2" className={labelCls}>
+                    Email
+                  </Label>
+                  <Input
+                    id="email2"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    className={inputCls}
+                  />
                 </div>
                 <div>
-                  <Label htmlFor="password2">Password</Label>
-                  <PasswordInput id="password2" name="password" required minLength={6} />
+                  <Label htmlFor="password2" className={labelCls}>
+                    Password
+                  </Label>
+                  <PasswordInput
+                    id="password2"
+                    name="password"
+                    autoComplete="new-password"
+                    required
+                    minLength={6}
+                    className={passwordCls}
+                  />
                 </div>
-                <Button type="submit" disabled={loading} className="w-full">
+                <Button
+                  type="submit"
+                  variant="dark"
+                  disabled={loading}
+                  className="h-14 w-full text-base"
+                >
                   {loading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}Create client
                   account
                 </Button>
               </form>
             </TabsContent>
           </Tabs>
-          <p className="mt-6 text-xs text-muted-foreground text-center">
-            <Link to="/" className="hover:underline">
-              ← Back to home
-            </Link>
+
+          <div
+            className="my-6 flex items-center gap-4 text-sm text-muted-foreground"
+            aria-hidden="true"
+          >
+            <span className="h-px flex-1 bg-border" />
+            or
+            <span className="h-px flex-1 bg-border" />
+          </div>
+          <p className="text-center text-sm text-muted-foreground">
+            {mode === "signin" ? "New here?" : "Already have an account?"}{" "}
+            <button
+              type="button"
+              onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+              className="rounded-full px-1 font-semibold text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              {mode === "signin" ? "Create account" : "Sign in"}
+            </button>
           </p>
         </div>
       </div>
-    <WhatsAppButton />
+      <WhatsAppButton />
     </div>
   );
 }

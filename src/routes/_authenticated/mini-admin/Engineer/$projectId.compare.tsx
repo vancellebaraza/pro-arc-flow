@@ -63,7 +63,7 @@ function ComparePage() {
   const diff = totalA - totalQ;
 
   return (
-    <div className="p-4 md:p-8 fade-in max-w-4xl mx-auto pb-24">
+    <div className="fade-in max-w-4xl pb-24">
       <Link
         to="/mini-admin/Engineer/$projectId"
         params={{ projectId }}
@@ -72,15 +72,15 @@ function ComparePage() {
         <ArrowLeft className="h-4 w-4 mr-1" />
         Back to project
       </Link>
-      <h1 className="mt-3 text-2xl md:text-3xl font-semibold tracking-tight">Quoted vs Actual</h1>
-      <p className="text-muted-foreground mt-1">Update actual costs as work progresses.</p>
+      <h1 className="font-display text-[1.75rem] font-bold leading-tight mt-3">Quoted vs Actual</h1>
+      <p className="mt-1 text-sm text-muted-foreground">Update actual costs as work progresses.</p>
 
       {loading ? (
-        <p className="mt-6 text-sm text-muted-foreground">Loading…</p>
+        <p className="mt-5 text-sm text-muted-foreground">Loading…</p>
       ) : rows.length === 0 ? (
-        <p className="mt-6 text-sm text-muted-foreground">No quotation yet for this project.</p>
+        <p className="mt-5 text-sm text-muted-foreground">No quotation yet for this project.</p>
       ) : (
-        <div className="mt-6 rounded-lg border overflow-x-auto bg-card">
+        <div className="mt-5 rounded-lg border overflow-x-auto bg-card">
           <table className="w-full text-sm">
             <thead className="bg-surface text-left">
               <tr>

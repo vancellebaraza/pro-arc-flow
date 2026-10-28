@@ -1,5 +1,3 @@
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
 
 export interface HistoricalProject {
   no: string;
@@ -40,7 +38,9 @@ export const HISTORICAL_PROJECTS: HistoricalProject[] = [
 
 const fmt = (n: number) => n.toLocaleString("en-KE", { minimumFractionDigits: 0 });
 
-export function exportHistoricalProjectsPdf() {
+export async function exportHistoricalProjectsPdf() {
+  const { jsPDF } = await import("jspdf");
+  const { default: autoTable } = await import("jspdf-autotable");
   const doc = new jsPDF({ orientation: "landscape" });
   const date = new Date().toISOString().slice(0, 10);
 

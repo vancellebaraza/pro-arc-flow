@@ -1,5 +1,5 @@
-import { jsPDF } from "jspdf";
-import autoTable, { type CellHookData } from "jspdf-autotable";
+import type { jsPDF } from "jspdf";
+import type { CellHookData } from "jspdf-autotable";
 import { BANK_DETAILS } from "./services";
 
 const BRAND: [number, number, number] = [218, 31, 38];
@@ -234,6 +234,7 @@ export interface QuotePdfInput {
 }
 
 export async function generateQuotationPdf(doc: jsPDF, q: QuotePdfInput) {
+  const { default: autoTable } = await import("jspdf-autotable");
   // const doc = new jsPDF();
   await header(doc, "QUOTATION", `No: ${q.quoteNo || "DRAFT"}  •  ${q.date}`);
 
@@ -390,6 +391,7 @@ export interface InspectionPdfInput {
 }
 
 export async function generateInspectionPdf(doc: jsPDF, input: InspectionPdfInput) {
+  const { default: autoTable } = await import("jspdf-autotable");
   // const doc = new jsPDF();
   await header(doc, "INSPECTION REPORT", input.inspectionDate);
   const y = 34;
@@ -585,6 +587,7 @@ export interface WorksheetPdfInput {
 }
 
 export async function generateWorksheetPdf(doc: jsPDF, w: WorksheetPdfInput) {
+  const { default: autoTable } = await import("jspdf-autotable");
   // const doc = new jsPDF();
   await header(doc, "WORKSHEET", `Job ${w.jobNo}  •  ${w.jobDate}`);
   let y = 34;
@@ -673,6 +676,7 @@ export async function generateProjectPdf({
   inspection: InspectionPdfInput;
   worksheet: WorksheetPdfInput;
 }) {
+  const { jsPDF } = await import("jspdf");
   const doc = new jsPDF();
 
   //

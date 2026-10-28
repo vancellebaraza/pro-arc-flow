@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Film, Trash2, UploadCloud, X } from "lucide-react";
+import { getUserCached } from "@/lib/auth-cache";
 
 const BUCKET = "gallery-images";
 const MAX_PER_SIDE = 3;
@@ -166,7 +167,7 @@ function SidePicker({
     <div>
       <div className="flex items-center justify-between">
         <Label className="text-sm font-medium">{label} photos or videos</Label>
-        <span className="text-xs text-muted-foreground">
+        <span className="text-sm text-muted-foreground">
           {files.length}/{MAX_PER_SIDE}
         </span>
       </div>
@@ -190,7 +191,7 @@ function SidePicker({
         >
           <UploadCloud className="h-6 w-6 text-muted-foreground" />
           <p className="text-sm font-medium">Drag photos or videos here, or click to browse</p>
-          <p className="text-xs text-muted-foreground">Videos: MP4, WebM or MOV, up to 200 MB</p>
+          <p className="text-sm text-muted-foreground">Videos: MP4, WebM or MOV, up to 200 MB</p>
           <input
             ref={inputRef}
             type="file"
@@ -219,7 +220,7 @@ function SidePicker({
                     aria-label={`${label} video preview ${i + 1}`}
                     className="aspect-square w-full object-cover"
                   />
-                  <span className="absolute bottom-1.5 left-1.5 inline-flex items-center gap-1 rounded bg-black/70 px-1.5 py-0.5 text-[10px] font-medium text-white">
+                  <span className="absolute bottom-1.5 left-1.5 inline-flex items-center gap-1 rounded bg-black/70 px-1.5 py-0.5 text-xs font-medium text-white">
                     <Film className="h-3 w-3" />
                     {formatMB(files[i].size)}
                   </span>
@@ -368,7 +369,7 @@ export default function GalleryManager() {
     const uploaded: string[] = [];
     const uploadedVideos: string[] = [];
     try {
-      const { data: userData } = await supabase.auth.getUser();
+      const { data: userData } = await getUserCached();
       if (!userData.user) throw new Error("You must be signed in.");
 
       const { before: beforeUrls, after: afterUrls } = await uploadMedia(
@@ -446,8 +447,8 @@ export default function GalleryManager() {
   }
 
   return (
-    <section className="mt-8 rounded-xl border bg-card p-5">
-      <h2 className="text-lg font-semibold tracking-tight">Photo gallery</h2>
+    <section className="mt-5 rounded-xl border bg-card p-5">
+      <h2 className="font-display text-xl font-bold">Photo gallery</h2>
       <p className="text-sm text-muted-foreground">
         Each project shows on the public gallery page as one before/after slide. Add 1 to 3 photos
         or videos for each side (3 in total per side) and a short description under each.
@@ -590,7 +591,7 @@ export default function GalleryManager() {
       </Button>
 
       <div className="mt-8">
-        <h3 className="text-sm font-medium uppercase tracking-[0.12em] text-muted-foreground">
+        <h3 className="text-sm font-medium text-muted-foreground">
           Published projects
         </h3>
 
@@ -609,7 +610,7 @@ export default function GalleryManager() {
                   <Thumb url={set.before_images[0]} alt="Before" />
                   <Thumb url={set.after_images[0]} alt="After" />
                 </div>
-                <div className="space-y-1 p-3 text-xs text-muted-foreground">
+                <div className="space-y-1 p-3 text-sm text-muted-foreground">
                   {set.title && (
                     <p className="truncate text-sm font-medium text-foreground">{set.title}</p>
                   )}

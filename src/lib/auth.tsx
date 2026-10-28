@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { getRolesCached, peekCachedRoles, peekCachedUser } from "@/lib/auth-cache";
 
 export type AppRole = "client" | "engineer" | "admin" | "mini_admin" | "accountant" | "project_view_admin";
 
@@ -23,8 +24,11 @@ export function useSession() {
 
 export function useMyRoles() {
   const { user, loading } = useSession();
-  const [roles, setRoles] = useState<AppRole[]>([]);
-  const [rolesLoading, setRolesLoading] = useState(true);
+  // Seed from the shared cache so the layout does not wait on a second roles fetch.
+  const seededUser = peekCachedUser();
+  const seededRoles = seededUser ? peekCachedRoles(seededUser.id) : null;
+  const [roles, setRoles] = useState<AppRole[]>((seededRoles ?? []) as AppRole[]);
+  const [rolesLoading, setRolesLoading] = useState(seededRoles === null);
   useEffect(() => {
     if (loading) return;
     if (!user) {
@@ -32,14 +36,15 @@ export function useMyRoles() {
       setRolesLoading(false);
       return;
     }
-    supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", user.id)
-      .then(({ data }) => {
-        setRoles((data ?? []).map((r) => r.role as AppRole));
-        setRolesLoading(false);
-      });
+    let active = true;
+    getRolesCached(user.id).then((names) => {
+      if (!active) return;
+      setRoles((names ?? []) as AppRole[]);
+      setRolesLoading(false);
+    });
+    return () => {
+      active = false;
+    };
   }, [user, loading]);
   const primaryRole: AppRole = roles.includes("admin")
     ? "admin"

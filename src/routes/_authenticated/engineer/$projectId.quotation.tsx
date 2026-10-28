@@ -8,8 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { generateQuotationPdf } from "@/lib/pdf";
 import { SERVICES, BANK_DETAILS } from "@/lib/services";
 import { toast } from "sonner";
-import { jsPDF } from "jspdf";
 import { ArrowLeft, Plus, Trash2, Save, FileDown, Send } from "lucide-react";
+import { getUserCached } from "@/lib/auth-cache";
 
 export const Route = createFileRoute("/_authenticated/engineer/$projectId/quotation")({
   component: QuotationPage,
@@ -164,7 +164,7 @@ const grandTotal = vatableAmount + vatAmount;
   async function save(newStatus?: "draft" | "sent") {
     setSaving(true);
     try {
-      const { data: u } = await supabase.auth.getUser();
+      const { data: u } = await getUserCached();
       if (!u.user) throw new Error("Not signed in");
       const meta = {
         bill_to: billTo,
@@ -232,6 +232,7 @@ const grandTotal = vatableAmount + vatAmount;
   }
 
   async function exportPdf() {
+    const { jsPDF } = await import("jspdf");
     const doc = new jsPDF();
     try {
       
@@ -268,7 +269,7 @@ const grandTotal = vatableAmount + vatAmount;
   }
 
   return (
-    <div className="p-4 md:p-8 fade-in max-w-5xl mx-auto pb-24">
+    <div className="fade-in pb-24">
       <Link
         to="/engineer/$projectId"
         params={{ projectId }}
@@ -277,10 +278,10 @@ const grandTotal = vatableAmount + vatAmount;
         <ArrowLeft className="h-4 w-4 mr-1" />
         Back to project
       </Link>
-      <h1 className="mt-3 text-2xl md:text-3xl font-semibold tracking-tight">Quotation</h1>
-      <p className="text-muted-foreground mt-1">Project: {projectTitle}</p>
+      <h1 className="font-display text-[1.75rem] font-bold leading-tight mt-3">Quotation</h1>
+      <p className="mt-1 text-sm text-muted-foreground">Project: {projectTitle}</p>
 
-      <section className="mt-6 grid md:grid-cols-2 gap-4">
+      <section className="mt-5 grid md:grid-cols-2 gap-4">
         <div>
           <Label>Bill To</Label>
           <Input
@@ -315,9 +316,9 @@ const grandTotal = vatableAmount + vatAmount;
         </div>
       </section>
 
-      <section className="mt-8">
+      <section className="mt-5">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold tracking-tight">Line Items</h2>
+          <h2 className="font-display text-xl font-bold">Line Items</h2>
           <Button
             variant="outline"
             size="sm"
@@ -352,7 +353,7 @@ const grandTotal = vatableAmount + vatAmount;
   Add Subtitle
 </Button>
         </div>
-        <div className="mt-3 overflow-x-auto rounded-lg border">
+        <div className="mt-3 overflow-x-auto rounded-2xl border">
           <table className="w-full text-sm">
             <thead className="bg-surface text-left">
               <tr>
@@ -368,7 +369,7 @@ const grandTotal = vatableAmount + vatAmount;
 {items.map((it, i) => {
   if (it.type === "subtitle") {
     return (
-      <tr key={i} className="bg-gray-100">
+      <tr key={i} className="bg-muted">
         <td colSpan={6} className="p-2">
           <div className="flex items-center gap-2">
             <Input
@@ -460,7 +461,7 @@ const grandTotal = vatableAmount + vatAmount;
         </div>
       </section>
 
-      <section className="mt-6 grid md:grid-cols-2 gap-4">
+      <section className="mt-5 grid md:grid-cols-2 gap-4">
         <div>
           <Label>Notes</Label>
           <Textarea rows={4} value={notes} onChange={(e) => setNotes(e.target.value)} />
@@ -473,7 +474,7 @@ const grandTotal = vatableAmount + vatAmount;
             />
           </div>
         </div>
-    <div className="rounded-lg border bg-surface p-4 self-start space-y-3">
+    <div className="rounded-2xl border bg-surface p-4 self-start space-y-3">
   <div className="flex items-center gap-2">
     <Label className="flex-1">Labour (KES)</Label>
     <Input
@@ -518,13 +519,13 @@ const grandTotal = vatableAmount + vatAmount;
     <strong>{grandTotal.toFixed(2)}</strong>
   </div>
 
-  <div className="text-xs text-muted-foreground capitalize">
+  <div className="text-sm text-muted-foreground capitalize">
     Status: {status}
   </div>
 </div>
       </section>
 
-      <section className="mt-8 rounded-lg border bg-card p-5">
+      <section className="mt-5 rounded-card border bg-card shadow-[var(--shadow-card)] p-5">
         <h3 className="font-medium">Payment Option — Bank Details</h3>
         <div className="mt-3 grid sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
           <div>
@@ -554,7 +555,7 @@ const grandTotal = vatableAmount + vatAmount;
         </div>
       </section>
 
-      <div className="mt-8 flex flex-wrap justify-end gap-2">
+      <div className="mt-5 flex flex-wrap justify-end gap-2">
         <Button variant="outline" onClick={exportPdf}>
           <FileDown className="h-4 w-4 mr-1" />
           Export PDF

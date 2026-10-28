@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Send, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
+import { getUserCached } from "@/lib/auth-cache";
 
 export const Route = createFileRoute("/_authenticated/mini-admin/Engineer/$projectId/messages")({
   component: MessagesPage,
@@ -47,7 +48,7 @@ function MessagesPage() {
   async function send() {
     if (!body.trim() || sending) return;
     setSending(true);
-    const { data: u } = await supabase.auth.getUser();
+    const { data: u } = await getUserCached();
     if (!u.user) return;
     const { error } = await supabase.from("messages").insert({
       project_id: projectId,
@@ -64,7 +65,7 @@ function MessagesPage() {
   const waMsg = encodeURIComponent(`FusionPro — Project: ${projectTitle}. `);
 
   async function logWa() {
-    const { data: u } = await supabase.auth.getUser();
+    const { data: u } = await getUserCached();
     if (!u.user) return;
     await supabase.from("whatsapp_logs").insert({
       sender_id: u.user.id,
@@ -75,7 +76,7 @@ function MessagesPage() {
   }
 
   return (
-    <div className="p-4 md:p-8 fade-in max-w-3xl mx-auto pb-24">
+    <div className="fade-in max-w-3xl pb-24">
       <Link
         to="/mini-admin/Engineer/$projectId"
         params={{ projectId }}
@@ -86,8 +87,8 @@ function MessagesPage() {
       </Link>
       <div className="mt-3 flex items-end justify-between flex-wrap gap-2">
         <div>
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Communication</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="font-display text-[1.75rem] font-bold leading-tight">Communication</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Internal messages and WhatsApp launcher (logged).
           </p>
         </div>
@@ -99,13 +100,13 @@ function MessagesPage() {
         </a>
       </div>
 
-      <div className="mt-6 space-y-2">
+      <div className="mt-5 space-y-2">
         {messages.length === 0 ? (
           <p className="text-sm text-muted-foreground">No messages yet.</p>
         ) : (
           messages.map((m) => (
             <div key={m.id} className="rounded-lg border bg-card p-3">
-              <div className="text-xs text-muted-foreground">
+              <div className="text-sm text-muted-foreground">
                 {new Date(m.created_at).toLocaleString()}
               </div>
               <div className="mt-1 text-sm whitespace-pre-wrap">{m.body}</div>
@@ -114,7 +115,7 @@ function MessagesPage() {
         )}
       </div>
 
-      <div className="mt-6 rounded-lg border bg-card p-3">
+      <div className="mt-5 rounded-lg border bg-card p-3">
         <Textarea
           rows={3}
           value={body}

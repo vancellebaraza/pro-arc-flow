@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { jsPDF } from "jspdf";
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -10,6 +9,7 @@ import { generateQuotationPdf } from "@/lib/pdf";
 import { SERVICES, BANK_DETAILS } from "@/lib/services";
 import { toast } from "sonner";
 import { ArrowLeft, Plus, Trash2, Save, FileDown, Send } from "lucide-react";
+import { getUserCached } from "@/lib/auth-cache";
 
 export const Route = createFileRoute("/_authenticated/mini-admin/Engineer/$projectId/quotation")({
   component: QuotationPage,
@@ -166,7 +166,7 @@ function QuotationPage() {
   async function save(newStatus?: "draft" | "sent") {
     setSaving(true);
     try {
-      const { data: u } = await supabase.auth.getUser();
+      const { data: u } = await getUserCached();
       if (!u.user) throw new Error("Not signed in");
       const meta = {
         bill_to: billTo,
@@ -234,8 +234,10 @@ function QuotationPage() {
   }
 
   async function exportPdf() {
+    const { jsPDF } = await import("jspdf");
     const doc = new jsPDF();
     try {
+      const { jsPDF } = await import("jspdf");
       const doc = new jsPDF();
       await generateQuotationPdf(doc, {
         projectTitle,
@@ -269,7 +271,7 @@ function QuotationPage() {
   }
 
   return (
-    <div className="p-4 md:p-8 fade-in max-w-5xl mx-auto pb-24">
+    <div className="fade-in pb-24">
       <Link
         to="/mini-admin/Engineer/$projectId"
         params={{ projectId }}
@@ -278,10 +280,10 @@ function QuotationPage() {
         <ArrowLeft className="h-4 w-4 mr-1" />
         Back to project
       </Link>
-      <h1 className="mt-3 text-2xl md:text-3xl font-semibold tracking-tight">Quotation</h1>
-      <p className="text-muted-foreground mt-1">Project: {projectTitle}</p>
+      <h1 className="font-display text-[1.75rem] font-bold leading-tight mt-3">Quotation</h1>
+      <p className="mt-1 text-sm text-muted-foreground">Project: {projectTitle}</p>
 
-      <section className="mt-6 grid md:grid-cols-2 gap-4">
+      <section className="mt-5 grid md:grid-cols-2 gap-4">
         <div>
           <Label>Bill To</Label>
           <Input
@@ -316,9 +318,9 @@ function QuotationPage() {
         </div>
       </section>
 
-      <section className="mt-8">
+      <section className="mt-5">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold tracking-tight">Line Items</h2>
+          <h2 className="font-display text-xl font-bold">Line Items</h2>
           <Button
             variant="outline"
             size="sm"
@@ -449,7 +451,7 @@ function QuotationPage() {
         </div>
       </section>
 
-      <section className="mt-6 grid md:grid-cols-2 gap-4">
+      <section className="mt-5 grid md:grid-cols-2 gap-4">
         <div>
           <Label>Notes</Label>
           <Textarea rows={4} value={notes} onChange={(e) => setNotes(e.target.value)} />
@@ -507,13 +509,13 @@ function QuotationPage() {
             <strong>{grandTotal.toFixed(2)}</strong>
           </div>
 
-          <div className="text-xs text-muted-foreground capitalize">Status: {status}</div>
+          <div className="text-sm text-muted-foreground capitalize">Status: {status}</div>
         </div>
       </section>
 
-      <section className="mt-8 rounded-lg border bg-card p-5">
+      <section className="mt-5 rounded-lg border bg-card p-5">
         <h3 className="font-medium">Payment Details</h3>
-        <div className="mt-4 grid gap-6 md:grid-cols-2 text-sm">
+        <div className="mt-4 grid gap-5 md:grid-cols-2 text-sm">
           <div className="rounded-md border bg-surface p-4">
             <h4 className="mb-3 font-medium text-foreground">Paybill Payments</h4>
             <div className="space-y-2">
@@ -560,7 +562,7 @@ function QuotationPage() {
         </div>
       </section>
 
-      <div className="mt-8 flex flex-wrap justify-end gap-2">
+      <div className="mt-5 flex flex-wrap justify-end gap-2">
         <Button variant="outline" onClick={exportPdf}>
           <FileDown className="h-4 w-4 mr-1" />
           Export PDF

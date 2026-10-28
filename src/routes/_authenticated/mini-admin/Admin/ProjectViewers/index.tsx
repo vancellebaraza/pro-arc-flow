@@ -144,19 +144,19 @@ function ProjectViewersPage() {
   }
 
   return (
-    <div className="p-6 md:p-10 max-w-4xl mx-auto fade-in">
+    <div className="fade-in">
       <div>
-        <h1 className="text-2xl md:text-3xl font-semibold tracking-tight flex items-center gap-2">
+        <h1 className="font-display text-[1.75rem] font-bold leading-tight flex items-center gap-2">
           <Eye className="h-6 w-6" />
           Project Viewers
         </h1>
-        <p className="text-muted-foreground mt-1">
+        <p className="mt-1 text-sm text-muted-foreground">
           Create view-only accounts and assign which projects they can see. They get no
           approval or edit rights anywhere.
         </p>
       </div>
 
-      <section className="mt-8 rounded-xl border bg-card p-6">
+      <section className="mt-5 rounded-xl border bg-card p-6">
         <h2 className="font-semibold flex items-center gap-2">
           <UserPlus className="h-4 w-4" />
           Create a project viewer
@@ -207,8 +207,8 @@ function ProjectViewersPage() {
         </form>
       </section>
 
-      <section className="mt-10">
-        <h2 className="text-lg font-semibold tracking-tight">Existing viewers</h2>
+      <section className="mt-5">
+        <h2 className="font-display text-xl font-bold">Existing viewers</h2>
         {loading ? (
           <p className="text-sm text-muted-foreground mt-2">Loading…</p>
         ) : loadError ? (
@@ -224,7 +224,7 @@ function ProjectViewersPage() {
                   <div className="flex items-start justify-between">
                     <div>
                       <div className="font-medium">{v.full_name || v.email}</div>
-                      <div className="text-xs text-muted-foreground">
+                      <div className="text-sm text-muted-foreground">
                         {v.email} {v.phone && `· ${v.phone}`}
                       </div>
                     </div>
@@ -238,7 +238,7 @@ function ProjectViewersPage() {
                     </Button>
                   </div>
                   <div className="mt-3 text-sm">
-                    <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
+                    <div className="text-sm text-muted-foreground mb-2">
                       Assigned projects
                     </div>
                     <div className="grid sm:grid-cols-2 gap-1">

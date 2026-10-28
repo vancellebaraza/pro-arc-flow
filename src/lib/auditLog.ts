@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { Json } from "@/integrations/supabase/types";
+import { getUserCached } from "@/lib/auth-cache";
 
 type AuditAction = "insert" | "update" | "delete";
 
@@ -16,7 +17,7 @@ export async function logAudit(
   newData: Record<string, unknown> | null,
 ) {
   try {
-    const { data: userData } = await supabase.auth.getUser();
+    const { data: userData } = await getUserCached();
 
     const { error } = await supabase.from("audit_logs").insert({
       table_name: tableName,

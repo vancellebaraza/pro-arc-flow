@@ -196,10 +196,10 @@ function BankAccountsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl p-4 md:p-8">
+    <div className="fade-in">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">Bank Accounts</h1>
+          <h1 className="font-display text-[1.75rem] font-bold leading-tight">Bank Accounts</h1>
           <p className="mt-1 text-muted-foreground">
             Set up bank accounts linked to your ledger, ready for statement import and reconciliation.
           </p>
@@ -209,13 +209,13 @@ function BankAccountsPage() {
 
       <div className="mt-6">
         {loading ? (
-          <div className="rounded-lg border bg-card p-5 text-sm text-muted-foreground">Loading…</div>
+          <div className="rounded-card border bg-card shadow-[var(--shadow-card)] p-5 text-sm text-muted-foreground">Loading…</div>
         ) : bankAccounts.length === 0 ? (
-          <div className="rounded-lg border bg-card p-5 text-sm text-muted-foreground">
+          <div className="rounded-card border bg-card shadow-[var(--shadow-card)] p-5 text-sm text-muted-foreground">
             No bank accounts set up yet. Add one to start reconciling.
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-lg border bg-card">
+          <div className="overflow-x-auto rounded-card border bg-card shadow-[var(--shadow-card)]">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -223,9 +223,9 @@ function BankAccountsPage() {
                   <TableHead>Account name</TableHead>
                   <TableHead>Last 4</TableHead>
                   <TableHead>Linked ledger account</TableHead>
-                  <TableHead className="text-right">Opening balance</TableHead>
+                  <TableHead className="text-right tabular-nums">Opening balance</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="text-right tabular-nums">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -237,7 +237,7 @@ function BankAccountsPage() {
                     <TableCell>
                       {row.ledger_code} - {row.ledger_name}
                     </TableCell>
-                    <TableCell className="text-right">{row.opening_balance.toFixed(2)}</TableCell>
+                    <TableCell className="text-right tabular-nums">{row.opening_balance.toFixed(2)}</TableCell>
                     <TableCell>
                       <span
                         className={`inline-flex rounded-full px-2 py-0.5 text-xs ${
@@ -247,7 +247,7 @@ function BankAccountsPage() {
                         {row.is_active ? "Active" : "Inactive"}
                       </span>
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-right tabular-nums">
                       <Button size="sm" variant="outline" onClick={() => openEdit(row)}>
                         Edit
                       </Button>

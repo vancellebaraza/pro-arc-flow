@@ -1,7 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState, useCallback } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { SERVICES, STATUS_LABEL, statusColorClasses } from "@/lib/services";
+import { StatusChip } from "@/components/ui/status-chip";
+import { SERVICES, statusColorClasses } from "@/lib/services";
 import { ArrowRight, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -21,31 +23,32 @@ interface Project {
   scheduled_date: string | null;
 }
 
+const NO_PROJECTS: Project[] = [];
+
 function EngineerHome() {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    try {
-      const { data: projectRows } = await supabase
-        .from("projects")
-        .select("id,title,service,status,location,engineer_id,created_at,scheduled_date")
-        .eq("archived", false)
-        .order("created_at", { ascending: false });
+  // Cached list is shown straight away on return visits and always refreshed on mount.
+  const { data: cachedProjects, isPending: loading } = useQuery<Project[]>({
+    queryKey: ["engineer-projects"],
+    staleTime: 30_000,
+    refetchOnMount: "always",
+    queryFn: async () => {
+      try {
+        const { data: projectRows } = await supabase
+          .from("projects")
+          .select("id,title,service,status,location,engineer_id,created_at,scheduled_date")
+          .eq("archived", false)
+          .order("created_at", { ascending: false });
 
-      setProjects((projectRows ?? []) as Project[]);
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Unable to load engineer dashboard");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    load();
-  }, [load]);
+        return (projectRows ?? []) as Project[];
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "Unable to load engineer dashboard");
+        return [];
+      }
+    },
+  });
+  const projects = cachedProjects ?? NO_PROJECTS;
 
   const filtered = projects.filter(
     (p) =>
@@ -55,11 +58,11 @@ function EngineerHome() {
   );
 
   return (
-    <div className="p-4 md:p-8 fade-in">
-      <div className="flex items-end justify-between flex-wrap gap-4 mb-6">
+    <div className="fade-in">
+      <div className="flex items-end justify-between flex-wrap gap-4 mb-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Engineer dashboard</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="font-display text-[1.75rem] font-bold leading-tight">Engineer dashboard</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Pick a project to open inspection, quotation, worksheet and more.
           </p>
         </div>
@@ -75,13 +78,13 @@ function EngineerHome() {
       </div>
 
       {loading ? (
-        <p className="text-sm text-muted-foreground mb-8">Loading…</p>
+        <p className="text-sm text-muted-foreground mb-5">Loading…</p>
       ) : filtered.length === 0 ? (
-        <div className="rounded-xl border bg-card p-10 text-center text-muted-foreground mb-8">
+        <div className="rounded-xl border bg-card p-6 text-center text-muted-foreground mb-5">
           No projects found.
         </div>
       ) : (
-        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 mb-8">
+        <ul className="mb-5 grid gap-5 [grid-template-columns:repeat(auto-fill,minmax(min(380px,100%),1fr))]">
           {filtered.map((p) => {
             const svc = SERVICES.find((s) => s.key === p.service);
             const colors = statusColorClasses(p.status);
@@ -90,25 +93,26 @@ function EngineerHome() {
                 <Link
                   to="/engineer/$projectId"
                   params={{ projectId: p.id }}
-                  className="relative block h-full overflow-hidden rounded-xl border bg-card p-5 pl-6 hover:border-foreground/40 hover:shadow-sm transition"
+                  className="relative flex h-full flex-col overflow-hidden rounded-2xl border bg-card p-5 pl-6 shadow-[var(--shadow-card)] transition-[transform,box-shadow] duration-150 hover:-translate-y-px hover:shadow-[var(--shadow-raised-hover)] active:scale-[0.98] motion-reduce:transform-none md:p-6 md:pl-7"
                 >
                   <div className={`absolute inset-y-0 left-0 w-[3px] ${colors.dot}`} />
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs uppercase tracking-wider text-muted-foreground">
+                  <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+                    <span className="shrink-0 text-[13px] font-medium uppercase tracking-wide text-muted-foreground">
                       {svc?.label ?? p.service}
                     </span>
-                    <span className={`inline-flex items-center gap-2 rounded-full px-2 py-0.5 text-xs ${colors.badge}`}>
-                      <span className={`h-1.5 w-1.5 rounded-full ${colors.dot}`} />
-                      {STATUS_LABEL[p.status] ?? p.status}
-                    </span>
+                    <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+                      <StatusChip status={p.status} />
+                    </div>
                   </div>
-                  <h3 className="mt-2 font-medium truncate">{p.title}</h3>
-                  <p className="text-xs text-muted-foreground truncate">{p.location ?? "—"}</p>
-                  <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
-                    <span>
-                      {p.scheduled_date ? `Scheduled ${p.scheduled_date}` : "Unscheduled"}
-                    </span>
-                    <ArrowRight className="h-4 w-4" />
+                  <h3 className="mt-3 line-clamp-2 text-lg font-semibold leading-snug">{p.title}</h3>
+                  <p className="mt-1 truncate text-sm text-muted-foreground">{p.location ?? "—"}</p>
+                  <div className="mt-auto pt-4">
+                    <div className="flex items-center justify-between border-t pt-3 text-sm text-muted-foreground">
+                      <span>
+                        {p.scheduled_date ? `Scheduled ${p.scheduled_date}` : "Unscheduled"}
+                      </span>
+                      <ArrowRight className="h-4 w-4" />
+                    </div>
                   </div>
                 </Link>
               </li>

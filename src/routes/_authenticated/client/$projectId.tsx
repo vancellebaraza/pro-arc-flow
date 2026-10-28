@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { jsPDF } from "jspdf";
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -136,6 +135,7 @@ function ProjectDetail() {
     if (!quote || !project) return;
     try {
       const labour = items.reduce((sum, it) => sum + Number(it.amount), 0);
+      const { jsPDF } = await import("jspdf");
       const doc = new jsPDF();
       await generateQuotationPdf(doc, {
         projectTitle: project.title,
@@ -158,13 +158,13 @@ function ProjectDetail() {
     }
   }
 
-  if (loading) return <div className="p-8 text-sm text-muted-foreground">Loading…</div>;
-  if (!project) return <div className="p-8 text-sm">Project not found.</div>;
+  if (loading) return <div className="p-6 text-sm text-muted-foreground">Loading…</div>;
+  if (!project) return <div className="p-6 text-sm">Project not found.</div>;
   const svc = SERVICES.find((s) => s.key === project.service);
   const waText = `FusionPro — Project: ${project.title} (${STATUS_LABEL[project.status] ?? project.status}). Reference: ${project.id.slice(0, 8)}`;
 
   return (
-    <div className="p-6 md:p-10 max-w-4xl mx-auto fade-in">
+    <div className="fade-in">
       <Link
         to="/client"
         className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
@@ -174,13 +174,13 @@ function ProjectDetail() {
       </Link>
       <div className="mt-4 flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground uppercase tracking-wider">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <span>{svc?.label}</span>·<span>{STATUS_LABEL[project.status] ?? project.status}</span>
           </div>
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight mt-1">
+          <h1 className="font-display text-[1.75rem] font-bold leading-tight mt-1">
             {project.title}
           </h1>
-          <p className="text-muted-foreground mt-1">{project.location}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{project.location}</p>
         </div>
         <WhatsAppButton
           projectId={project.id}
@@ -190,19 +190,19 @@ function ProjectDetail() {
         />
       </div>
 
-      <ProjectProgress status={project.status} className="mt-6" />
+      <ProjectProgress status={project.status} className="mt-5" />
 
-      {project.description && <p className="mt-6 text-sm leading-relaxed">{project.description}</p>}
+      {project.description && <p className="mt-5 text-sm leading-relaxed">{project.description}</p>}
 
       {project.image_urls.length > 0 && (
-        <div className="mt-6 grid grid-cols-2 gap-3">
+        <div className="mt-5 grid grid-cols-2 gap-3">
           {project.image_urls.map((u, i) => (
             <a
               key={i}
               href={u}
               target="_blank"
               rel="noreferrer"
-              className="block rounded-md overflow-hidden border bg-card"
+              className="block rounded-2xl overflow-hidden border bg-card"
             >
               <img src={u} alt={`attachment ${i + 1}`} className="w-full h-40 object-cover" />
             </a>
@@ -210,14 +210,14 @@ function ProjectDetail() {
         </div>
       )}
 
-      <section className="mt-10">
-        <h2 className="text-lg font-semibold tracking-tight">Inspection reports</h2>
+      <section className="mt-5">
+        <h2 className="font-display text-xl font-bold">Inspection reports</h2>
         {inspections.length === 0 ? (
           <p className="text-sm text-muted-foreground mt-2">No inspections yet.</p>
         ) : (
           <ul className="mt-3 space-y-3">
             {inspections.map((ins) => (
-              <li key={ins.id} className="rounded-lg border bg-card p-4">
+              <li key={ins.id} className="rounded-card border bg-card shadow-[var(--shadow-card)] p-4">
                 <div className="flex justify-between text-sm">
                   <span className="font-medium capitalize">{ins.stage} inspection</span>
                   <span className="text-muted-foreground">
@@ -244,9 +244,9 @@ function ProjectDetail() {
         )}
       </section>
 
-      <section className="mt-10">
+      <section className="mt-5">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold tracking-tight">Quotation</h2>
+          <h2 className="font-display text-xl font-bold">Quotation</h2>
           {quote && (
             <Button variant="outline" size="sm" onClick={downloadPdf}>
               <FileDown className="h-4 w-4 mr-1" />
@@ -257,7 +257,7 @@ function ProjectDetail() {
         {!quote ? (
           <p className="text-sm text-muted-foreground mt-2">No quotation yet.</p>
         ) : (
-          <div className="mt-3 rounded-lg border bg-card overflow-hidden">
+          <div className="mt-3 rounded-card border bg-card shadow-[var(--shadow-card)] overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-surface text-left">
                 <tr>
@@ -302,7 +302,7 @@ function ProjectDetail() {
               </div>
             )}
             {quote.status !== "sent" && (
-              <div className="border-t p-3 text-xs text-muted-foreground text-right capitalize">
+              <div className="border-t p-3 text-sm text-muted-foreground text-right capitalize">
                 Status: {quote.status}
               </div>
             )}

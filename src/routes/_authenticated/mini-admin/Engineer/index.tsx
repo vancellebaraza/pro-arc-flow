@@ -21,6 +21,7 @@ import {
 import { toast } from "sonner";
 import ProgressButton from "@/components/ProgressButton";
 import type { ProgressCategory } from "@/lib/progress";
+import { getUserCached } from "@/lib/auth-cache";
 
 export const Route = createFileRoute("/_authenticated/mini-admin/Engineer/")({
   component: EngineerHome,
@@ -81,7 +82,7 @@ function EngineerHome() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const { data: userData, error: userError } = await supabase.auth.getUser();
+      const { data: userData, error: userError } = await getUserCached();
       if (userError || !userData.user) {
         toast.error("Unable to verify current engineer.");
         return;
@@ -164,7 +165,7 @@ function EngineerHome() {
       return copy;
     });
 
-    const { data: userData } = await supabase.auth.getUser();
+    const { data: userData } = await getUserCached();
     const query = next
       ? (supabase as any).from("project_progress").upsert(
           {
@@ -255,11 +256,11 @@ function EngineerHome() {
   }
 
   return (
-    <div className="p-4 md:p-8 fade-in">
-      <div className="flex items-end justify-between flex-wrap gap-4 mb-6">
+    <div className="fade-in">
+      <div className="flex items-end justify-between flex-wrap gap-4 mb-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Engineer dashboard</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="font-display text-[1.75rem] font-bold leading-tight">Engineer dashboard</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Pick a project to open inspection, quotation, worksheet and more.
           </p>
         </div>
@@ -275,20 +276,20 @@ function EngineerHome() {
       </div>
 
       {loading ? (
-        <p className="text-sm text-muted-foreground mb-8">Loading…</p>
+        <p className="text-sm text-muted-foreground mb-4">Loading…</p>
       ) : filtered.length === 0 ? (
-        <div className="rounded-xl border bg-card p-10 text-center text-muted-foreground mb-8">
+        <div className="rounded-xl border bg-card p-6 text-center text-muted-foreground mb-4">
           No projects found.
         </div>
       ) : (
-        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 mb-8">
+        <ul className="mb-5 grid gap-5 [grid-template-columns:repeat(auto-fill,minmax(min(380px,100%),1fr))]">
           {filtered.map((p) => {
             const svc = SERVICES.find((s) => s.key === p.service);
             const colors = statusColorClasses(p.status);
             return (
               <li
                 key={p.id}
-                className="relative h-full overflow-hidden rounded-xl border bg-card p-5 pl-6 transition hover:border-foreground/40 hover:shadow-sm"
+                className="relative flex h-full flex-col overflow-hidden rounded-2xl border bg-card p-5 pl-6 shadow-[var(--shadow-card)] transition-[transform,box-shadow] duration-150 hover:-translate-y-px hover:shadow-[var(--shadow-raised-hover)] active:scale-[0.98] motion-reduce:transform-none md:p-6 md:pl-7"
               >
                 {/* The whole card opens the project; the progress button sits above it. */}
                 <Link
@@ -298,29 +299,31 @@ function EngineerHome() {
                   className="absolute inset-0 z-0"
                 />
                 <div className={`absolute inset-y-0 left-0 w-[3px] ${colors.dot}`} />
-                <div className="pointer-events-none relative z-10">
-                  <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1.5">
-                    <span className="text-xs uppercase tracking-wider text-muted-foreground">
+                <div className="pointer-events-none relative z-10 flex flex-1 flex-col">
+                  <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+                    <span className="shrink-0 text-[13px] font-medium uppercase tracking-wide text-muted-foreground">
                       {svc?.label ?? p.service}
                     </span>
-                    <div className="flex items-center gap-1.5">
+                    <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
                       <ProgressButton
                         value={progressMap[p.id] ?? null}
                         onChange={(value) => changeProgress(p.id, value)}
                       />
-                      <span className={`inline-flex items-center gap-2 rounded-full px-2 py-0.5 text-xs ${colors.badge}`}>
+                      <span className={`inline-flex items-center gap-2 rounded-full px-2.5 py-0.5 text-xs font-semibold ${colors.badge}`}>
                         <span className={`h-1.5 w-1.5 rounded-full ${colors.dot}`} />
                         {STATUS_LABEL[p.status] ?? p.status}
                       </span>
                     </div>
                   </div>
-                  <h3 className="mt-2 font-medium truncate">{p.title}</h3>
-                  <p className="text-xs text-muted-foreground truncate">{p.location ?? "—"}</p>
-                  <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
-                    <span>
-                      {p.scheduled_date ? `Scheduled ${p.scheduled_date}` : "Unscheduled"}
-                    </span>
-                    <ArrowRight className="h-4 w-4" />
+                  <h3 className="mt-3 line-clamp-2 text-lg font-semibold leading-snug">{p.title}</h3>
+                  <p className="mt-1 truncate text-sm text-muted-foreground">{p.location ?? "—"}</p>
+                  <div className="mt-auto pt-4">
+                    <div className="flex items-center justify-between border-t pt-3 text-sm text-muted-foreground">
+                      <span>
+                        {p.scheduled_date ? `Scheduled ${p.scheduled_date}` : "Unscheduled"}
+                      </span>
+                      <ArrowRight className="h-4 w-4" />
+                    </div>
                   </div>
                 </div>
               </li>
@@ -329,10 +332,10 @@ function EngineerHome() {
         </ul>
       )}
 
-      <section className="mb-8 rounded-xl border bg-card p-5">
+      <section className="mb-4 rounded-xl border bg-card p-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <h2 className="text-lg font-semibold tracking-tight">My Staff To Do Row</h2>
+            <h2 className="font-display text-xl font-bold">My Staff To Do Row</h2>
             <p className="text-sm text-muted-foreground mt-1">
               Add your weekly activity row here. Admin will see these entries in Staff To Do.
             </p>
@@ -414,10 +417,10 @@ function EngineerHome() {
                           {todo ? (
                             <>
                               <div className="text-sm font-semibold">{todo.activity}</div>
-                              <div className="mt-1 text-xs text-muted-foreground">
+                              <div className="mt-1 text-sm text-muted-foreground">
                                 {todo.location ?? "No location"}
                               </div>
-                              <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-white/80 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.15em] text-slate-700">
+                              <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-white/80 px-2 py-1 text-xs font-semibold text-slate-700">
                                 <span
                                   className={todo.is_done ? "text-emerald-700" : "text-rose-700"}
                                 >

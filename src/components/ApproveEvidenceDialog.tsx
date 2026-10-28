@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Loader2, Check } from "lucide-react";
+import { getUserCached } from "@/lib/auth-cache";
 
 interface Props {
   quotationId: string;
@@ -38,7 +39,7 @@ export default function ApproveEvidenceDialog({ quotationId, projectId, onApprov
         evidenceUrl = data.publicUrl;
       }
 
-      const { data: userData } = await supabase.auth.getUser();
+      const { data: userData } = await getUserCached();
 
       const { error: qErr } = await supabase
         .from("quotations")

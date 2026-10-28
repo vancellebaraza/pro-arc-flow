@@ -18,8 +18,8 @@ function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold">404</h1>
-        <h2 className="mt-4 text-xl font-semibold">Page not found</h2>
+        <h1 className="font-display text-[1.75rem] font-bold leading-tight text-7xl">404</h1>
+        <h2 className="font-display text-xl font-bold mt-4">Page not found</h2>
         <p className="mt-2 text-sm text-muted-foreground">This page doesn't exist.</p>
         <div className="mt-6">
           <Link
@@ -43,7 +43,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight">Something went wrong</h1>
+        <h1 className="font-display text-[1.75rem] font-bold leading-tight">Something went wrong</h1>
         <p className="mt-2 text-sm text-muted-foreground">Please try again.</p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
@@ -108,13 +108,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      // Loaded with media="print" and switched to "all" by the script in RootShell,
+      // so the font stylesheets do not block first render.
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap",
+        media: "print",
+        "data-font-swap": "",
       },
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Ballet&display=swap",
+        media: "print",
+        "data-font-swap": "",
       },
     ],
   }),
@@ -129,6 +135,11 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `document.querySelectorAll('link[data-font-swap]').forEach(function(l){function s(){l.media='all'}if(l.sheet)s();else l.addEventListener('load',s)})`,
+          }}
+        />
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-FSTY56BXZE" />
         <script
           dangerouslySetInnerHTML={{
@@ -153,10 +164,22 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+    // supabase-js can re-emit SIGNED_IN (for example on tab refocus) for the same
+    // user, so only react when the signed-in user actually changes.
+    let currentUserId: string | null | undefined;
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      const userId = session?.user?.id ?? null;
+      if (event === "INITIAL_SESSION" || event === "TOKEN_REFRESHED") {
+        currentUserId = userId;
+        return;
+      }
+      if (event === "SIGNED_IN" && userId === currentUserId) return;
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
+      currentUserId = userId;
       router.invalidate();
-      if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
+      // Cached data belongs to the previous user, so drop it rather than just marking it stale.
+      if (event === "USER_UPDATED") queryClient.invalidateQueries();
+      else queryClient.clear();
     });
     return () => sub.subscription.unsubscribe();
   }, [router, queryClient]);

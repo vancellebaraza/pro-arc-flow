@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState, useCallback } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import WorkDataSheet from "@/components/WorkDataSheet";
+import { CollapsibleSection } from "@/components/CollapsibleSection";
 import ProjectCommentSummary from "@/components/ProjectCommentSummary";
 import ApproveEvidenceDialog from "@/components/ApproveEvidenceDialog";
 import QuotationDetailsDialog from "@/components/QuotationDetailsDialog";
@@ -18,12 +20,11 @@ import { Input } from "@/components/ui/input";
 import { STATUS_LABEL, SERVICES, type ServiceKey } from "@/lib/services";
 import { downloadCsv } from "@/lib/pdf";
 import { exportHistoricalProjectsPdf } from "@/lib/historicalProjects";
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
 import { toast } from "sonner";
 import { FileDown, Check, Calendar, Trash2 } from "lucide-react";
 import DeleteProjectDialog from "@/components/DeleteProjectDialog";
 import GalleryManager from "@/components/GalleryManager";
+import { getRolesCached, getUserCached } from "@/lib/auth-cache";
 
 export const Route = createFileRoute("/_authenticated/mini-admin/Dashboard/")({
   component: AdminHome,
@@ -120,9 +121,14 @@ function renderScheduleDisplay(startDate: string | null, endDate: string | null)
   );
 }
 
+type DashboardData = { rows: Row[]; pendingQuotes: PendingQuoteRow[] };
+
+const DASHBOARD_KEY = ["mini-admin-dashboard"] as const;
+const NO_ROWS: Row[] = [];
+const NO_QUOTES: PendingQuoteRow[] = [];
+
 function AdminHome() {
-  const [rows, setRows] = useState<Row[]>([]);
-  const [pendingQuotes, setPendingQuotes] = useState<PendingQuoteRow[]>([]);
+  const queryClient = useQueryClient();
   const [filter, setFilter] = useState("");
   const [serviceFilter, setServiceFilter] = useState("all");
   const [completionFilter, setCompletionFilter] = useState<"all" | "completed" | "not_completed">(
@@ -135,99 +141,110 @@ function AdminHome() {
   const [editService, setEditService] = useState<ServiceKey | "">("");
   const [savingEdit, setSavingEdit] = useState(false);
 
-  const load = useCallback(async () => {
-    const { data } = await supabase
-      .from("projects")
-      .select(
-        `id,title,service,status,location,scheduled_date,scheduled_end_date,created_at,job_number,client_id,engineer_id,work_comment,quotations(project_id,grand_total,payment_status,created_at)`,
-      )
-      .eq("archived", false)
-      .order("created_at", { ascending: false });
+  // Cached copy is shown straight away when coming back to the page and is always
+  // refreshed on mount, so edits made on other pages still show up.
+  const { data: dashboard, refetch } = useQuery<DashboardData>({
+    queryKey: DASHBOARD_KEY,
+    staleTime: 30_000,
+    refetchOnMount: "always",
+    queryFn: async () => {
+      // The independent queries run in parallel; only the profile lookup needs the project rows.
+      const [{ data }, { data: vendorCosts }, { data: quotations }] = await Promise.all([
+        supabase
+          .from("projects")
+          .select(
+            `id,title,service,status,location,scheduled_date,scheduled_end_date,created_at,job_number,client_id,engineer_id,work_comment,quotations(project_id,grand_total,payment_status,created_at)`,
+          )
+          .eq("archived", false)
+          .order("created_at", { ascending: false }),
+        supabase.from("project_vendor_assignments").select("project_id,cost"),
+        supabase
+          .from("quotations")
+          .select("id,project_id,grand_total,status, project:projects(title)")
+          .eq("status", "sent"),
+      ]);
 
-    const projectRows = (data ?? []) as ProjectQueryRow[];
+      const projectRows = (data ?? []) as ProjectQueryRow[];
 
-    const profileIds = Array.from(
-      new Set(
-        projectRows.flatMap((row: ProjectQueryRow) =>
-          [row.client_id, row.engineer_id].filter(Boolean),
+      const profileIds = Array.from(
+        new Set(
+          projectRows.flatMap((row: ProjectQueryRow) =>
+            [row.client_id, row.engineer_id].filter(Boolean),
+          ),
         ),
-      ),
-    ) as string[];
+      ) as string[];
 
-    const { data: profiles } = profileIds.length
-      ? await supabase
-          .from("profiles")
-          .select("id,full_name")
-          .in("id", profileIds as string[])
-      : { data: [] as ProfileRow[] };
+      const { data: profiles } = profileIds.length
+        ? await supabase
+            .from("profiles")
+            .select("id,full_name")
+            .in("id", profileIds as string[])
+        : { data: [] as ProfileRow[] };
 
-    const profileMap = (profiles ?? []).reduce<Record<string, string>>((map, profile) => {
-      map[(profile as ProfileRow).id] = (profile as ProfileRow).full_name ?? "";
-      return map;
-    }, {});
-
-    const rowsWithAggregates = projectRows.map((row: ProjectQueryRow) => {
-      const projectQuotations = Array.isArray(row.quotations) ? row.quotations : [];
-      const latestQuotation = projectQuotations.sort(
-        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
-      )[0];
-      return {
-        ...row,
-        client_name: profileMap[row.client_id] ?? null,
-        engineer_name: row.engineer_id ? (profileMap[row.engineer_id] ?? null) : null,
-        quoted_amount: latestQuotation?.grand_total ?? null,
-        payment_status: latestQuotation?.payment_status ?? null,
-        vendor_cost: 0,
-      } as Row;
-    });
-
-    const { data: vendorCosts } = await supabase
-      .from("project_vendor_assignments")
-      .select("project_id,cost");
-
-    const vendorCostMap = (vendorCosts ?? []).reduce<Record<string, number>>(
-      (map, assignment: VendorCostRow) => {
-        map[assignment.project_id] =
-          (map[assignment.project_id] ?? 0) + Number(assignment.cost ?? 0);
+      const profileMap = (profiles ?? []).reduce<Record<string, string>>((map, profile) => {
+        map[(profile as ProfileRow).id] = (profile as ProfileRow).full_name ?? "";
         return map;
-      },
-      {},
-    );
+      }, {});
 
-    setRows(
-      rowsWithAggregates.map((row) => ({
-        ...row,
-        vendor_cost: vendorCostMap[row.id] ?? 0,
-      })),
-    );
+      const rowsWithAggregates = projectRows.map((row: ProjectQueryRow) => {
+        const projectQuotations = Array.isArray(row.quotations) ? row.quotations : [];
+        const latestQuotation = projectQuotations.sort(
+          (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+        )[0];
+        return {
+          ...row,
+          client_name: profileMap[row.client_id] ?? null,
+          engineer_name: row.engineer_id ? (profileMap[row.engineer_id] ?? null) : null,
+          quoted_amount: latestQuotation?.grand_total ?? null,
+          payment_status: latestQuotation?.payment_status ?? null,
+          vendor_cost: 0,
+        } as Row;
+      });
 
-    const { data: quotations } = await supabase
-      .from("quotations")
-      .select("id,project_id,grand_total,status, project:projects(title)")
-      .eq("status", "sent");
-    setPendingQuotes((quotations ?? []) as PendingQuoteRow[]);
-  }, []);
-  useEffect(() => {
-    load();
-  }, [load]);
+      const vendorCostMap = (vendorCosts ?? []).reduce<Record<string, number>>(
+        (map, assignment: VendorCostRow) => {
+          map[assignment.project_id] =
+            (map[assignment.project_id] ?? 0) + Number(assignment.cost ?? 0);
+          return map;
+        },
+        {},
+      );
+
+      return {
+        rows: rowsWithAggregates.map((row) => ({
+          ...row,
+          vendor_cost: vendorCostMap[row.id] ?? 0,
+        })),
+        pendingQuotes: (quotations ?? []) as PendingQuoteRow[],
+      };
+    },
+  });
+  const rows = dashboard?.rows ?? NO_ROWS;
+  const pendingQuotes = dashboard?.pendingQuotes ?? NO_QUOTES;
+  const setRows = useCallback(
+    (update: (current: Row[]) => Row[]) => {
+      queryClient.setQueryData<DashboardData>(DASHBOARD_KEY, (current) =>
+        current ? { ...current, rows: update(current.rows) } : current,
+      );
+    },
+    [queryClient],
+  );
+  const load = useCallback(async () => {
+    await refetch();
+  }, [refetch]);
 
   useEffect(() => {
     let mounted = true;
 
     async function loadRoles() {
-      const { data: userData, error } = await supabase.auth.getUser();
+      const { data: userData, error } = await getUserCached();
       if (!mounted || error || !userData.user) return;
 
-      const { data: rolesData, error: rolesError } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", userData.user.id);
+      const roleNames = await getRolesCached(userData.user.id);
 
-      if (!mounted || rolesError) return;
+      if (!mounted || !roleNames) return;
 
-      const isManageRole = (rolesData ?? []).some(
-        (role: { role: string }) => role.role === "admin" || role.role === "mini_admin",
-      );
+      const isManageRole = roleNames.some((role) => role === "admin" || role === "mini_admin");
       setCanManage(isManageRole);
     }
 
@@ -321,7 +338,8 @@ function AdminHome() {
     downloadCsv(`fusionpro-work-data-sheet-${Date.now()}.csv`, data);
   }
 
-  function exportPdf() {
+  async function exportPdf() {
+    const { jsPDF } = await import("jspdf");
     const doc = new jsPDF();
     const date = new Date().toISOString().slice(0, 10);
     doc.setFontSize(16);
@@ -329,6 +347,7 @@ function AdminHome() {
     doc.setFontSize(9);
     doc.text(`Export date: ${date}`, 14, 26);
 
+    const { default: autoTable } = await import("jspdf-autotable");
     autoTable(doc, {
       startY: 34,
       head: [
@@ -400,11 +419,11 @@ function AdminHome() {
   });
 
   return (
-    <div className="p-4 md:p-8 fade-in">
-      <div className="flex items-end justify-between flex-wrap gap-4">
+    <div className="fade-in space-y-5">
+      <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Admin overview</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="font-display text-[1.75rem] font-bold leading-tight">Admin overview</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Manage vendors, schedule work, and export reports.
           </p>
         </div>
@@ -480,22 +499,26 @@ function AdminHome() {
         </DialogContent>
       </Dialog>
 
-      <div className="mt-6 grid gap-4 md:grid-cols-2">
+      <div className="grid gap-5 md:grid-cols-2">
         {[{ label: "Total projects", value: rows.length }].map((s) => (
           <div key={s.label} className="rounded-xl border bg-card p-5">
-            <div className="text-xs uppercase tracking-wider text-muted-foreground">{s.label}</div>
-            <div className="mt-1 text-3xl font-semibold">{s.value}</div>
+            <div className="text-sm text-muted-foreground">{s.label}</div>
+            <div className="font-display mt-1 text-[2rem] font-bold leading-tight">{s.value}</div>
           </div>
         ))}
         <ProjectCommentSummary projects={rows} />
       </div>
 
       {pendingQuotes.length > 0 && (
-        <section className="mt-8">
-          <h2 className="text-lg font-semibold tracking-tight">Quotations pending approval</h2>
-          <ul className="mt-3 divide-y rounded-xl border bg-card">
+        <CollapsibleSection
+          className="mt-5"
+          title="Quotations pending approval"
+          count={pendingQuotes.length}
+          storageKey="mini-admin-dashboard:pending-quotations"
+        >
+          <ul className="divide-y rounded-xl border bg-card">
             {pendingQuotes.map((quotation) => (
-              <li key={quotation.id} className="flex items-center justify-between gap-4 p-4">
+              <li key={quotation.id} className="flex items-center justify-between gap-4 px-4 py-3">
                 <div className="min-w-0">
                   <div className="truncate font-medium">{quotation.project?.title ?? "—"}</div>
                   <div className="text-sm text-muted-foreground">
@@ -520,7 +543,7 @@ function AdminHome() {
               </li>
             ))}
           </ul>
-        </section>
+        </CollapsibleSection>
       )}
 
       <WorkDataSheet

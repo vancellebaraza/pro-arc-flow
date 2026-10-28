@@ -49,7 +49,7 @@ export default function ProjectProgress({ status, className = "" }: Props) {
 
   return (
     <div className={`mt-6 ${className}`}>
-      <div className="text-xs text-muted-foreground mb-3">Project progress</div>
+      <div className="text-sm text-muted-foreground mb-3">Project progress</div>
       <div className="relative w-full">
         <div
           className="absolute left-4 right-4 top-1/2 h-1 -translate-y-1/2 rounded-full"
@@ -92,7 +92,7 @@ export default function ProjectProgress({ status, className = "" }: Props) {
                     <div className="w-2 h-2 rounded-full" />
                   )}
                 </div>
-                <div className="mt-2 text-[11px] leading-tight text-muted-foreground max-w-[80px]">
+                <div className="mt-2 text-sm leading-tight text-muted-foreground max-w-[80px]">
                   {s.label}
                 </div>
               </div>

@@ -10,6 +10,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { toast } from "sonner";
 import { MessageCircle, Pencil, Save, Plus } from "lucide-react";
+import { getUserCached } from "@/lib/auth-cache";
 
 const CATEGORY_OPTIONS = [
   "Electrical",
@@ -91,7 +92,7 @@ function VendorManagementPage() {
 
     setSaving(true);
     try {
-      const { data: userData } = await supabase.auth.getUser();
+      const { data: userData } = await getUserCached();
       const parsedCost = form.cost.trim() === "" ? null : parseFloat(form.cost);
       const payload = {
         ...form,
@@ -142,11 +143,11 @@ function VendorManagementPage() {
   }
 
   return (
-    <div className="p-4 md:p-8 fade-in max-w-6xl mx-auto">
-      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+    <div className="fade-in">
+      <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Vendor Management</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="font-display text-[1.75rem] font-bold leading-tight">Vendor Management</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Create, edit, and review vendors available for project assignments.
           </p>
         </div>
@@ -158,21 +159,19 @@ function VendorManagementPage() {
         </Link>
       </div>
 
-      <section className="mt-8 grid gap-4 lg:grid-cols-[1.2fr_1fr]">
+      <section className="grid gap-5 lg:grid-cols-[1.2fr_1fr]">
         <div className="rounded-xl border bg-card p-5">
           <div className="flex items-center justify-between gap-3">
-            <div>
-              <h2 className="text-lg font-semibold tracking-tight">Vendor details</h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                Required fields are Vendor Name, Contact Person, Telephone, and Category of Works.
-              </p>
-            </div>
-            <Button size="sm" variant="outline" onClick={resetForm}>
+            <h2 className="font-display text-xl font-bold">Vendor details</h2>
+            <Button size="sm" variant="outline" className="shrink-0" onClick={resetForm}>
               <Plus className="h-4 w-4 mr-1" /> New vendor
             </Button>
           </div>
+          <p className="mt-1 w-full text-sm text-muted-foreground">
+            Required fields are Vendor Name, Contact Person, Telephone, and Category of Works.
+          </p>
 
-          <div className="mt-6 grid gap-4">
+          <div className="mt-4 grid gap-4">
             <div>
               <Label>Vendor Name</Label>
               <Input
@@ -266,11 +265,11 @@ function VendorManagementPage() {
         </div>
 
         <div className="rounded-xl border bg-card p-5">
-          <h2 className="text-lg font-semibold tracking-tight">Vendor list</h2>
+          <h2 className="font-display text-xl font-bold">Vendor list</h2>
           <p className="text-sm text-muted-foreground mt-1">
             Tap a vendor row to load it into the form.
           </p>
-          <div className="mt-5 overflow-x-auto">
+          <div className="mt-4 overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
