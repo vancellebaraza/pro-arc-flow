@@ -1,6 +1,7 @@
 import { Outlet, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
+import { AccountantBackdrop } from "@/components/AccountantBackdrop";
 import { requireRole } from "@/lib/requireRole";
 import {
   LayoutDashboard,
@@ -121,7 +122,10 @@ function AccountantLayout() {
 
   return (
     <AppShell title="Accountant" links={links} onSignOut={handleSignOut}>
-      <Outlet />
+      <div className="relative isolate">
+        <AccountantBackdrop />
+        <Outlet />
+      </div>
     </AppShell>
   );
 }

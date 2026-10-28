@@ -375,3 +375,15 @@
     animation: none !important;
   }
 }
+
+/* Accountant header backdrop: fades out downward and toward the left so it ends before tables start. */
+.accountant-backdrop {
+  -webkit-mask-image:
+    linear-gradient(to bottom, #000 25%, transparent 100%),
+    linear-gradient(to right, transparent 0%, #000 55%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to bottom, #000 25%, transparent 100%),
+    linear-gradient(to right, transparent 0%, #000 55%);
+  mask-composite: intersect;
+}
