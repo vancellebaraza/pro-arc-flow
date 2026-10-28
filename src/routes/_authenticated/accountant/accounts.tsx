@@ -170,7 +170,7 @@ function AccountsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl p-4 md:p-8">
+    <div className="fade-in">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <h1 className="font-display text-[1.75rem] font-bold leading-tight">Chart of Accounts</h1>
@@ -183,7 +183,7 @@ function AccountsPage() {
 
       <div className="mt-6 space-y-6">
         {loading ? (
-          <div className="rounded-lg border bg-card p-5 text-sm text-muted-foreground">Loading accounts…</div>
+          <div className="rounded-card border bg-card shadow-[var(--shadow-card)] p-5 text-sm text-muted-foreground">Loading accounts…</div>
         ) : (
           accountTypeOrder.map((type) => {
             const groupAccounts = groupedAccounts[type];
@@ -192,7 +192,7 @@ function AccountsPage() {
             }
 
             return (
-              <section key={type} className="rounded-lg border bg-card p-4">
+              <section key={type} className="rounded-card border bg-card shadow-[var(--shadow-card)] p-4">
                 <div className="mb-4 flex items-center gap-2">
                   <h2 className="font-display text-xl font-bold capitalize">{accountTypeLabels[type] ?? type}</h2>
                   <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
@@ -208,7 +208,7 @@ function AccountsPage() {
                         <TableHead>Name</TableHead>
                         <TableHead>Type</TableHead>
                         <TableHead>Status</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
+                        <TableHead className="text-right tabular-nums">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -228,7 +228,7 @@ function AccountsPage() {
                               {account.is_active ? "Active" : "Inactive"}
                             </span>
                           </TableCell>
-                          <TableCell className="text-right">
+                          <TableCell className="text-right tabular-nums">
                             <Button size="sm" variant="outline" onClick={() => openEditAccount(account)}>
                               Edit
                             </Button>

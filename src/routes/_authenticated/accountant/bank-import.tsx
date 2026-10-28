@@ -217,7 +217,7 @@ function BankImportPage() {
   const invalidCount = parsedRows.filter((r) => !r.isValid).length;
 
   return (
-    <div className="mx-auto max-w-7xl p-4 md:p-8">
+    <div className="fade-in">
       <div>
         <h1 className="font-display text-[1.75rem] font-bold leading-tight">Import Bank Statement</h1>
         <p className="mt-1 text-muted-foreground">
@@ -225,7 +225,7 @@ function BankImportPage() {
         </p>
       </div>
 
-      <div className="mt-6 space-y-6 rounded-lg border bg-card p-5">
+      <div className="mt-6 space-y-6 rounded-card border bg-card shadow-[var(--shadow-card)] p-5">
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
             <Label>Bank account</Label>
@@ -391,13 +391,13 @@ function BankImportPage() {
             )}
           </div>
 
-          <div className="max-h-[500px] overflow-auto rounded-lg border bg-card">
+          <div className="max-h-[500px] overflow-auto rounded-card border bg-card shadow-[var(--shadow-card)]">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Date</TableHead>
                   <TableHead>Description</TableHead>
-                  <TableHead className="text-right">Amount</TableHead>
+                  <TableHead className="text-right tabular-nums">Amount</TableHead>
                   <TableHead>Status</TableHead>
                 </TableRow>
               </TableHeader>
@@ -406,7 +406,7 @@ function BankImportPage() {
                   <TableRow key={i}>
                     <TableCell>{row.date ?? "—"}</TableCell>
                     <TableCell>{row.description || "—"}</TableCell>
-                    <TableCell className="text-right">{row.amount.toFixed(2)}</TableCell>
+                    <TableCell className="text-right tabular-nums">{row.amount.toFixed(2)}</TableCell>
                     <TableCell>
                       {!row.isValid ? (
                         <span className="text-xs text-red-700">Invalid</span>

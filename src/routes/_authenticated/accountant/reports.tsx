@@ -242,7 +242,7 @@ function ReportsPage() {
   const totalEquity = totalEquityBase + netProfit;
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-6 p-4 md:p-8">
+    <div className="fade-in flex flex-col gap-5">
       <div>
         <h1 className="font-display text-[1.75rem] font-bold leading-tight">Reports</h1>
         <p className="mt-2 text-sm text-muted-foreground">

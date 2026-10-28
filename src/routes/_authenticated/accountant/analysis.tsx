@@ -328,7 +328,7 @@ function AccountantAnalysisPage() {
   const selectedProject = selectedProjects.find((project) => project.id === selectedProjectId) ?? null;
 
   return (
-    <div className="mx-auto max-w-7xl p-4 md:p-8">
+    <div className="fade-in">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <h1 className="font-display text-[1.75rem] font-bold leading-tight">Analysis</h1>
@@ -355,7 +355,7 @@ function AccountantAnalysisPage() {
                 setSelectedCategory(category.key);
                 setSelectedProjectId(null);
               }}
-              className={`rounded-lg border p-5 text-left transition hover:border-foreground/40 hover:shadow-sm ${category.key === "scope" ? "bg-fuchsia-100" : "bg-card"}`}
+              className={`rounded-card border p-5 text-left transition hover:border-foreground/40 hover:shadow-[var(--shadow-raised)] ${category.key === "scope" ? "bg-[color-mix(in_oklch,var(--primary)_10%,var(--card))]" : "bg-card"}`}
             >
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
@@ -471,7 +471,7 @@ function AccountantAnalysisPage() {
           { label: "Gross margin", value: money(analysis.grossMargin), icon: TrendingUp },
           { label: "Margin rate", value: `${analysis.marginRate.toFixed(1)}%`, icon: Percent },
         ].map((metric) => (
-          <div key={metric.label} className="rounded-lg border bg-card p-5">
+          <div key={metric.label} className="rounded-card border bg-card shadow-[var(--shadow-card)] p-5">
             <div className="flex items-center justify-between gap-3">
               <div className="text-sm text-muted-foreground">{metric.label}</div>
               <metric.icon className="h-4 w-4 text-muted-foreground" />
@@ -487,7 +487,7 @@ function AccountantAnalysisPage() {
           { label: "Outstanding quoted", value: money(analysis.outstandingQuoted) },
           { label: "Completion rate", value: `${analysis.completionRate.toFixed(1)}%` },
         ].map((metric) => (
-          <div key={metric.label} className="rounded-lg border bg-card p-5">
+          <div key={metric.label} className="rounded-card border bg-card shadow-[var(--shadow-card)] p-5">
             <div className="text-sm text-muted-foreground">{metric.label}</div>
             <div className="mt-1 text-[2rem] font-bold leading-tight">{loading ? "..." : metric.value}</div>
           </div>
@@ -495,7 +495,7 @@ function AccountantAnalysisPage() {
       </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_1.2fr]">
-        <section className="rounded-lg border bg-card p-5">
+        <section className="rounded-card border bg-card shadow-[var(--shadow-card)] p-5">
           <h2 className="font-display text-xl font-bold">Project status</h2>
           <div className="mt-5 space-y-4">
             {analysis.statusCounts.length === 0 && <div className="text-sm text-muted-foreground">No project data available.</div>}
@@ -513,7 +513,7 @@ function AccountantAnalysisPage() {
           </div>
         </section>
 
-        <section className="mt-8 flex h-[420px] flex-col rounded-lg border bg-card p-5 lg:mt-0">
+        <section className="mt-8 flex h-[420px] flex-col rounded-card border bg-card shadow-[var(--shadow-card)] p-5 lg:mt-0">
           <div className="flex items-center gap-2">
             <BarChart3 className="h-5 w-5 text-muted-foreground" />
             <h2 className="font-display text-xl font-bold">Most visited work locations</h2>
@@ -532,7 +532,7 @@ function AccountantAnalysisPage() {
                     </span>
                   </div>
                   <div className="h-5 overflow-hidden rounded-full bg-muted">
-                    <div className="h-full rounded-full bg-blue-600" style={{ width: `${(count / maxLocationCount) * 100}%` }} />
+                    <div className="h-full rounded-full bg-primary" style={{ width: `${(count / maxLocationCount) * 100}%` }} />
                   </div>
                 </div>
               ))
@@ -540,7 +540,7 @@ function AccountantAnalysisPage() {
           </div>
         </section>
 
-        <section className="rounded-lg border bg-card p-5 lg:col-span-2">
+        <section className="rounded-card border bg-card shadow-[var(--shadow-card)] p-5 lg:col-span-2">
           <h2 className="font-display text-xl font-bold">New projects by month</h2>
           <div className="mt-6 flex h-56 items-end gap-3">
             {analysis.monthCounts.map((month) => (
@@ -556,7 +556,7 @@ function AccountantAnalysisPage() {
         </section>
       </div>
 
-      <section className="mt-8 rounded-lg border bg-card p-5">
+      <section className="mt-8 rounded-card border bg-card shadow-[var(--shadow-card)] p-5">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>
             <h2 className="font-display text-xl font-bold">Project Gantt chart</h2>
@@ -618,7 +618,7 @@ function AccountantAnalysisPage() {
         </div>
       </section>
 
-      <section className="mt-8 rounded-lg border bg-card p-5">
+      <section className="mt-8 rounded-card border bg-card shadow-[var(--shadow-card)] p-5">
         <h2 className="font-display text-xl font-bold">Service Gantt chart</h2>
         <div className="mt-5 overflow-x-auto">
           <div className="min-w-[760px]">
@@ -669,7 +669,7 @@ function AccountantAnalysisPage() {
         </div>
       </section>
 
-      <section className="mt-8 rounded-lg border bg-card p-5">
+      <section className="mt-8 rounded-card border bg-card shadow-[var(--shadow-card)] p-5">
         <div className="flex items-center gap-2">
           <BriefcaseBusiness className="h-5 w-5 text-muted-foreground" />
           <h2 className="font-display text-xl font-bold">Service performance</h2>
@@ -680,9 +680,9 @@ function AccountantAnalysisPage() {
               <TableRow>
                 <TableHead>Service</TableHead>
                 <TableHead>Projects</TableHead>
-                <TableHead className="text-right">Quoted</TableHead>
-                <TableHead className="text-right">Vendor Cost</TableHead>
-                <TableHead className="text-right">Margin</TableHead>
+                <TableHead className="text-right tabular-nums">Quoted</TableHead>
+                <TableHead className="text-right tabular-nums">Vendor Cost</TableHead>
+                <TableHead className="text-right tabular-nums">Margin</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -690,9 +690,9 @@ function AccountantAnalysisPage() {
                 <TableRow key={service.label}>
                   <TableCell className="font-medium">{service.label}</TableCell>
                   <TableCell>{service.count}</TableCell>
-                  <TableCell className="text-right">{money(service.quoted)}</TableCell>
-                  <TableCell className="text-right">{money(service.cost)}</TableCell>
-                  <TableCell className="text-right">{money(service.margin)}</TableCell>
+                  <TableCell className="text-right tabular-nums">{money(service.quoted)}</TableCell>
+                  <TableCell className="text-right tabular-nums">{money(service.cost)}</TableCell>
+                  <TableCell className="text-right tabular-nums">{money(service.margin)}</TableCell>
                 </TableRow>
               ))}
               {analysis.serviceBreakdown.length === 0 && (
@@ -707,7 +707,7 @@ function AccountantAnalysisPage() {
         </div>
       </section>
 
-      <section className="mt-8 rounded-lg border bg-card p-5">
+      <section className="mt-8 rounded-card border bg-card shadow-[var(--shadow-card)] p-5">
         <h2 className="font-display text-xl font-bold">Highest quoted projects</h2>
         <div className="mt-4 overflow-x-auto">
           <Table>
@@ -716,8 +716,8 @@ function AccountantAnalysisPage() {
                 <TableHead>Project</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Service</TableHead>
-                <TableHead className="text-right">Quoted</TableHead>
-                <TableHead className="text-right">Margin</TableHead>
+                <TableHead className="text-right tabular-nums">Quoted</TableHead>
+                <TableHead className="text-right tabular-nums">Margin</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -726,8 +726,8 @@ function AccountantAnalysisPage() {
                   <TableCell className="font-medium">{project.title}</TableCell>
                   <TableCell>{STATUS_LABEL[project.status] ?? project.status}</TableCell>
                   <TableCell>{SERVICES.find((service) => service.key === project.service)?.label ?? project.service}</TableCell>
-                  <TableCell className="text-right">{money(project.quotedAmount)}</TableCell>
-                  <TableCell className="text-right">{money(project.quotedAmount - project.vendorCost)}</TableCell>
+                  <TableCell className="text-right tabular-nums">{money(project.quotedAmount)}</TableCell>
+                  <TableCell className="text-right tabular-nums">{money(project.quotedAmount - project.vendorCost)}</TableCell>
                 </TableRow>
               ))}
               {analysis.topProjects.length === 0 && (

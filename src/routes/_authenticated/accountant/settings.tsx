@@ -120,7 +120,7 @@ function SettingsPage() {
   )}`;
 
   return (
-    <div className="p-4 md:p-8 fade-in max-w-2xl">
+    <div className="fade-in max-w-2xl">
       <div className="mb-6">
         <h1 className="font-display text-[1.75rem] font-bold leading-tight">Settings</h1>
         <p className="text-muted-foreground mt-1">

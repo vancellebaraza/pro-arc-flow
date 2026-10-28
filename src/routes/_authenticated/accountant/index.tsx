@@ -154,7 +154,7 @@ function AccountantDashboardPage() {
     : [];
 
   return (
-    <div className="mx-auto max-w-7xl p-4 md:p-8">
+    <div className="fade-in">
       <div className="space-y-2">
         <h1 className="font-display text-[1.75rem] font-bold leading-tight">Accounting overview</h1>
         <p className="text-muted-foreground">
@@ -165,14 +165,14 @@ function AccountantDashboardPage() {
       <div className="mt-6 grid gap-4 md:grid-cols-3">
         {loading ? (
           Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="rounded-lg border bg-card p-5">
+            <div key={i} className="rounded-card border bg-card shadow-[var(--shadow-card)] p-5">
               <div className="h-4 w-24 animate-pulse rounded bg-muted" />
               <div className="mt-3 h-6 w-32 animate-pulse rounded bg-muted" />
             </div>
           ))
         ) : (
           cards.map((card) => (
-            <Link key={card.title} to={card.to} className="rounded-lg border bg-card p-5 transition-colors hover:bg-accent">
+            <Link key={card.title} to={card.to} className="rounded-card border bg-card shadow-[var(--shadow-card)] p-5 transition-colors hover:bg-accent">
               <div className="text-sm text-muted-foreground">{card.title}</div>
               <div className="mt-3 text-xl font-semibold">{card.value}</div>
               <div className="mt-1 text-sm text-muted-foreground">{card.sub}</div>

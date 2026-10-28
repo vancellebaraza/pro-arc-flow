@@ -124,7 +124,7 @@ function CashbookPage() {
   }, [rows]);
 
   return (
-    <div className="mx-auto max-w-7xl p-4 md:p-8">
+    <div className="fade-in">
       <div className="space-y-2">
         <h1 className="font-display text-[1.75rem] font-bold leading-tight">Cashbook</h1>
         <p className="text-muted-foreground">
@@ -153,7 +153,7 @@ function CashbookPage() {
         </Card>
       </div>
 
-      <div className="mt-6 overflow-x-auto rounded-lg border bg-card">
+      <div className="mt-6 overflow-x-auto rounded-card border bg-card shadow-[var(--shadow-card)]">
         <table className="w-full text-sm">
           <thead className="border-b bg-muted/50 text-left text-muted-foreground">
             <tr>
