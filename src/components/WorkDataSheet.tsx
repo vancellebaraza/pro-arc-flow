@@ -559,19 +559,19 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
               </th>
               <th
                 colSpan={3}
-                className="sticky top-0 z-20 whitespace-nowrap border-b border-l bg-[var(--surface)] px-3 text-left font-semibold text-foreground"
+                className="sticky top-0 z-20 whitespace-nowrap border-b bg-[var(--surface)] px-3 text-left font-semibold text-foreground"
               >
                 Client
               </th>
               <th
                 colSpan={8}
-                className="sticky top-0 z-20 whitespace-nowrap border-b border-l bg-[color-mix(in_oklch,var(--primary)_10%,var(--card))] px-3 text-left font-semibold text-foreground"
+                className="sticky top-0 z-20 whitespace-nowrap border-b bg-[color-mix(in_oklch,var(--primary)_10%,var(--card))] px-3 text-left font-semibold text-foreground"
               >
                 Vendor
               </th>
               <th
                 colSpan={5}
-                className="sticky top-0 z-20 whitespace-nowrap border-b border-l bg-[var(--accent)] px-3 text-left font-semibold text-foreground"
+                className="sticky top-0 z-20 whitespace-nowrap border-b bg-[var(--accent)] px-3 text-left font-semibold text-foreground"
               >
                 Work done / date
               </th>
@@ -682,8 +682,8 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
               </tr>
             ) : (
               displayedRows.map((r, i) => (
-                <tr key={r.id} className="group h-14 hover:bg-[var(--surface)]">
-                  <td className="sticky left-0 z-10 border-b bg-card px-3 align-middle tabular-nums group-hover:bg-[var(--surface)]">
+                <tr key={r.id} className="group h-14 transition-colors hover:bg-[color-mix(in_oklch,var(--foreground)_4%,var(--card))]">
+                  <td className="sticky left-0 z-10 border-b bg-card px-3 align-middle tabular-nums group-hover:bg-[color-mix(in_oklch,var(--foreground)_4%,var(--card))]">
                     {i + 1}
                   </td>
                   <td className="whitespace-nowrap border-b px-3 align-middle">
@@ -691,7 +691,7 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
                   </td>
                   <td className="whitespace-nowrap border-b px-3 align-middle">{r.jobNo}</td>
                   <td
-                    className="sticky left-[56px] z-10 truncate whitespace-nowrap border-b bg-card px-3 align-middle font-medium shadow-[6px_0_8px_-6px_rgba(0,0,0,0.18)] group-hover:bg-[var(--surface)]"
+                    className="sticky left-[56px] z-10 truncate whitespace-nowrap border-b bg-card px-3 align-middle font-medium shadow-[6px_0_8px_-6px_rgba(0,0,0,0.18)] group-hover:bg-[color-mix(in_oklch,var(--foreground)_4%,var(--card))]"
                     title={r.title}
                   >
                     {r.title}
