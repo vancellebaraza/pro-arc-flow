@@ -53,7 +53,7 @@ After the first visit in a session, the role lookup comes from cache (see TTL be
     is read-only, so preloading only warms code and cached auth.
 11. Google Fonts load with `media="print"` and a small script switches them to `all` on load (swap behaviour kept).
     Checked in the browser: both links end up `all` and Inter is loaded.
-12. Migration `supabase/migrations/20261027120000_performance_indexes_and_rls.sql` (not applied).
+12. Migration `docs/db/pending/20261027120000_performance_indexes_and_rls.sql` (not applied; kept outside supabase/migrations so no tool picks it up).
 
 ## getUser() calls deliberately kept
 
