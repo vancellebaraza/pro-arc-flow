@@ -44,7 +44,7 @@ function ProjectViewerHome() {
   }, []);
 
   return (
-    <div className="p-6 md:p-10 max-w-5xl mx-auto fade-in">
+    <div className="fade-in">
       <div>
         <h1 className="font-display text-[1.75rem] font-bold leading-tight">Assigned projects</h1>
         <p className="text-muted-foreground mt-1">
@@ -52,17 +52,17 @@ function ProjectViewerHome() {
         </p>
       </div>
 
-      <div className="mt-8">
+      <div className="mt-5">
         {loading ? (
           <p className="text-sm text-muted-foreground">Loading…</p>
         ) : projects.length === 0 ? (
-          <div className="rounded-xl border bg-card p-10 text-center">
+          <div className="rounded-card border bg-card p-10 text-center shadow-[var(--shadow-card)]">
             <p className="text-muted-foreground">
               No projects assigned to you yet. Ask your mini-admin to assign one.
             </p>
           </div>
         ) : (
-          <ul className="divide-y rounded-xl border bg-card">
+          <ul className="divide-y overflow-hidden rounded-card border bg-card shadow-[var(--shadow-card)]">
             {projects.map((p) => {
               const svc = SERVICES.find((s) => s.key === p.service);
               const colors = statusColorClasses(p.status);
@@ -79,7 +79,7 @@ function ProjectViewerHome() {
                         <span className="text-sm text-muted-foreground">
                           {svc?.label ?? p.service}
                         </span>
-                        <span className={`inline-flex items-center gap-2 rounded-full px-2 py-0.5 text-xs ${colors.badge}`}>
+                        <span className={`inline-flex items-center gap-2 rounded-full px-2.5 py-0.5 text-xs whitespace-nowrap ${colors.badge}`}>
                           <span className={`h-1.5 w-1.5 rounded-full ${colors.dot}`} />
                           {STATUS_LABEL[p.status] ?? p.status}
                         </span>

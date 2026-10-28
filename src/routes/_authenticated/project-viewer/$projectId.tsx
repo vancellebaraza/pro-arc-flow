@@ -203,7 +203,7 @@ function ProjectViewerDetail() {
   const svc = SERVICES.find((s) => s.key === project.service);
 
   return (
-    <div className="p-6 md:p-10 max-w-4xl mx-auto fade-in">
+    <div className="fade-in">
       <div className="flex items-center justify-between">
         <Link
           to="/project-viewer"
@@ -233,7 +233,7 @@ function ProjectViewerDetail() {
               href={u}
               target="_blank"
               rel="noreferrer"
-              className="block rounded-md overflow-hidden border bg-card"
+              className="block rounded-2xl overflow-hidden border bg-card"
             >
               <img src={u} alt={`attachment ${i + 1}`} className="w-full h-40 object-cover" />
             </a>
@@ -248,7 +248,7 @@ function ProjectViewerDetail() {
         ) : (
           <ul className="mt-3 space-y-3">
             {inspections.map((ins) => (
-              <li key={ins.id} className="rounded-lg border bg-card p-4">
+              <li key={ins.id} className="rounded-card border bg-card shadow-[var(--shadow-card)] p-4">
                 <div className="flex justify-between text-sm">
                   <span className="font-medium capitalize">{ins.stage} inspection</span>
                   <span className="text-muted-foreground">
@@ -306,7 +306,7 @@ function ProjectViewerDetail() {
         {!worksheet ? (
           <p className="text-sm text-muted-foreground mt-2">No job worksheet has been created yet.</p>
         ) : (
-          <div className="mt-3 rounded-lg border bg-card p-4 space-y-4">
+          <div className="mt-3 rounded-card border bg-card shadow-[var(--shadow-card)] p-4 space-y-4">
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
               <div>
                 <div className="text-sm text-muted-foreground">Job no.</div>
@@ -348,7 +348,7 @@ function ProjectViewerDetail() {
                   {worksheet.observations
                     .filter((o) => o.observation)
                     .map((o, i) => (
-                      <li key={i} className="rounded-md border bg-surface p-3">
+                      <li key={i} className="rounded-2xl border bg-surface p-3">
                         <div>{o.observation}</div>
                         {o.action && (
                           <div className="text-muted-foreground mt-1">Action: {o.action}</div>
@@ -369,7 +369,7 @@ function ProjectViewerDetail() {
                       href={u}
                       target="_blank"
                       rel="noreferrer"
-                      className="block rounded-md overflow-hidden border bg-card"
+                      className="block rounded-2xl overflow-hidden border bg-card"
                     >
                       <img src={u} alt={`worksheet photo ${i + 1}`} className="w-full h-32 object-cover" />
                     </a>
@@ -414,7 +414,7 @@ function ProjectViewerDetail() {
         {!quote ? (
           <p className="text-sm text-muted-foreground mt-2">No quotation yet.</p>
         ) : (
-          <div className="mt-3 rounded-lg border bg-card overflow-hidden">
+          <div className="mt-3 rounded-card border bg-card shadow-[var(--shadow-card)] overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-surface text-left">
                 <tr>

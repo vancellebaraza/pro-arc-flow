@@ -18,6 +18,7 @@ import {
   Calendar,
   BarChart3,
   Bell,
+  Eye,
 } from "lucide-react";
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -32,6 +33,7 @@ const SHELL_TITLE: Record<string, string> = {
   mini_admin: "Mini Admin",
   engineer: "Engineer",
   client: "Client",
+  project_view_admin: "Project Viewer",
 };
 
 const AIAssistant = lazy(() =>
@@ -57,7 +59,15 @@ function AuthedLayout() {
   const isMiniAdminPage = pathname.startsWith("/mini-admin");
   const isAccountantPage = pathname.startsWith("/accountant");
   const isStandaloneSectionPage = isMiniAdminPage || isAccountantPage;
-  const [notifications, setNotifications] = useState<Array<{ id: string; title: string; body: string | null; link: string | null; read_at: string | null }>>([]);
+  const [notifications, setNotifications] = useState<
+    Array<{
+      id: string;
+      title: string;
+      body: string | null;
+      link: string | null;
+      read_at: string | null;
+    }>
+  >([]);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const mountedRef = useRef(false);
 
@@ -98,8 +108,13 @@ function AuthedLayout() {
   }, [notificationsOpen, loadNotifications]);
 
   async function handleNotificationClick(notificationId: string, link: string | null) {
-    await supabase.from("notifications").update({ read_at: new Date().toISOString() }).eq("id", notificationId);
-    setNotifications((current) => current.filter((notification) => notification.id !== notificationId));
+    await supabase
+      .from("notifications")
+      .update({ read_at: new Date().toISOString() })
+      .eq("id", notificationId);
+    setNotifications((current) =>
+      current.filter((notification) => notification.id !== notificationId),
+    );
     if (link) {
       navigate({ to: link as string });
     }
@@ -126,10 +141,12 @@ function AuthedLayout() {
                 { to: "/engineer", label: "Engineer", icon: Wrench },
                 { to: "/engineer/todos", label: "To Do List", icon: Calendar },
               ]
-            : [
-                { to: "/client", label: "My projects", icon: LayoutDashboard },
-                { to: "/client/new", label: "New request", icon: ClipboardPlus },
-              ];
+            : primaryRole === "project_view_admin"
+              ? [{ to: "/project-viewer", label: "Project Viewer", icon: Eye }]
+              : [
+                  { to: "/client", label: "My projects", icon: LayoutDashboard },
+                  { to: "/client/new", label: "New request", icon: ClipboardPlus },
+                ];
 
   const content = loading ? (
     <div className="p-4 text-sm text-muted-foreground">Loading…</div>
