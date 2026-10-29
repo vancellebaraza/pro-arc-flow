@@ -12,8 +12,15 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { CsvButton } from "@/components/accountant/CsvButton";
+import { loadAging as loadAgingData, loadLedgerSums, type AgingRow } from "@/lib/accounting";
+
+const REPORT_TABS = ["trial-balance", "pl", "balance-sheet", "aging"] as const;
+type ReportTab = (typeof REPORT_TABS)[number];
 
 export const Route = createFileRoute("/_authenticated/accountant/reports")({
+  validateSearch: (search: Record<string, unknown>): { tab?: ReportTab } => ({
+    tab: REPORT_TABS.find((t) => t === search.tab),
+  }),
   component: ReportsPage,
 });
 
@@ -25,15 +32,6 @@ interface AccountBalance {
   debit: number;
   credit: number;
   balance: number;
-}
-
-interface AgingRow {
-  id: string;
-  partyId: string;
-  party: string;
-  dueDate: string | null;
-  remaining: number;
-  bucket: "current" | "1-30" | "31-60" | "61-90" | "90+";
 }
 
 interface PartyView {
@@ -288,19 +286,9 @@ function PartyDialog({ party, onClose }: { party: PartyView | null; onClose: () 
 
 const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
 
-function getAgingBucket(dueDate: string | null, today: string): AgingRow["bucket"] {
-  if (!dueDate || dueDate >= today) return "current";
-  const days = Math.floor(
-    (new Date(today).getTime() - new Date(dueDate).getTime()) / (1000 * 60 * 60 * 24),
-  );
-  if (days <= 30) return "1-30";
-  if (days <= 60) return "31-60";
-  if (days <= 90) return "61-90";
-  return "90+";
-}
-
 function ReportsPage() {
   const navigate = useNavigate();
+  const { tab = "trial-balance" } = Route.useSearch();
   const [balances, setBalances] = useState<AccountBalance[]>([]);
   const [arAging, setArAging] = useState<AgingRow[]>([]);
   const [apAging, setApAging] = useState<AgingRow[]>([]);
@@ -315,177 +303,46 @@ function ReportsPage() {
 
   async function loadAging() {
     setAgingLoading(true);
-    const today = new Date().toISOString().slice(0, 10);
-
-    const { data: invoices, error: invError } = await supabase
-      .from("invoices")
-      .select("id,total,status,due_date,client_id,client_display_name")
-      .in("status", ["sent", "partially_paid"]);
-
-    if (invError) {
-      toast.error(invError.message);
+    try {
+      const { ar, ap } = await loadAgingData();
+      setArAging(ar);
+      setApAging(ap);
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : String(error));
+    } finally {
       setAgingLoading(false);
-      return;
     }
-
-    const { data: paymentAllocs, error: allocError } = await supabase
-      .from("payment_allocations")
-      .select("invoice_id,amount_applied");
-
-    if (allocError) {
-      toast.error(allocError.message);
-      setAgingLoading(false);
-      return;
-    }
-
-    const clientIds = [...new Set((invoices ?? []).map((i) => i.client_id))];
-    const { data: profiles, error: profError } =
-      clientIds.length > 0
-        ? await supabase.from("profiles").select("id,full_name").in("id", clientIds)
-        : { data: [], error: null };
-
-    if (profError) {
-      toast.error(profError.message);
-      setAgingLoading(false);
-      return;
-    }
-
-    const clientNameMap = new Map(
-      (profiles ?? []).map((p) => [p.id, p.full_name ?? "Unnamed client"]),
-    );
-    const paidMap = new Map<string, number>();
-    for (const a of paymentAllocs ?? []) {
-      paidMap.set(a.invoice_id, (paidMap.get(a.invoice_id) ?? 0) + (Number(a.amount_applied) || 0));
-    }
-
-    const ar: AgingRow[] = (invoices ?? [])
-      .map((inv) => {
-        const remaining = (Number(inv.total) || 0) - (paidMap.get(inv.id) ?? 0);
-        return {
-          id: inv.id,
-          partyId: inv.client_id,
-          party: inv.client_display_name ?? clientNameMap.get(inv.client_id) ?? "Unknown client",
-          dueDate: inv.due_date,
-          remaining,
-          bucket: getAgingBucket(inv.due_date, today),
-        };
-      })
-      .filter((r) => r.remaining > 0.01);
-
-    setArAging(ar);
-
-    const { data: bills, error: billError } = await supabase
-      .from("bills")
-      .select("id,amount,status,due_date,vendor_id")
-      .in("status", ["approved", "partially_paid"]);
-
-    if (billError) {
-      toast.error(billError.message);
-      setAgingLoading(false);
-      return;
-    }
-
-    const { data: vendorAllocs, error: vAllocError } = await supabase
-      .from("vendor_payment_allocations")
-      .select("bill_id,amount_applied");
-
-    if (vAllocError) {
-      toast.error(vAllocError.message);
-      setAgingLoading(false);
-      return;
-    }
-
-    const vendorIds = [...new Set((bills ?? []).map((b) => b.vendor_id))];
-    const { data: vendors, error: vendorError } =
-      vendorIds.length > 0
-        ? await supabase.from("vendors").select("id,name").in("id", vendorIds)
-        : { data: [], error: null };
-
-    if (vendorError) {
-      toast.error(vendorError.message);
-      setAgingLoading(false);
-      return;
-    }
-
-    const vendorNameMap = new Map((vendors ?? []).map((v) => [v.id, v.name]));
-    const vendorPaidMap = new Map<string, number>();
-    for (const a of vendorAllocs ?? []) {
-      vendorPaidMap.set(
-        a.bill_id,
-        (vendorPaidMap.get(a.bill_id) ?? 0) + (Number(a.amount_applied) || 0),
-      );
-    }
-
-    const ap: AgingRow[] = (bills ?? [])
-      .map((b) => {
-        const remaining = (Number(b.amount) || 0) - (vendorPaidMap.get(b.id) ?? 0);
-        return {
-          id: b.id,
-          partyId: b.vendor_id,
-          party: vendorNameMap.get(b.vendor_id) ?? "Unknown vendor",
-          dueDate: b.due_date,
-          remaining,
-          bucket: getAgingBucket(b.due_date, today),
-        };
-      })
-      .filter((r) => r.remaining > 0.01);
-
-    setApAging(ap);
-    setAgingLoading(false);
   }
 
   async function loadBalances() {
     setLoading(true);
 
-    const { data: accounts, error: accError } = await supabase
-      .from("accounts")
-      .select("id,code,name,type")
-      .order("code");
+    try {
+      // Paged read: a plain select would silently stop at 1000 journal lines.
+      const ledger = await loadLedgerSums();
+      const result: AccountBalance[] = ledger.accounts.map((acc) => {
+        const s = ledger.sums.get(acc.id) ?? { debit: 0, credit: 0 };
+        // Asset/Expense accounts: normal balance is debit (debit - credit).
+        // Liability/Equity/Revenue accounts: normal balance is credit (credit - debit).
+        const isDebitNormal = acc.type === "asset" || acc.type === "expense";
+        const balance = isDebitNormal ? s.debit - s.credit : s.credit - s.debit;
 
-    if (accError) {
-      toast.error(accError.message);
+        return {
+          id: acc.id,
+          code: acc.code,
+          name: acc.name,
+          type: acc.type,
+          debit: s.debit,
+          credit: s.credit,
+          balance,
+        };
+      });
+      setBalances(result);
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : String(error));
+    } finally {
       setLoading(false);
-      return;
     }
-
-    const { data: lines, error: lineError } = await supabase
-      .from("journal_lines")
-      .select("account_id,debit,credit");
-
-    if (lineError) {
-      toast.error(lineError.message);
-      setLoading(false);
-      return;
-    }
-
-    const sums = new Map<string, { debit: number; credit: number }>();
-    for (const line of lines ?? []) {
-      const current = sums.get(line.account_id) ?? { debit: 0, credit: 0 };
-      current.debit += Number(line.debit) || 0;
-      current.credit += Number(line.credit) || 0;
-      sums.set(line.account_id, current);
-    }
-
-    const result: AccountBalance[] = (accounts ?? []).map((acc) => {
-      const s = sums.get(acc.id) ?? { debit: 0, credit: 0 };
-      // Asset/Expense accounts: normal balance is debit (debit - credit).
-      // Liability/Equity/Revenue accounts: normal balance is credit (credit - debit).
-      const isDebitNormal = acc.type === "asset" || acc.type === "expense";
-      const balance = isDebitNormal ? s.debit - s.credit : s.credit - s.debit;
-
-      return {
-        id: acc.id,
-        code: acc.code,
-        name: acc.name,
-        type: acc.type,
-        debit: s.debit,
-        credit: s.credit,
-        balance,
-      };
-    });
-
-    setBalances(result);
-    setLoading(false);
   }
 
   // Trial Balance: net per account. Debit minus credit, positive goes in Debit, otherwise
@@ -573,7 +430,16 @@ function ReportsPage() {
       {loading ? (
         <div className="text-sm text-muted-foreground">Loading…</div>
       ) : (
-        <Tabs defaultValue="trial-balance">
+        <Tabs
+          value={tab}
+          onValueChange={(v) =>
+            void navigate({
+              to: "/accountant/reports",
+              search: { tab: v as ReportTab },
+              replace: true,
+            })
+          }
+        >
           <TabsList>
             <TabsTrigger value="trial-balance">Trial Balance</TabsTrigger>
             <TabsTrigger value="pl">Profit &amp; Loss</TabsTrigger>
