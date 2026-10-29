@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
+import { CsvButton } from "@/components/accountant/CsvButton";
 
 export const Route = createFileRoute("/_authenticated/accountant/audit-log")({
   component: AuditLogPage,
@@ -128,7 +129,14 @@ function AuditLogPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Recent activity (last 200)</CardTitle>
+          <div className="flex items-center justify-between gap-2">
+            <CardTitle>Recent activity (last 200)</CardTitle>
+            <CsvButton
+              name="audit-log"
+              headers={["When", "Who", "Action", "Table", "Record"]}
+              rows={entries.map((e) => [e.changed_at, e.changed_by_name ?? e.changed_by, e.action, e.table_name, e.record_id])}
+            />
+          </div>
         </CardHeader>
         <CardContent>
           {loading ? (

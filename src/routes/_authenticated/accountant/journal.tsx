@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Fragment, useEffect, useState, useCallback, useMemo } from "react";
+import { Fragment, useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,9 +20,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ChevronDown, ChevronRight, Plus, Search, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronRight, Plus, Search, Trash2, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 import { logAudit } from "@/lib/auditLog";
+import { ConfirmDialog } from "@/components/accountant/ConfirmDialog";
+import { CsvButton } from "@/components/accountant/CsvButton";
+
+// Reversals carry this prefix plus the original entry id in `reference`, which is the only link the
+// create_manual_journal_entry RPC lets us store (it forces source_id to null).
+const REVERSAL_PREFIX = "REV:";
 
 export const Route = createFileRoute("/_authenticated/accountant/journal")({
   component: JournalPage,
@@ -81,6 +87,12 @@ function JournalPage() {
   const [description, setDescription] = useState("");
   const [reference, setReference] = useState("");
   const [lines, setLines] = useState<DraftLine[]>([emptyLine(), emptyLine()]);
+
+  const [reverseTarget, setReverseTarget] = useState<JournalEntry | null>(null);
+  const [reverseReason, setReverseReason] = useState("");
+  const [reversing, setReversing] = useState(false);
+  // Synchronous lock against double submit (state updates are async).
+  const reverseInFlight = useRef(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -157,6 +169,92 @@ function JournalPage() {
     );
   });
 
+  const reversedIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const e of entries) {
+      if (e.reference?.startsWith(REVERSAL_PREFIX))
+        ids.add(e.reference.slice(REVERSAL_PREFIX.length));
+    }
+    return ids;
+  }, [entries]);
+
+  async function handleReverse() {
+    if (!reverseTarget || reverseInFlight.current) return;
+    const reason = reverseReason.trim();
+    if (!reason) {
+      toast.error("A reason is required to reverse an entry.");
+      return;
+    }
+    reverseInFlight.current = true;
+    setReversing(true);
+    try {
+      const original = reverseTarget;
+      const ref = REVERSAL_PREFIX + original.id;
+
+      // Authoritative duplicate check (the list is capped at 300 rows and may be stale).
+      const { data: existing, error: existingError } = await supabase
+        .from("journal_entries")
+        .select("id")
+        .eq("reference", ref)
+        .limit(1);
+      if (existingError) throw existingError;
+      if (existing && existing.length > 0) throw new Error("This entry has already been reversed.");
+
+      const { data: freshLines, error: linesError } = await supabase
+        .from("journal_lines")
+        .select("account_id,debit,credit,memo")
+        .eq("journal_entry_id", original.id);
+      if (linesError) throw linesError;
+      if (!freshLines || freshLines.length < 2) throw new Error("Entry has no lines to reverse.");
+
+      // Exact opposite: every debit becomes a credit of the same amount on the same account.
+      const payload = freshLines.map((l) => ({
+        account_id: l.account_id,
+        debit: Number(l.credit) || 0,
+        credit: Number(l.debit) || 0,
+        memo: `Reversal${l.memo ? `: ${l.memo}` : ""}`,
+      }));
+
+      const description = `Reversal of: ${original.description} (Reason: ${reason})`;
+      const { data: entryId, error } = await supabase.rpc("create_manual_journal_entry", {
+        p_entry_date: todayISO(),
+        p_description: description,
+        p_reference: ref,
+        p_lines: payload,
+      });
+      if (error) {
+        // The unique index on REV: references catches a concurrent reversal the pre-check missed.
+        if (
+          error.code === "23505" &&
+          String(error.message).includes("journal_entries_reversal_ref_uniq")
+        ) {
+          throw new Error("This entry has already been reversed.");
+        }
+        throw new Error(error.message);
+      }
+
+      await logAudit("journal_entries", entryId as string, "insert", null, {
+        entry_date: todayISO(),
+        description,
+        reference: ref,
+        reverses: original.id,
+        reason,
+        source_type: "manual",
+        lines: payload,
+      });
+
+      toast.success("Entry reversed.");
+      setReverseTarget(null);
+      setReverseReason("");
+      await load();
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : String(error));
+    } finally {
+      reverseInFlight.current = false;
+      setReversing(false);
+    }
+  }
+
   function resetForm() {
     setEntryDate(todayISO());
     setDescription("");
@@ -195,7 +293,9 @@ function JournalPage() {
       return;
     }
 
-    const cleanLines = lines.filter((l) => l.account_id && (Number(l.debit) > 0 || Number(l.credit) > 0));
+    const cleanLines = lines.filter(
+      (l) => l.account_id && (Number(l.debit) > 0 || Number(l.credit) > 0),
+    );
 
     if (cleanLines.length < 2) {
       toast.error("Add at least two lines with an account and an amount.");
@@ -210,7 +310,9 @@ function JournalPage() {
     }
 
     if (totals.diff !== 0) {
-      toast.error(`Entry is not balanced. Debits ${totals.debit.toFixed(2)} vs credits ${totals.credit.toFixed(2)}.`);
+      toast.error(
+        `Entry is not balanced. Debits ${totals.debit.toFixed(2)} vs credits ${totals.credit.toFixed(2)}.`,
+      );
       return;
     }
 
@@ -272,6 +374,31 @@ function JournalPage() {
               className="pl-8"
             />
           </div>
+          <CsvButton
+            name="journal"
+            headers={[
+              "Date",
+              "Description",
+              "Source",
+              "Reference",
+              "Account",
+              "Memo",
+              "Debit",
+              "Credit",
+            ]}
+            rows={filtered.flatMap((e) =>
+              e.lines.map((l) => [
+                e.entry_date,
+                e.description,
+                e.source_type,
+                e.reference,
+                accountLabel(l.account_id),
+                l.memo,
+                l.debit || "",
+                l.credit || "",
+              ]),
+            )}
+          />
           <Button onClick={openNewEntry}>
             <Plus className="h-4 w-4 mr-2" />
             New entry
@@ -297,6 +424,7 @@ function JournalPage() {
                 <th className="p-3">Reference</th>
                 <th className="p-3 text-right">Total</th>
                 <th className="p-3">Status</th>
+                <th className="p-3"></th>
               </tr>
             </thead>
             <tbody>
@@ -338,11 +466,33 @@ function JournalPage() {
                         >
                           {isBalanced ? "balanced" : "unbalanced"}
                         </span>
+                        {reversedIds.has(entry.id) && (
+                          <span className="ml-1 inline-flex items-center rounded-full bg-amber-500/10 px-2 py-0.5 text-xs text-amber-700">
+                            reversed
+                          </span>
+                        )}
+                      </td>
+                      <td className="p-3 text-right">
+                        {!entry.reference?.startsWith(REVERSAL_PREFIX) &&
+                          !reversedIds.has(entry.id) && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setReverseReason("");
+                                setReverseTarget(entry);
+                              }}
+                            >
+                              <Undo2 className="mr-1 h-4 w-4" />
+                              Reverse
+                            </Button>
+                          )}
                       </td>
                     </tr>
                     {isOpen && (
                       <tr className="border-t bg-surface/40">
-                        <td colSpan={7} className="p-0">
+                        <td colSpan={8} className="p-0">
                           <table className="w-full text-sm">
                             <thead>
                               <tr className="text-sm text-muted-foreground">
@@ -455,7 +605,12 @@ function JournalPage() {
                       step="0.01"
                       placeholder="Debit"
                       value={line.debit}
-                      onChange={(e) => updateLine(index, { debit: e.target.value, credit: e.target.value ? "" : line.credit })}
+                      onChange={(e) =>
+                        updateLine(index, {
+                          debit: e.target.value,
+                          credit: e.target.value ? "" : line.credit,
+                        })
+                      }
                     />
                     <Input
                       type="number"
@@ -463,7 +618,12 @@ function JournalPage() {
                       step="0.01"
                       placeholder="Credit"
                       value={line.credit}
-                      onChange={(e) => updateLine(index, { credit: e.target.value, debit: e.target.value ? "" : line.debit })}
+                      onChange={(e) =>
+                        updateLine(index, {
+                          credit: e.target.value,
+                          debit: e.target.value ? "" : line.debit,
+                        })
+                      }
                     />
                     <Input
                       placeholder="Memo (optional)"
@@ -492,12 +652,19 @@ function JournalPage() {
               >
                 <span>Debits: {totals.debit.toFixed(2)}</span>
                 <span>Credits: {totals.credit.toFixed(2)}</span>
-                <span>{totals.diff === 0 ? "Balanced" : `Out by ${Math.abs(totals.diff).toFixed(2)}`}</span>
+                <span>
+                  {totals.diff === 0 ? "Balanced" : `Out by ${Math.abs(totals.diff).toFixed(2)}`}
+                </span>
               </div>
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={submitting}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOpen(false)}
+                disabled={submitting}
+              >
                 Cancel
               </Button>
               <Button type="submit" disabled={submitting || totals.diff !== 0}>
@@ -507,6 +674,35 @@ function JournalPage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      <ConfirmDialog
+        open={reverseTarget !== null}
+        title="Reverse this journal entry?"
+        description={
+          <>
+            Posts a new entry dated today with every debit and credit swapped, referencing the
+            original ({reverseTarget?.description}).
+            {reverseTarget?.source_type && reverseTarget.source_type !== "manual"
+              ? ` This entry was generated by the ${reverseTarget.source_type} flow; reversing it does not change the source document's status.`
+              : ""}
+          </>
+        }
+        confirmLabel="Post reversal"
+        busy={reversing}
+        confirmDisabled={!reverseReason.trim()}
+        onConfirm={() => void handleReverse()}
+        onCancel={() => setReverseTarget(null)}
+      >
+        <div className="space-y-2">
+          <Label htmlFor="reverseReason">Reason (required)</Label>
+          <Textarea
+            id="reverseReason"
+            value={reverseReason}
+            onChange={(e) => setReverseReason(e.target.value)}
+            placeholder="Why is this entry being reversed?"
+          />
+        </div>
+      </ConfirmDialog>
     </div>
   );
 }

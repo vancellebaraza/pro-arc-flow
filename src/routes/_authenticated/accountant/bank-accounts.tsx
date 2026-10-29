@@ -27,6 +27,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { toast } from "sonner";
+import { CsvButton } from "@/components/accountant/CsvButton";
 
 export const Route = createFileRoute("/_authenticated/accountant/bank-accounts")({
   component: BankAccountsPage,
@@ -204,7 +205,22 @@ function BankAccountsPage() {
             Set up bank accounts linked to your ledger, ready for statement import and reconciliation.
           </p>
         </div>
-        <Button onClick={openNew}>New bank account</Button>
+        <div className="flex items-center gap-2">
+          <CsvButton
+            name="bank-accounts"
+            headers={["Bank", "Account name", "Last 4", "Ledger account", "Opening balance", "Opening date", "Active"]}
+            rows={bankAccounts.map((b) => [
+              b.bank_name,
+              b.account_name,
+              b.account_number_last4,
+              `${b.ledger_code} - ${b.ledger_name}`,
+              b.opening_balance,
+              b.opening_balance_date,
+              b.is_active ? "yes" : "no",
+            ])}
+          />
+          <Button onClick={openNew}>New bank account</Button>
+        </div>
       </div>
 
       <div className="mt-6">

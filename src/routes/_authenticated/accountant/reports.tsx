@@ -1,15 +1,24 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { CsvButton } from "@/components/accountant/CsvButton";
 
 export const Route = createFileRoute("/_authenticated/accountant/reports")({
   component: ReportsPage,
 });
 
 interface AccountBalance {
+  id: string;
   code: string;
   name: string;
   type: string;
@@ -20,15 +29,270 @@ interface AccountBalance {
 
 interface AgingRow {
   id: string;
+  partyId: string;
   party: string;
   dueDate: string | null;
   remaining: number;
   bucket: "current" | "1-30" | "31-60" | "61-90" | "90+";
 }
 
+interface PartyView {
+  kind: "client" | "vendor";
+  id: string;
+  name: string;
+}
+
+interface PartyDoc {
+  id: string;
+  number: string;
+  status: string;
+  date: string;
+  due: string | null;
+  total: number;
+  paid: number;
+}
+
+interface PartyPayment {
+  id: string;
+  date: string;
+  amount: number;
+  method: string | null;
+  reference: string | null;
+}
+
+function PartyDialog({ party, onClose }: { party: PartyView | null; onClose: () => void }) {
+  const [docs, setDocs] = useState<PartyDoc[]>([]);
+  const [payments, setPayments] = useState<PartyPayment[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!party) return;
+    let cancelled = false;
+    void (async () => {
+      setLoading(true);
+      try {
+        if (party.kind === "client") {
+          const [{ data: invs, error: e1 }, { data: pays, error: e2 }] = await Promise.all([
+            supabase
+              .from("invoices")
+              .select("id,invoice_number,status,total,issue_date,due_date")
+              .eq("client_id", party.id)
+              .order("issue_date", { ascending: false }),
+            supabase
+              .from("payments")
+              .select("id,amount,method,received_date,reference")
+              .eq("client_id", party.id)
+              .order("received_date", { ascending: false }),
+          ]);
+          if (e1 || e2) throw e1 ?? e2;
+          const ids = (invs ?? []).map((i) => i.id);
+          const { data: allocs } = ids.length
+            ? await supabase
+                .from("payment_allocations")
+                .select("invoice_id,amount_applied")
+                .in("invoice_id", ids)
+            : { data: [] };
+          const paid = new Map<string, number>();
+          for (const a of allocs ?? [])
+            paid.set(a.invoice_id, (paid.get(a.invoice_id) ?? 0) + (Number(a.amount_applied) || 0));
+          if (cancelled) return;
+          setDocs(
+            (invs ?? []).map((i) => ({
+              id: i.id,
+              number: i.invoice_number,
+              status: i.status,
+              date: i.issue_date,
+              due: i.due_date,
+              total: Number(i.total) || 0,
+              paid: paid.get(i.id) ?? 0,
+            })),
+          );
+          setPayments(
+            (pays ?? []).map((x) => ({
+              id: x.id,
+              date: x.received_date,
+              amount: Number(x.amount) || 0,
+              method: x.method,
+              reference: x.reference,
+            })),
+          );
+        } else {
+          const [{ data: bills, error: e1 }, { data: pays, error: e2 }] = await Promise.all([
+            supabase
+              .from("bills")
+              .select("id,bill_number,description,status,amount,bill_date,due_date")
+              .eq("vendor_id", party.id)
+              .order("bill_date", { ascending: false }),
+            supabase
+              .from("vendor_payments")
+              .select("id,amount,method,paid_date,reference")
+              .eq("vendor_id", party.id)
+              .order("paid_date", { ascending: false }),
+          ]);
+          if (e1 || e2) throw e1 ?? e2;
+          const ids = (bills ?? []).map((b) => b.id);
+          const { data: allocs } = ids.length
+            ? await supabase
+                .from("vendor_payment_allocations")
+                .select("bill_id,amount_applied")
+                .in("bill_id", ids)
+            : { data: [] };
+          const paid = new Map<string, number>();
+          for (const a of allocs ?? [])
+            paid.set(a.bill_id, (paid.get(a.bill_id) ?? 0) + (Number(a.amount_applied) || 0));
+          if (cancelled) return;
+          setDocs(
+            (bills ?? []).map((b) => ({
+              id: b.id,
+              number: b.bill_number || b.description,
+              status: b.status,
+              date: b.bill_date,
+              due: b.due_date,
+              total: Number(b.amount) || 0,
+              paid: paid.get(b.id) ?? 0,
+            })),
+          );
+          setPayments(
+            (pays ?? []).map((x) => ({
+              id: x.id,
+              date: x.paid_date,
+              amount: Number(x.amount) || 0,
+              method: x.method,
+              reference: x.reference,
+            })),
+          );
+        }
+      } catch (error: unknown) {
+        toast.error(error instanceof Error ? error.message : String(error));
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+      setDocs([]);
+      setPayments([]);
+    };
+  }, [party]);
+
+  const docLabel = party?.kind === "client" ? "Invoices" : "Bills";
+  const docHeaders = [
+    party?.kind === "client" ? "Invoice" : "Bill",
+    "Status",
+    "Date",
+    "Due",
+    "Total",
+    "Paid",
+    "Balance",
+  ];
+  const docRows = docs.map((d) => [
+    d.number,
+    d.status,
+    d.date,
+    d.due,
+    d.total,
+    d.paid,
+    round2(d.total - d.paid),
+  ]);
+
+  return (
+    <Dialog open={party !== null} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-h-[85vh] max-w-3xl overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>{party?.name}</DialogTitle>
+          <DialogDescription>
+            {party?.kind === "client" ? "Client" : "Vendor"} account: {docLabel.toLowerCase()} and
+            payments.
+          </DialogDescription>
+        </DialogHeader>
+        {loading ? (
+          <p className="text-sm text-muted-foreground">Loading…</p>
+        ) : (
+          <div className="space-y-6">
+            <div>
+              <div className="mb-2 flex items-center justify-between">
+                <h3 className="font-medium">{docLabel}</h3>
+                <CsvButton
+                  name={`${(party?.name ?? "party").replace(/\s+/g, "-").toLowerCase()}-${docLabel.toLowerCase()}`}
+                  headers={docHeaders}
+                  rows={docRows}
+                />
+              </div>
+              {docs.length === 0 ? (
+                <p className="text-sm text-muted-foreground">None.</p>
+              ) : (
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b text-left text-muted-foreground">
+                      <th className="py-2">{docHeaders[0]}</th>
+                      <th className="py-2">Status</th>
+                      <th className="py-2">Due</th>
+                      <th className="py-2 text-right">Total</th>
+                      <th className="py-2 text-right">Balance</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {docs.map((d) => (
+                      <tr key={d.id} className="border-b">
+                        <td className="py-2">{d.number}</td>
+                        <td className="py-2 capitalize">{d.status.replace("_", " ")}</td>
+                        <td className="py-2">{d.due ?? "—"}</td>
+                        <td className="py-2 text-right">{d.total.toFixed(2)}</td>
+                        <td className="py-2 text-right">{round2(d.total - d.paid).toFixed(2)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+            <div>
+              <div className="mb-2 flex items-center justify-between">
+                <h3 className="font-medium">Payments</h3>
+                <CsvButton
+                  name={`${(party?.name ?? "party").replace(/\s+/g, "-").toLowerCase()}-payments`}
+                  headers={["Date", "Amount", "Method", "Reference"]}
+                  rows={payments.map((x) => [x.date, x.amount, x.method, x.reference])}
+                />
+              </div>
+              {payments.length === 0 ? (
+                <p className="text-sm text-muted-foreground">None.</p>
+              ) : (
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b text-left text-muted-foreground">
+                      <th className="py-2">Date</th>
+                      <th className="py-2">Method</th>
+                      <th className="py-2">Reference</th>
+                      <th className="py-2 text-right">Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {payments.map((x) => (
+                      <tr key={x.id} className="border-b">
+                        <td className="py-2">{x.date}</td>
+                        <td className="py-2">{x.method ?? "—"}</td>
+                        <td className="py-2">{x.reference ?? "—"}</td>
+                        <td className="py-2 text-right">{x.amount.toFixed(2)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
+
 function getAgingBucket(dueDate: string | null, today: string): AgingRow["bucket"] {
   if (!dueDate || dueDate >= today) return "current";
-  const days = Math.floor((new Date(today).getTime() - new Date(dueDate).getTime()) / (1000 * 60 * 60 * 24));
+  const days = Math.floor(
+    (new Date(today).getTime() - new Date(dueDate).getTime()) / (1000 * 60 * 60 * 24),
+  );
   if (days <= 30) return "1-30";
   if (days <= 60) return "31-60";
   if (days <= 90) return "61-90";
@@ -36,11 +300,13 @@ function getAgingBucket(dueDate: string | null, today: string): AgingRow["bucket
 }
 
 function ReportsPage() {
+  const navigate = useNavigate();
   const [balances, setBalances] = useState<AccountBalance[]>([]);
   const [arAging, setArAging] = useState<AgingRow[]>([]);
   const [apAging, setApAging] = useState<AgingRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [agingLoading, setAgingLoading] = useState(true);
+  const [party, setParty] = useState<PartyView | null>(null);
 
   useEffect(() => {
     void loadBalances();
@@ -84,7 +350,9 @@ function ReportsPage() {
       return;
     }
 
-    const clientNameMap = new Map((profiles ?? []).map((p) => [p.id, p.full_name ?? "Unnamed client"]));
+    const clientNameMap = new Map(
+      (profiles ?? []).map((p) => [p.id, p.full_name ?? "Unnamed client"]),
+    );
     const paidMap = new Map<string, number>();
     for (const a of paymentAllocs ?? []) {
       paidMap.set(a.invoice_id, (paidMap.get(a.invoice_id) ?? 0) + (Number(a.amount_applied) || 0));
@@ -95,6 +363,7 @@ function ReportsPage() {
         const remaining = (Number(inv.total) || 0) - (paidMap.get(inv.id) ?? 0);
         return {
           id: inv.id,
+          partyId: inv.client_id,
           party: inv.client_display_name ?? clientNameMap.get(inv.client_id) ?? "Unknown client",
           dueDate: inv.due_date,
           remaining,
@@ -141,7 +410,10 @@ function ReportsPage() {
     const vendorNameMap = new Map((vendors ?? []).map((v) => [v.id, v.name]));
     const vendorPaidMap = new Map<string, number>();
     for (const a of vendorAllocs ?? []) {
-      vendorPaidMap.set(a.bill_id, (vendorPaidMap.get(a.bill_id) ?? 0) + (Number(a.amount_applied) || 0));
+      vendorPaidMap.set(
+        a.bill_id,
+        (vendorPaidMap.get(a.bill_id) ?? 0) + (Number(a.amount_applied) || 0),
+      );
     }
 
     const ap: AgingRow[] = (bills ?? [])
@@ -149,6 +421,7 @@ function ReportsPage() {
         const remaining = (Number(b.amount) || 0) - (vendorPaidMap.get(b.id) ?? 0);
         return {
           id: b.id,
+          partyId: b.vendor_id,
           party: vendorNameMap.get(b.vendor_id) ?? "Unknown vendor",
           dueDate: b.due_date,
           remaining,
@@ -201,6 +474,7 @@ function ReportsPage() {
       const balance = isDebitNormal ? s.debit - s.credit : s.credit - s.debit;
 
       return {
+        id: acc.id,
         code: acc.code,
         name: acc.name,
         type: acc.type,
@@ -214,30 +488,76 @@ function ReportsPage() {
     setLoading(false);
   }
 
-  // Trial Balance: every account with nonzero activity, debit/credit totals
+  // Trial Balance: net per account. Debit minus credit, positive goes in Debit, otherwise
+  // the absolute value goes in Credit. Everything is rounded to cents before it is summed.
   const trialBalanceRows = useMemo(
-    () => balances.filter((b) => b.debit !== 0 || b.credit !== 0),
+    () =>
+      balances
+        .map((b) => {
+          const net = round2(b.debit - b.credit);
+          return {
+            id: b.id,
+            code: b.code,
+            name: b.name,
+            debit: net > 0 ? net : 0,
+            credit: net > 0 ? 0 : Math.abs(net),
+            net,
+          };
+        })
+        .filter((r) => r.net !== 0),
     [balances],
   );
   const trialBalanceTotals = useMemo(
-    () => trialBalanceRows.reduce((acc, b) => ({ debit: acc.debit + b.debit, credit: acc.credit + b.credit }), { debit: 0, credit: 0 }),
+    () =>
+      trialBalanceRows.reduce(
+        (acc, b) => ({ debit: round2(acc.debit + b.debit), credit: round2(acc.credit + b.credit) }),
+        { debit: 0, credit: 0 },
+      ),
     [trialBalanceRows],
   );
+  const trialBalanceDiff = round2(trialBalanceTotals.debit - trialBalanceTotals.credit);
 
   // P&L: revenue and expense accounts
-  const revenueRows = useMemo(() => balances.filter((b) => b.type === "revenue" && b.balance !== 0), [balances]);
-  const expenseRows = useMemo(() => balances.filter((b) => b.type === "expense" && b.balance !== 0), [balances]);
-  const totalRevenue = useMemo(() => revenueRows.reduce((sum, r) => sum + r.balance, 0), [revenueRows]);
-  const totalExpenses = useMemo(() => expenseRows.reduce((sum, r) => sum + r.balance, 0), [expenseRows]);
+  const revenueRows = useMemo(
+    () => balances.filter((b) => b.type === "revenue" && b.balance !== 0),
+    [balances],
+  );
+  const expenseRows = useMemo(
+    () => balances.filter((b) => b.type === "expense" && b.balance !== 0),
+    [balances],
+  );
+  const totalRevenue = useMemo(
+    () => revenueRows.reduce((sum, r) => sum + r.balance, 0),
+    [revenueRows],
+  );
+  const totalExpenses = useMemo(
+    () => expenseRows.reduce((sum, r) => sum + r.balance, 0),
+    [expenseRows],
+  );
   const netProfit = totalRevenue - totalExpenses;
 
   // Balance Sheet: assets, liabilities, equity
-  const assetRows = useMemo(() => balances.filter((b) => b.type === "asset" && b.balance !== 0), [balances]);
-  const liabilityRows = useMemo(() => balances.filter((b) => b.type === "liability" && b.balance !== 0), [balances]);
-  const equityRows = useMemo(() => balances.filter((b) => b.type === "equity" && b.balance !== 0), [balances]);
+  const assetRows = useMemo(
+    () => balances.filter((b) => b.type === "asset" && b.balance !== 0),
+    [balances],
+  );
+  const liabilityRows = useMemo(
+    () => balances.filter((b) => b.type === "liability" && b.balance !== 0),
+    [balances],
+  );
+  const equityRows = useMemo(
+    () => balances.filter((b) => b.type === "equity" && b.balance !== 0),
+    [balances],
+  );
   const totalAssets = useMemo(() => assetRows.reduce((sum, r) => sum + r.balance, 0), [assetRows]);
-  const totalLiabilities = useMemo(() => liabilityRows.reduce((sum, r) => sum + r.balance, 0), [liabilityRows]);
-  const totalEquityBase = useMemo(() => equityRows.reduce((sum, r) => sum + r.balance, 0), [equityRows]);
+  const totalLiabilities = useMemo(
+    () => liabilityRows.reduce((sum, r) => sum + r.balance, 0),
+    [liabilityRows],
+  );
+  const totalEquityBase = useMemo(
+    () => equityRows.reduce((sum, r) => sum + r.balance, 0),
+    [equityRows],
+  );
   // Retained earnings for the sheet = net profit not yet formally closed to equity
   const totalEquity = totalEquityBase + netProfit;
 
@@ -264,7 +584,22 @@ function ReportsPage() {
           <TabsContent value="trial-balance">
             <Card>
               <CardHeader>
-                <CardTitle>Trial Balance</CardTitle>
+                <div className="flex items-center justify-between gap-2">
+                  <CardTitle>Trial Balance</CardTitle>
+                  <CsvButton
+                    name="trial-balance"
+                    headers={["Code", "Account", "Debit", "Credit"]}
+                    rows={[
+                      ...trialBalanceRows.map((r) => [
+                        r.code,
+                        r.name,
+                        r.debit || "",
+                        r.credit || "",
+                      ]),
+                      ["", "Total", trialBalanceTotals.debit, trialBalanceTotals.credit],
+                    ]}
+                  />
+                </div>
               </CardHeader>
               <CardContent>
                 <table className="w-full text-sm">
@@ -278,11 +613,34 @@ function ReportsPage() {
                   </thead>
                   <tbody>
                     {trialBalanceRows.map((row) => (
-                      <tr key={row.code} className="border-b">
+                      <tr
+                        key={row.code}
+                        className="cursor-pointer border-b hover:bg-muted/50"
+                        tabIndex={0}
+                        role="link"
+                        title="Open account ledger"
+                        onClick={() =>
+                          void navigate({
+                            to: "/accountant/account-ledger",
+                            search: { account: row.id },
+                          })
+                        }
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter")
+                            void navigate({
+                              to: "/accountant/account-ledger",
+                              search: { account: row.id },
+                            });
+                        }}
+                      >
                         <td className="py-2">{row.code}</td>
                         <td className="py-2">{row.name}</td>
-                        <td className="py-2 text-right">{row.debit > 0 ? row.debit.toFixed(2) : ""}</td>
-                        <td className="py-2 text-right">{row.credit > 0 ? row.credit.toFixed(2) : ""}</td>
+                        <td className="py-2 text-right">
+                          {row.debit > 0 ? row.debit.toFixed(2) : ""}
+                        </td>
+                        <td className="py-2 text-right">
+                          {row.credit > 0 ? row.credit.toFixed(2) : ""}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -296,12 +654,14 @@ function ReportsPage() {
                     </tr>
                   </tfoot>
                 </table>
-                {Math.abs(trialBalanceTotals.debit - trialBalanceTotals.credit) > 0.01 && (
-                  <p className="mt-3 text-sm text-red-600">
-                    Warning: totals do not match — this should never happen given the ledger's constraints.
-                    Flag this immediately if you see it.
-                  </p>
-                )}
+                <p
+                  className={`mt-3 text-sm font-medium ${trialBalanceDiff === 0 ? "text-green-700" : "text-red-700"}`}
+                  data-testid="tb-check"
+                >
+                  {trialBalanceDiff === 0
+                    ? "Balanced"
+                    : `Out by ${Math.abs(trialBalanceDiff).toFixed(2)} (${trialBalanceDiff > 0 ? "debits exceed credits" : "credits exceed debits"})`}
+                </p>
               </CardContent>
             </Card>
           </TabsContent>
@@ -340,7 +700,9 @@ function ReportsPage() {
                 </div>
                 <div className="flex justify-between border-t-2 pt-2 text-base font-semibold">
                   <span>Net Profit</span>
-                  <span className={netProfit >= 0 ? "text-green-700" : "text-red-700"}>{netProfit.toFixed(2)}</span>
+                  <span className={netProfit >= 0 ? "text-green-700" : "text-red-700"}>
+                    {netProfit.toFixed(2)}
+                  </span>
                 </div>
               </CardContent>
             </Card>
@@ -397,8 +759,15 @@ function ReportsPage() {
                 </div>
                 <div className="flex justify-between border-t-2 pt-2 text-base font-semibold">
                   <span>Assets = Liabilities + Equity?</span>
-                  <span className={Math.abs(totalAssets - (totalLiabilities + totalEquity)) < 0.01 ? "text-green-700" : "text-red-700"}>
-                    {totalAssets.toFixed(2)} {Math.abs(totalAssets - (totalLiabilities + totalEquity)) < 0.01 ? "=" : "≠"}{" "}
+                  <span
+                    className={
+                      Math.abs(totalAssets - (totalLiabilities + totalEquity)) < 0.01
+                        ? "text-green-700"
+                        : "text-red-700"
+                    }
+                  >
+                    {totalAssets.toFixed(2)}{" "}
+                    {Math.abs(totalAssets - (totalLiabilities + totalEquity)) < 0.01 ? "=" : "≠"}{" "}
                     {(totalLiabilities + totalEquity).toFixed(2)}
                   </span>
                 </div>
@@ -410,7 +779,14 @@ function ReportsPage() {
             <div className="grid gap-6 md:grid-cols-2">
               <Card>
                 <CardHeader>
-                  <CardTitle>Accounts Receivable Aging</CardTitle>
+                  <div className="flex items-center justify-between gap-2">
+                    <CardTitle>Accounts Receivable Aging</CardTitle>
+                    <CsvButton
+                      name="ar-aging"
+                      headers={["Client", "Due date", "Bucket", "Owed"]}
+                      rows={arAging.map((r) => [r.party, r.dueDate, r.bucket, round2(r.remaining)])}
+                    />
+                  </div>
                 </CardHeader>
                 <CardContent>
                   {agingLoading ? (
@@ -429,7 +805,20 @@ function ReportsPage() {
                       </thead>
                       <tbody>
                         {arAging.map((row) => (
-                          <tr key={row.id} className="border-b">
+                          <tr
+                            key={row.id}
+                            className="cursor-pointer border-b hover:bg-muted/50"
+                            tabIndex={0}
+                            role="button"
+                            title="View invoices and payments"
+                            onClick={() =>
+                              setParty({ kind: "client", id: row.partyId, name: row.party })
+                            }
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter")
+                                setParty({ kind: "client", id: row.partyId, name: row.party });
+                            }}
+                          >
                             <td className="py-2">{row.party}</td>
                             <td className="py-2">{row.dueDate ?? "—"}</td>
                             <td className="py-2">
@@ -466,7 +855,14 @@ function ReportsPage() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Accounts Payable Aging</CardTitle>
+                  <div className="flex items-center justify-between gap-2">
+                    <CardTitle>Accounts Payable Aging</CardTitle>
+                    <CsvButton
+                      name="ap-aging"
+                      headers={["Vendor", "Due date", "Bucket", "Owed"]}
+                      rows={apAging.map((r) => [r.party, r.dueDate, r.bucket, round2(r.remaining)])}
+                    />
+                  </div>
                 </CardHeader>
                 <CardContent>
                   {agingLoading ? (
@@ -485,7 +881,20 @@ function ReportsPage() {
                       </thead>
                       <tbody>
                         {apAging.map((row) => (
-                          <tr key={row.id} className="border-b">
+                          <tr
+                            key={row.id}
+                            className="cursor-pointer border-b hover:bg-muted/50"
+                            tabIndex={0}
+                            role="button"
+                            title="View bills and payments"
+                            onClick={() =>
+                              setParty({ kind: "vendor", id: row.partyId, name: row.party })
+                            }
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter")
+                                setParty({ kind: "vendor", id: row.partyId, name: row.party });
+                            }}
+                          >
                             <td className="py-2">{row.party}</td>
                             <td className="py-2">{row.dueDate ?? "—"}</td>
                             <td className="py-2">
@@ -523,6 +932,7 @@ function ReportsPage() {
           </TabsContent>
         </Tabs>
       )}
+      <PartyDialog party={party} onClose={() => setParty(null)} />
     </div>
   );
 }

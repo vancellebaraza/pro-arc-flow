@@ -27,6 +27,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { toast } from "sonner";
+import { CsvButton } from "@/components/accountant/CsvButton";
 import { logAudit } from "@/lib/auditLog";
 
 export const Route = createFileRoute("/_authenticated/accountant/accounts")({
@@ -178,7 +179,14 @@ function AccountsPage() {
             Manage accounts, assign parent accounts where relevant, and toggle active status without deleting records.
           </p>
         </div>
-        <Button onClick={openNewAccount}>New account</Button>
+        <div className="flex items-center gap-2">
+          <CsvButton
+            name="chart-of-accounts"
+            headers={["Code", "Name", "Type", "Active"]}
+            rows={accounts.map((a) => [a.code, a.name, a.type, a.is_active ? "yes" : "no"])}
+          />
+          <Button onClick={openNewAccount}>New account</Button>
+        </div>
       </div>
 
       <div className="mt-6 space-y-6">

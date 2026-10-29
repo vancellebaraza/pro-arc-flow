@@ -3,43 +3,16 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { toast } from "sonner";
-import { logAudit } from "@/lib/auditLog";
-import { getUserCached } from "@/lib/auth-cache";
+import { CsvButton } from "@/components/accountant/CsvButton";
+import {
+  RecordPaymentDialog,
+  type PayableInvoice,
+} from "@/components/accountant/RecordPaymentDialog";
 
 export const Route = createFileRoute("/_authenticated/accountant/payments")({
   component: PaymentsPage,
 });
-
-interface OpenInvoice {
-  id: string;
-  invoice_number: string;
-  total: number;
-  client_id: string;
-  paid_so_far: number;
-}
-
-interface DepositAccount {
-  id: string;
-  code: string;
-  name: string;
-}
 
 interface PaymentRecord {
   id: string;
@@ -50,16 +23,10 @@ interface PaymentRecord {
 }
 
 function PaymentsPage() {
-  const [openInvoices, setOpenInvoices] = useState<OpenInvoice[]>([]);
+  const [openInvoices, setOpenInvoices] = useState<PayableInvoice[]>([]);
   const [payments, setPayments] = useState<PaymentRecord[]>([]);
   const [loading, setLoading] = useState(true);
-  const [recording, setRecording] = useState<OpenInvoice | null>(null);
-  const [amount, setAmount] = useState("");
-  const [method, setMethod] = useState("");
-  const [reference, setReference] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [depositAccounts, setDepositAccounts] = useState<DepositAccount[]>([]);
-  const [depositAccountId, setDepositAccountId] = useState("");
+  const [recording, setRecording] = useState<PayableInvoice | null>(null);
 
   useEffect(() => {
     void loadData();
@@ -68,18 +35,9 @@ function PaymentsPage() {
   async function loadData() {
     setLoading(true);
 
-    const { data: accountRows } = await supabase
-      .from("accounts")
-      .select("id,code,name")
-      .eq("type", "asset")
-      .like("code", "10%")
-      .eq("is_active", true)
-      .order("code");
-    setDepositAccounts(accountRows ?? []);
-
     const { data: invoices, error: invError } = await supabase
       .from("invoices")
-      .select("id,invoice_number,total,client_id,status")
+      .select("id,invoice_number,total,client_id,client_display_name,status")
       .in("status", ["sent", "partially_paid"]);
 
     if (invError) {
@@ -97,12 +55,20 @@ function PaymentsPage() {
       paidMap.set(a.invoice_id, (paidMap.get(a.invoice_id) ?? 0) + Number(a.amount_applied));
     }
 
+    const clientIds = [...new Set((invoices ?? []).map((i) => i.client_id).filter(Boolean))];
+    const { data: profiles } =
+      clientIds.length > 0
+        ? await supabase.from("profiles").select("id,full_name").in("id", clientIds)
+        : { data: [] };
+    const names = new Map((profiles ?? []).map((p) => [p.id, p.full_name as string | null]));
+
     const open = (invoices ?? [])
       .map((inv) => ({
         id: inv.id,
         invoice_number: inv.invoice_number,
         total: Number(inv.total) || 0,
         client_id: inv.client_id,
+        client_name: inv.client_display_name ?? names.get(inv.client_id) ?? null,
         paid_so_far: paidMap.get(inv.id) ?? 0,
       }))
       .filter((inv) => inv.paid_so_far < inv.total);
@@ -124,84 +90,6 @@ function PaymentsPage() {
     setLoading(false);
   }
 
-  function openRecordDialog(invoice: OpenInvoice) {
-    setRecording(invoice);
-    setAmount((invoice.total - invoice.paid_so_far).toFixed(2));
-    setMethod("");
-    setReference("");
-    const bank = depositAccounts.find((a) => a.code === "1000");
-    setDepositAccountId(bank?.id ?? depositAccounts[0]?.id ?? "");
-  }
-
-  async function handleRecordPayment() {
-    if (!recording) return;
-    const amt = Number(amount);
-    if (Number.isNaN(amt) || amt <= 0) {
-      toast.error("Enter a valid amount.");
-      return;
-    }
-    const remaining = recording.total - recording.paid_so_far;
-    if (amt > remaining + 0.01) {
-      toast.error(`Amount exceeds what's owed (${remaining.toFixed(2)}).`);
-      return;
-    }
-    if (!depositAccountId) {
-      toast.error("Pick which account this payment landed in.");
-      return;
-    }
-
-    setSaving(true);
-    try {
-      const { data: userData } = await getUserCached();
-
-      const { data: paymentData, error: paymentError } = await supabase
-        .from("payments")
-        .insert({
-          client_id: recording.client_id,
-          amount: amt,
-          method: method.trim() || null,
-          reference: reference.trim() || null,
-          deposit_account_id: depositAccountId,
-          created_by: userData.user?.id ?? null,
-        })
-        .select("id")
-        .single();
-
-      if (paymentError || !paymentData?.id) {
-        throw paymentError ?? new Error("Could not create payment.");
-      }
-
-      const { error: allocError } = await supabase.from("payment_allocations").insert({
-        payment_id: paymentData.id,
-        invoice_id: recording.id,
-        amount_applied: amt,
-      });
-
-      if (allocError) {
-        throw allocError;
-      }
-
-      // Update invoice status
-      const newTotal = recording.paid_so_far + amt;
-      const newStatus = newTotal >= recording.total ? "paid" : "partially_paid";
-      await supabase.from("invoices").update({ status: newStatus }).eq("id", recording.id);
-
-      toast.success("Payment recorded and posted to the ledger.");
-      void logAudit("payments", paymentData.id, "insert", null, {
-        invoice_id: recording.id,
-        amount: amt,
-        method: method.trim() || null,
-      });
-      setRecording(null);
-      await loadData();
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
-      toast.error(message);
-    } finally {
-      setSaving(false);
-    }
-  }
-
   return (
     <div className="fade-in flex flex-col gap-5">
       <div>
@@ -213,7 +101,20 @@ function PaymentsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Open invoices</CardTitle>
+          <div className="flex items-center justify-between gap-2">
+            <CardTitle>Open invoices</CardTitle>
+            <CsvButton
+              name="open-invoices"
+              headers={["Invoice", "Client", "Total", "Paid", "Owed"]}
+              rows={openInvoices.map((i) => [
+                i.invoice_number,
+                i.client_name,
+                i.total,
+                i.paid_so_far,
+                Math.round((i.total - i.paid_so_far) * 100) / 100,
+              ])}
+            />
+          </div>
         </CardHeader>
         <CardContent>
           {loading ? (
@@ -223,15 +124,21 @@ function PaymentsPage() {
           ) : (
             <div className="space-y-2">
               {openInvoices.map((inv) => (
-                <div key={inv.id} className="flex items-center justify-between rounded-lg border p-4">
+                <div
+                  key={inv.id}
+                  className="flex items-center justify-between rounded-lg border p-4"
+                >
                   <div>
-                    <div className="font-medium">{inv.invoice_number}</div>
+                    <div className="font-medium">
+                      {inv.invoice_number}
+                      {inv.client_name ? ` — ${inv.client_name}` : ""}
+                    </div>
                     <div className="text-sm text-muted-foreground">
                       Total {inv.total.toFixed(2)} • Paid {inv.paid_so_far.toFixed(2)} • Owed{" "}
                       {(inv.total - inv.paid_so_far).toFixed(2)}
                     </div>
                   </div>
-                  <Button onClick={() => openRecordDialog(inv)}>Record payment</Button>
+                  <Button onClick={() => setRecording(inv)}>Record payment</Button>
                 </div>
               ))}
             </div>
@@ -241,7 +148,14 @@ function PaymentsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Recent payments</CardTitle>
+          <div className="flex items-center justify-between gap-2">
+            <CardTitle>Recent payments</CardTitle>
+            <CsvButton
+              name="payments"
+              headers={["Received", "Amount", "Method", "Reference"]}
+              rows={payments.map((p) => [p.received_date, Number(p.amount), p.method, p.reference])}
+            />
+          </div>
         </CardHeader>
         <CardContent>
           {payments.length === 0 ? (
@@ -249,11 +163,17 @@ function PaymentsPage() {
           ) : (
             <div className="space-y-2">
               {payments.map((p) => (
-                <div key={p.id} className="flex items-center justify-between rounded-lg border p-4 text-sm">
+                <div
+                  key={p.id}
+                  className="flex items-center justify-between rounded-lg border p-4 text-sm"
+                >
                   <span>
-                    {p.amount.toFixed(2)} {p.method ? `via ${p.method}` : ""} {p.reference ? `• ${p.reference}` : ""}
+                    {Number(p.amount).toFixed(2)} {p.method ? `via ${p.method}` : ""}{" "}
+                    {p.reference ? `• ${p.reference}` : ""}
                   </span>
-                  <span className="text-muted-foreground">{new Date(p.received_date).toLocaleDateString()}</span>
+                  <span className="text-muted-foreground">
+                    {new Date(p.received_date).toLocaleDateString()}
+                  </span>
                 </div>
               ))}
             </div>
@@ -261,46 +181,11 @@ function PaymentsPage() {
         </CardContent>
       </Card>
 
-      <Dialog open={recording !== null} onOpenChange={(open) => !open && setRecording(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Record payment</DialogTitle>
-            <DialogDescription>{recording?.invoice_number}</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Amount</Label>
-              <Input type="number" min="0" step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label>Deposited to</Label>
-              <Select value={depositAccountId} onValueChange={setDepositAccountId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select account" />
-                </SelectTrigger>
-                <SelectContent>
-                  {depositAccounts.map((a) => (
-                    <SelectItem key={a.id} value={a.id}>
-                      {a.code} — {a.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>Method (optional)</Label>
-              <Input value={method} onChange={(e) => setMethod(e.target.value)} placeholder="e.g. M-Pesa, Bank transfer" />
-            </div>
-            <div className="space-y-2">
-              <Label>Reference (optional)</Label>
-              <Input value={reference} onChange={(e) => setReference(e.target.value)} />
-            </div>
-            <Button onClick={handleRecordPayment} disabled={saving || !depositAccountId} className="w-full">
-              {saving ? "Recording…" : "Record payment"}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <RecordPaymentDialog
+        invoice={recording}
+        onClose={() => setRecording(null)}
+        onDone={() => loadData()}
+      />
     </div>
   );
 }

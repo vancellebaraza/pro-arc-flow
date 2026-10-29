@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,6 +22,8 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { logAudit } from "@/lib/auditLog";
 import { getUserCached } from "@/lib/auth-cache";
+import { CsvButton } from "@/components/accountant/CsvButton";
+import { ConfirmDialog } from "@/components/accountant/ConfirmDialog";
 
 export const Route = createFileRoute("/_authenticated/accountant/bills")({
   component: BillsPage,
@@ -57,6 +59,10 @@ function BillsPage() {
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [approveTarget, setApproveTarget] = useState<BillRecord | null>(null);
+  const [approving, setApproving] = useState(false);
+  // Synchronous lock so a double click cannot approve (and post) the same bill twice.
+  const approveInFlight = useRef(false);
 
   const [vendorId, setVendorId] = useState("");
   const [expenseAccountId, setExpenseAccountId] = useState("");
@@ -178,20 +184,34 @@ function BillsPage() {
     }
   }
 
-  async function handleApproveBill(billId: string) {
-    const { error } = await supabase
-      .from("bills")
-      .update({ status: "approved" })
-      .eq("id", billId);
+  async function handleApproveBill() {
+    if (!approveTarget || approveInFlight.current) return;
+    approveInFlight.current = true;
+    setApproving(true);
+    try {
+      const billId = approveTarget.id;
+      // Only a draft can be approved; the status filter makes a repeat submit a no-op instead of a re-post.
+      const { data, error } = await supabase
+        .from("bills")
+        .update({ status: "approved" })
+        .eq("id", billId)
+        .eq("status", "draft")
+        .select("id");
+      if (error) throw error;
+      if (!data || data.length === 0) throw new Error("This bill is no longer a draft.");
 
-    if (error) {
-      toast.error(error.message);
-      return;
+      toast.success("Bill approved and posted to the ledger.");
+      void logAudit("bills", billId, "update", { status: "draft" }, { status: "approved" });
+      setApproveTarget(null);
+      await loadData();
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : String(error));
+      setApproveTarget(null);
+      await loadData();
+    } finally {
+      approveInFlight.current = false;
+      setApproving(false);
     }
-
-    toast.success("Bill approved and posted to the ledger.");
-    void logAudit("bills", billId, "update", { status: "draft" }, { status: "approved" });
-    await loadData();
   }
 
   return (
@@ -208,7 +228,14 @@ function BillsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>All bills</CardTitle>
+          <div className="flex items-center justify-between gap-2">
+            <CardTitle>All bills</CardTitle>
+            <CsvButton
+              name="bills"
+              headers={["Vendor", "Description", "Bill number", "Status", "Bill date", "Amount"]}
+              rows={bills.map((b) => [b.vendor_name, b.description, b.bill_number, b.status, b.bill_date, b.amount])}
+            />
+          </div>
         </CardHeader>
         <CardContent>
           {loading ? (
@@ -229,7 +256,7 @@ function BillsPage() {
                     </div>
                   </div>
                   {bill.status === "draft" ? (
-                    <Button variant="outline" onClick={() => handleApproveBill(bill.id)}>
+                    <Button variant="outline" onClick={() => setApproveTarget(bill)}>
                       Approve bill
                     </Button>
                   ) : (
@@ -241,6 +268,16 @@ function BillsPage() {
           )}
         </CardContent>
       </Card>
+
+      <ConfirmDialog
+        open={approveTarget !== null}
+        title="Approve bill and post to the ledger?"
+        description={`${approveTarget?.vendor_name ?? ""} - ${approveTarget?.description ?? ""} for ${Number(approveTarget?.amount ?? 0).toFixed(2)} will be posted to the general ledger (expense and Accounts Payable).`}
+        confirmLabel="Approve and post"
+        busy={approving}
+        onConfirm={() => void handleApproveBill()}
+        onCancel={() => setApproveTarget(null)}
+      />
 
       <Dialog open={creating} onOpenChange={setCreating}>
         <DialogContent>

@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
+import { CsvButton } from "@/components/accountant/CsvButton";
 
 export const Route = createFileRoute("/_authenticated/accountant/cashbook")({
   component: CashbookPage,
@@ -125,11 +126,26 @@ function CashbookPage() {
 
   return (
     <div className="fade-in">
-      <div className="space-y-2">
-        <h1 className="font-display text-[1.75rem] font-bold leading-tight">Cashbook</h1>
-        <p className="text-muted-foreground">
-          A running log of every payment received from clients and every payment made to vendors, in date order.
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="space-y-2">
+          <h1 className="font-display text-[1.75rem] font-bold leading-tight">Cashbook</h1>
+          <p className="text-muted-foreground">
+            A running log of every payment received from clients and every payment made to vendors, in date order.
+          </p>
+        </div>
+        <CsvButton
+          name="cashbook"
+          headers={["Date", "Direction", "Party", "Method", "Reference", "Amount", "Running balance"]}
+          rows={displayRows.map((r) => [
+            r.date,
+            r.direction === "in" ? "In" : "Out",
+            r.party,
+            r.method,
+            r.reference,
+            r.amount,
+            Math.round(r.runningBalance * 100) / 100,
+          ])}
+        />
       </div>
 
       <div className="mt-6 grid gap-4 md:grid-cols-3">

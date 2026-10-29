@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,6 +22,8 @@ import {
 import { toast } from "sonner";
 import { logAudit } from "@/lib/auditLog";
 import { getUserCached } from "@/lib/auth-cache";
+import { CsvButton } from "@/components/accountant/CsvButton";
+import { ConfirmDialog } from "@/components/accountant/ConfirmDialog";
 
 export const Route = createFileRoute("/_authenticated/accountant/vendor-payments")({
   component: VendorPaymentsPage,
@@ -59,6 +61,9 @@ function VendorPaymentsPage() {
   const [method, setMethod] = useState("");
   const [reference, setReference] = useState("");
   const [saving, setSaving] = useState(false);
+  const [confirmingPay, setConfirmingPay] = useState(false);
+  // Synchronous lock against double submit (state updates are async).
+  const payInFlight = useRef(false);
   const [sourceAccounts, setSourceAccounts] = useState<PaymentSourceAccount[]>([]);
   const [sourceAccountId, setSourceAccountId] = useState("");
 
@@ -136,7 +141,7 @@ function VendorPaymentsPage() {
   }
 
   async function handleRecordPayment() {
-    if (!recording) return;
+    if (!recording || payInFlight.current) return;
     const amt = Number(amount);
     if (Number.isNaN(amt) || amt <= 0) {
       toast.error("Enter a valid amount.");
@@ -152,6 +157,7 @@ function VendorPaymentsPage() {
       return;
     }
 
+    payInFlight.current = true;
     setSaving(true);
     try {
       const { data: userData } = await getUserCached();
@@ -199,6 +205,7 @@ function VendorPaymentsPage() {
       const message: string = error instanceof Error ? error.message : `${error}`;
       toast.error(message);
     } finally {
+      payInFlight.current = false;
       setSaving(false);
     }
   }
@@ -214,7 +221,20 @@ function VendorPaymentsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Unpaid bills</CardTitle>
+          <div className="flex items-center justify-between gap-2">
+            <CardTitle>Unpaid bills</CardTitle>
+            <CsvButton
+              name="unpaid-bills"
+              headers={["Bill number", "Description", "Amount", "Paid", "Owed"]}
+              rows={openBills.map((b) => [
+                b.bill_number,
+                b.description,
+                b.amount,
+                b.paid_so_far,
+                Math.round((b.amount - b.paid_so_far) * 100) / 100,
+              ])}
+            />
+          </div>
         </CardHeader>
         <CardContent>
           {loading ? (
@@ -243,7 +263,14 @@ function VendorPaymentsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Recent vendor payments</CardTitle>
+          <div className="flex items-center justify-between gap-2">
+            <CardTitle>Recent vendor payments</CardTitle>
+            <CsvButton
+              name="vendor-payments"
+              headers={["Paid", "Amount", "Method", "Reference"]}
+              rows={payments.map((p) => [p.paid_date, Number(p.amount), p.method, p.reference])}
+            />
+          </div>
         </CardHeader>
         <CardContent>
           {payments.length === 0 ? (
@@ -297,12 +324,24 @@ function VendorPaymentsPage() {
               <Label>Reference (optional)</Label>
               <Input value={reference} onChange={(e) => setReference(e.target.value)} />
             </div>
-            <Button onClick={handleRecordPayment} disabled={saving || !sourceAccountId} className="w-full">
+            <Button onClick={() => setConfirmingPay(true)} disabled={saving || !sourceAccountId} className="w-full">
               {saving ? "Recording…" : "Record payment"}
             </Button>
           </div>
         </DialogContent>
       </Dialog>
+
+      <ConfirmDialog
+        open={confirmingPay}
+        title="Post this vendor payment to the ledger?"
+        description={`${Number(amount || 0).toFixed(2)} against ${recording?.bill_number ?? recording?.description ?? "this bill"}. This posts to the general ledger immediately.`}
+        confirmLabel="Record payment"
+        busy={saving}
+        onConfirm={() => {
+          void handleRecordPayment().finally(() => setConfirmingPay(false));
+        }}
+        onCancel={() => setConfirmingPay(false)}
+      />
     </div>
   );
 }
