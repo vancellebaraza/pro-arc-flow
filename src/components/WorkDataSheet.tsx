@@ -146,6 +146,7 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
       ? await supabase
           .from("invoices")
           .select("id,quotation_id,total")
+          .neq("status", "void")
           .in("quotation_id", quotationIds)
       : { data: [] as any[] };
 
@@ -153,7 +154,8 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
     const { data: allocations } = invoiceIds.length
       ? await supabase
           .from("payment_allocations")
-          .select("invoice_id,amount_applied")
+          .select("invoice_id,amount_applied,payments!inner(voided_at)")
+          .is("payments.voided_at", null)
           .in("invoice_id", invoiceIds)
       : { data: [] as any[] };
 

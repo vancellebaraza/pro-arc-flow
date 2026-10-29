@@ -106,7 +106,12 @@ function useQuotationsToInvoice() {
           .eq("status", "approved")
           .eq("do_not_invoice", false),
         fetchAllRows<{ quotation_id: string }>((from, to) =>
-          supabase.from("invoices").select("quotation_id").order("id").range(from, to),
+          supabase
+            .from("invoices")
+            .select("quotation_id")
+            .neq("status", "void")
+            .order("id")
+            .range(from, to),
         ),
       ]);
       if (error) throw new Error(error.message);
@@ -176,6 +181,7 @@ function useRecentPayments() {
       const { data, error } = await supabase
         .from("payments")
         .select("id,amount,received_date,method,client_display_name")
+        .is("voided_at", null)
         .order("created_at", { ascending: false })
         .limit(5);
       if (error) throw new Error(error.message);

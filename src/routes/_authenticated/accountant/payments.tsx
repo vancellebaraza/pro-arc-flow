@@ -38,7 +38,8 @@ function PaymentsPage() {
     const { data: invoices, error: invError } = await supabase
       .from("invoices")
       .select("id,invoice_number,total,client_id,client_display_name,status")
-      .in("status", ["sent", "partially_paid"]);
+      .in("status", ["sent", "partially_paid"]) // void invoices are excluded by this status list
+      .neq("status", "void");
 
     if (invError) {
       toast.error(invError.message);
@@ -48,7 +49,8 @@ function PaymentsPage() {
 
     const { data: allocations } = await supabase
       .from("payment_allocations")
-      .select("invoice_id,amount_applied");
+      .select("invoice_id,amount_applied,payments!inner(voided_at)")
+      .is("payments.voided_at", null);
 
     const paidMap = new Map<string, number>();
     for (const a of allocations ?? []) {
@@ -78,6 +80,7 @@ function PaymentsPage() {
     const { data: paymentData, error: payError } = await supabase
       .from("payments")
       .select("id,amount,method,received_date,reference")
+      .is("voided_at", null)
       .order("created_at", { ascending: false })
       .limit(20);
 

@@ -40,7 +40,8 @@ function CashbookPage() {
 
     const { data: payments, error: payError } = await supabase
       .from("payments")
-      .select("id,client_id,client_display_name,amount,method,received_date,reference");
+      .select("id,client_id,client_display_name,amount,method,received_date,reference")
+      .is("voided_at", null);
 
     if (payError) {
       toast.error(payError.message);
@@ -61,14 +62,15 @@ function CashbookPage() {
     const clientIds = [...new Set((payments ?? []).map((p) => p.client_id))];
     const vendorIds = [...new Set((vendorPayments ?? []).map((p) => p.vendor_id))];
 
-    const [{ data: profiles, error: profError }, { data: vendors, error: vendError }] = await Promise.all([
-      clientIds.length > 0
-        ? supabase.from("profiles").select("id,full_name").in("id", clientIds)
-        : Promise.resolve({ data: [], error: null }),
-      vendorIds.length > 0
-        ? supabase.from("vendors").select("id,name").in("id", vendorIds)
-        : Promise.resolve({ data: [], error: null }),
-    ]);
+    const [{ data: profiles, error: profError }, { data: vendors, error: vendError }] =
+      await Promise.all([
+        clientIds.length > 0
+          ? supabase.from("profiles").select("id,full_name").in("id", clientIds)
+          : Promise.resolve({ data: [], error: null }),
+        vendorIds.length > 0
+          ? supabase.from("vendors").select("id,name").in("id", vendorIds)
+          : Promise.resolve({ data: [], error: null }),
+      ]);
 
     if (profError) {
       toast.error(profError.message);
@@ -81,7 +83,9 @@ function CashbookPage() {
       return;
     }
 
-    const clientNameMap = new Map((profiles ?? []).map((p) => [p.id, p.full_name ?? "Unnamed client"]));
+    const clientNameMap = new Map(
+      (profiles ?? []).map((p) => [p.id, p.full_name ?? "Unnamed client"]),
+    );
     const vendorNameMap = new Map((vendors ?? []).map((v) => [v.id, v.name]));
 
     const inRows: CashbookRow[] = (payments ?? []).map((p) => ({
@@ -104,7 +108,9 @@ function CashbookPage() {
       amount: Number(p.amount) || 0,
     }));
 
-    const merged = [...inRows, ...outRows].sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id));
+    const merged = [...inRows, ...outRows].sort(
+      (a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id),
+    );
 
     setRows(merged);
     setLoading(false);
@@ -130,12 +136,21 @@ function CashbookPage() {
         <div className="space-y-2">
           <h1 className="font-display text-[1.75rem] font-bold leading-tight">Cashbook</h1>
           <p className="text-muted-foreground">
-            A running log of every payment received from clients and every payment made to vendors, in date order.
+            A running log of every payment received from clients and every payment made to vendors,
+            in date order.
           </p>
         </div>
         <CsvButton
           name="cashbook"
-          headers={["Date", "Direction", "Party", "Method", "Reference", "Amount", "Running balance"]}
+          headers={[
+            "Date",
+            "Direction",
+            "Party",
+            "Method",
+            "Reference",
+            "Amount",
+            "Running balance",
+          ]}
           rows={displayRows.map((r) => [
             r.date,
             r.direction === "in" ? "In" : "Out",
@@ -151,19 +166,29 @@ function CashbookPage() {
       <div className="mt-6 grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-normal text-muted-foreground">Total received</CardTitle>
+            <CardTitle className="text-sm font-normal text-muted-foreground">
+              Total received
+            </CardTitle>
           </CardHeader>
-          <CardContent className="text-xl font-semibold text-green-600">{formatKes(totals.totalIn)}</CardContent>
+          <CardContent className="text-xl font-semibold text-green-600">
+            {formatKes(totals.totalIn)}
+          </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-normal text-muted-foreground">Total paid out</CardTitle>
+            <CardTitle className="text-sm font-normal text-muted-foreground">
+              Total paid out
+            </CardTitle>
           </CardHeader>
-          <CardContent className="text-xl font-semibold text-red-600">{formatKes(totals.totalOut)}</CardContent>
+          <CardContent className="text-xl font-semibold text-red-600">
+            {formatKes(totals.totalOut)}
+          </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-normal text-muted-foreground">Net cash movement</CardTitle>
+            <CardTitle className="text-sm font-normal text-muted-foreground">
+              Net cash movement
+            </CardTitle>
           </CardHeader>
           <CardContent className="text-xl font-semibold">{formatKes(totals.net)}</CardContent>
         </Card>
@@ -208,7 +233,9 @@ function CashbookPage() {
                   <td className="px-4 py-3 text-right text-red-600">
                     {row.direction === "out" ? row.amount.toFixed(2) : ""}
                   </td>
-                  <td className="px-4 py-3 text-right font-medium">{row.runningBalance.toFixed(2)}</td>
+                  <td className="px-4 py-3 text-right font-medium">
+                    {row.runningBalance.toFixed(2)}
+                  </td>
                 </tr>
               ))
             )}

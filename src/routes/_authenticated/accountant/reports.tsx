@@ -75,11 +75,13 @@ function PartyDialog({ party, onClose }: { party: PartyView | null; onClose: () 
               .from("invoices")
               .select("id,invoice_number,status,total,issue_date,due_date")
               .eq("client_id", party.id)
+              .neq("status", "void")
               .order("issue_date", { ascending: false }),
             supabase
               .from("payments")
               .select("id,amount,method,received_date,reference")
               .eq("client_id", party.id)
+              .is("voided_at", null)
               .order("received_date", { ascending: false }),
           ]);
           if (e1 || e2) throw e1 ?? e2;
@@ -87,7 +89,8 @@ function PartyDialog({ party, onClose }: { party: PartyView | null; onClose: () 
           const { data: allocs } = ids.length
             ? await supabase
                 .from("payment_allocations")
-                .select("invoice_id,amount_applied")
+                .select("invoice_id,amount_applied,payments!inner(voided_at)")
+                .is("payments.voided_at", null)
                 .in("invoice_id", ids)
             : { data: [] };
           const paid = new Map<string, number>();

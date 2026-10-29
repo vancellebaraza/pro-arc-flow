@@ -136,7 +136,7 @@ export async function loadAging(): Promise<{ ar: AgingRow[]; ap: AgingRow[] }> {
       supabase
         .from("invoices")
         .select("id,total,due_date,client_id,client_display_name")
-        .in("status", ["sent", "partially_paid"]),
+        .in("status", ["sent", "partially_paid"]), // void invoices are excluded by this status list
       supabase
         .from("bills")
         .select("id,amount,due_date,vendor_id")
@@ -154,7 +154,8 @@ export async function loadAging(): Promise<{ ar: AgingRow[]; ap: AgingRow[] }> {
     inChunks(invoiceIds, (ids) =>
       supabase
         .from("payment_allocations")
-        .select("invoice_id,amount_applied")
+        .select("invoice_id,amount_applied,payments!inner(voided_at)")
+        .is("payments.voided_at", null)
         .in("invoice_id", ids),
     ),
     inChunks(billIds, (ids) =>
