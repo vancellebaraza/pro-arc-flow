@@ -9,8 +9,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { toast } from "sonner";
-import { MessageCircle, Pencil, Save, Plus } from "lucide-react";
+import { FileDown, MessageCircle, Pencil, Save, Plus } from "lucide-react";
 import { getUserCached } from "@/lib/auth-cache";
+import { exportVendorsCsv } from "@/lib/csv";
 
 const CATEGORY_OPTIONS = [
   "Electrical",
@@ -265,7 +266,19 @@ function VendorManagementPage() {
         </div>
 
         <div className="rounded-xl border bg-card p-5">
-          <h2 className="font-display text-xl font-bold">Vendor list</h2>
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="font-display text-xl font-bold">Vendor list</h2>
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={vendors.length === 0}
+              title={`Exports all ${vendors.length} vendors shown in the list`}
+              onClick={() => toast.success(`Exported ${exportVendorsCsv(vendors)} vendors`)}
+            >
+              <FileDown className="h-4 w-4 mr-1" />
+              Export CSV
+            </Button>
+          </div>
           <p className="text-sm text-muted-foreground mt-1">
             Tap a vendor row to load it into the form.
           </p>
