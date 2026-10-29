@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +10,7 @@ export const Route = createFileRoute("/_authenticated/accountant/reports")({
 });
 
 interface AccountBalance {
+  id: string;
   code: string;
   name: string;
   type: string;
@@ -26,6 +27,8 @@ interface AgingRow {
   bucket: "current" | "1-30" | "31-60" | "61-90" | "90+";
 }
 
+const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
+
 function getAgingBucket(dueDate: string | null, today: string): AgingRow["bucket"] {
   if (!dueDate || dueDate >= today) return "current";
   const days = Math.floor((new Date(today).getTime() - new Date(dueDate).getTime()) / (1000 * 60 * 60 * 24));
@@ -36,6 +39,7 @@ function getAgingBucket(dueDate: string | null, today: string): AgingRow["bucket
 }
 
 function ReportsPage() {
+  const navigate = useNavigate();
   const [balances, setBalances] = useState<AccountBalance[]>([]);
   const [arAging, setArAging] = useState<AgingRow[]>([]);
   const [apAging, setApAging] = useState<AgingRow[]>([]);
@@ -201,6 +205,7 @@ function ReportsPage() {
       const balance = isDebitNormal ? s.debit - s.credit : s.credit - s.debit;
 
       return {
+        id: acc.id,
         code: acc.code,
         name: acc.name,
         type: acc.type,
@@ -214,15 +219,27 @@ function ReportsPage() {
     setLoading(false);
   }
 
-  // Trial Balance: every account with nonzero activity, debit/credit totals
+  // Trial Balance: net per account. Debit minus credit, positive goes in Debit, otherwise
+  // the absolute value goes in Credit. Everything is rounded to cents before it is summed.
   const trialBalanceRows = useMemo(
-    () => balances.filter((b) => b.debit !== 0 || b.credit !== 0),
+    () =>
+      balances
+        .map((b) => {
+          const net = round2(b.debit - b.credit);
+          return { id: b.id, code: b.code, name: b.name, debit: net > 0 ? net : 0, credit: net > 0 ? 0 : Math.abs(net), net };
+        })
+        .filter((r) => r.net !== 0),
     [balances],
   );
   const trialBalanceTotals = useMemo(
-    () => trialBalanceRows.reduce((acc, b) => ({ debit: acc.debit + b.debit, credit: acc.credit + b.credit }), { debit: 0, credit: 0 }),
+    () =>
+      trialBalanceRows.reduce(
+        (acc, b) => ({ debit: round2(acc.debit + b.debit), credit: round2(acc.credit + b.credit) }),
+        { debit: 0, credit: 0 },
+      ),
     [trialBalanceRows],
   );
+  const trialBalanceDiff = round2(trialBalanceTotals.debit - trialBalanceTotals.credit);
 
   // P&L: revenue and expense accounts
   const revenueRows = useMemo(() => balances.filter((b) => b.type === "revenue" && b.balance !== 0), [balances]);
@@ -278,7 +295,17 @@ function ReportsPage() {
                   </thead>
                   <tbody>
                     {trialBalanceRows.map((row) => (
-                      <tr key={row.code} className="border-b">
+                      <tr
+                        key={row.code}
+                        className="cursor-pointer border-b hover:bg-muted/50"
+                        tabIndex={0}
+                        role="link"
+                        title="Open account ledger"
+                        onClick={() => void navigate({ to: "/accountant/account-ledger", search: { account: row.id } })}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") void navigate({ to: "/accountant/account-ledger", search: { account: row.id } });
+                        }}
+                      >
                         <td className="py-2">{row.code}</td>
                         <td className="py-2">{row.name}</td>
                         <td className="py-2 text-right">{row.debit > 0 ? row.debit.toFixed(2) : ""}</td>
@@ -296,12 +323,14 @@ function ReportsPage() {
                     </tr>
                   </tfoot>
                 </table>
-                {Math.abs(trialBalanceTotals.debit - trialBalanceTotals.credit) > 0.01 && (
-                  <p className="mt-3 text-sm text-red-600">
-                    Warning: totals do not match — this should never happen given the ledger's constraints.
-                    Flag this immediately if you see it.
-                  </p>
-                )}
+                <p
+                  className={`mt-3 text-sm font-medium ${trialBalanceDiff === 0 ? "text-green-700" : "text-red-700"}`}
+                  data-testid="tb-check"
+                >
+                  {trialBalanceDiff === 0
+                    ? "Balanced"
+                    : `Out by ${Math.abs(trialBalanceDiff).toFixed(2)} (${trialBalanceDiff > 0 ? "debits exceed credits" : "credits exceed debits"})`}
+                </p>
               </CardContent>
             </Card>
           </TabsContent>
