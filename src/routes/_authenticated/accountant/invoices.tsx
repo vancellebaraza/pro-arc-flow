@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,10 +14,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { logAudit } from "@/lib/auditLog";
-import { AlertTriangle, Flag } from "lucide-react";
+import { AlertTriangle, ExternalLink, Flag, Printer, Wallet } from "lucide-react";
 import { getUserCached } from "@/lib/auth-cache";
 import { useMyRoles } from "@/lib/auth";
 import { Textarea } from "@/components/ui/textarea";
+import { ConfirmDialog } from "@/components/accountant/ConfirmDialog";
+import { CsvButton } from "@/components/accountant/CsvButton";
+import {
+  RecordPaymentDialog,
+  type PayableInvoice,
+} from "@/components/accountant/RecordPaymentDialog";
+import { printInvoice } from "@/lib/invoicePrint";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -43,6 +50,7 @@ interface ApprovableQuotation {
 interface FlagInfo {
   flagged: boolean;
   reason: string | null;
+  project_id?: string | null;
 }
 
 interface InvoiceRecord {
@@ -53,6 +61,10 @@ interface InvoiceRecord {
   issue_date: string;
   due_date: string | null;
   quotation_id: string;
+  subtotal: number;
+  vat_amount: number;
+  client_id: string;
+  client_display_name: string | null;
 }
 
 interface StuckProject {
@@ -85,6 +97,14 @@ function InvoicesPage() {
   const [flagTarget, setFlagTarget] = useState<{ id: string; label: string } | null>(null);
   const [flagReason, setFlagReason] = useState("");
   const [flagBusy, setFlagBusy] = useState(false);
+  const [paidByInvoice, setPaidByInvoice] = useState<Map<string, number>>(new Map());
+  const [clientNames, setClientNames] = useState<Map<string, string>>(new Map());
+  const [paying, setPaying] = useState<PayableInvoice | null>(null);
+  const [sendTarget, setSendTarget] = useState<InvoiceRecord | null>(null);
+  const [sending, setSending] = useState(false);
+  // Synchronous lock so a double click cannot post the same invoice twice.
+  const sendInFlight = useRef(false);
+  const isAdmin = roles.includes("admin");
 
   useEffect(() => {
     void loadData();
@@ -95,7 +115,9 @@ function InvoicesPage() {
 
     const { data: existingInvoices, error: invoicesError } = await supabase
       .from("invoices")
-      .select("id,invoice_number,status,total,issue_date,due_date,quotation_id")
+      .select(
+        "id,invoice_number,status,total,issue_date,due_date,quotation_id,subtotal,vat_amount,client_id,client_display_name",
+      )
       .order("created_at", { ascending: false });
 
     if (invoicesError) {
@@ -106,18 +128,42 @@ function InvoicesPage() {
 
     setInvoices(existingInvoices ?? []);
 
+    const { data: allocRows } = await supabase
+      .from("payment_allocations")
+      .select("invoice_id,amount_applied");
+    const paid = new Map<string, number>();
+    for (const a of allocRows ?? []) {
+      paid.set(a.invoice_id, (paid.get(a.invoice_id) ?? 0) + (Number(a.amount_applied) || 0));
+    }
+    setPaidByInvoice(paid);
+
+    const clientIds = [
+      ...new Set((existingInvoices ?? []).map((i) => i.client_id).filter(Boolean)),
+    ];
+    if (clientIds.length > 0) {
+      const { data: profs } = await supabase
+        .from("profiles")
+        .select("id,full_name")
+        .in("id", clientIds);
+      setClientNames(new Map((profs ?? []).map((pr) => [pr.id, pr.full_name ?? ""])));
+    }
+
     const invoicedQuotationIds = new Set((existingInvoices ?? []).map((inv) => inv.quotation_id));
 
     if (invoicedQuotationIds.size > 0) {
       const { data: flagRows } = await supabase
         .from("quotations")
-        .select("id,do_not_invoice,do_not_invoice_reason")
+        .select("id,do_not_invoice,do_not_invoice_reason,project_id")
         .in("id", [...invoicedQuotationIds]);
       setInvoiceFlags(
         new Map(
           (flagRows ?? []).map((f) => [
             f.id,
-            { flagged: !!f.do_not_invoice, reason: f.do_not_invoice_reason ?? null },
+            {
+              flagged: !!f.do_not_invoice,
+              reason: f.do_not_invoice_reason ?? null,
+              project_id: f.project_id ?? null,
+            },
           ]),
         ),
       );
@@ -354,21 +400,49 @@ function InvoicesPage() {
     );
   }
 
-  async function handleSendInvoice(invoiceId: string) {
-    const { error } = await supabase
-      .from("invoices")
-      .update({ status: "sent" })
-      .eq("id", invoiceId);
+  async function handleSendInvoice() {
+    if (!sendTarget || sendInFlight.current) return;
+    sendInFlight.current = true;
+    setSending(true);
+    try {
+      const invoiceId = sendTarget.id;
+      // Only a draft can become sent; the status filter makes a second submit a no-op instead of a re-post.
+      const { data, error } = await supabase
+        .from("invoices")
+        .update({ status: "sent" })
+        .eq("id", invoiceId)
+        .eq("status", "draft")
+        .select("id");
+      if (error) throw error;
+      if (!data || data.length === 0) throw new Error("This invoice is no longer a draft.");
 
-    if (error) {
-      toast.error(error.message);
-      return;
+      await logAudit("invoices", invoiceId, "update", { status: "draft" }, { status: "sent" });
+      toast.success("Invoice sent and posted to the ledger.");
+      setSendTarget(null);
+      await loadData();
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : String(error));
+      setSendTarget(null);
+      await loadData();
+    } finally {
+      sendInFlight.current = false;
+      setSending(false);
     }
+  }
 
-    await logAudit("invoices", invoiceId, "update", { status: "draft" }, { status: "sent" });
+  function clientNameFor(inv: InvoiceRecord) {
+    return inv.client_display_name || clientNames.get(inv.client_id) || null;
+  }
 
-    toast.success("Invoice sent and posted to the ledger.");
-    await loadData();
+  function toPayable(inv: InvoiceRecord): PayableInvoice {
+    return {
+      id: inv.id,
+      invoice_number: inv.invoice_number,
+      total: Number(inv.total) || 0,
+      client_id: inv.client_id,
+      client_name: clientNameFor(inv),
+      paid_so_far: paidByInvoice.get(inv.id) ?? 0,
+    };
   }
 
   const visibleQuotations = availableQuotations.filter((q) => showFlagged || !q.do_not_invoice);
@@ -489,7 +563,39 @@ function InvoicesPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>All invoices</CardTitle>
+          <div className="flex items-center justify-between gap-2">
+            <CardTitle>All invoices</CardTitle>
+            <CsvButton
+              name="invoices"
+              headers={[
+                "Invoice",
+                "Client",
+                "Status",
+                "Issued",
+                "Due",
+                "Subtotal",
+                "VAT",
+                "Total",
+                "Paid",
+                "Balance",
+              ]}
+              rows={visibleInvoices.map((inv) => {
+                const paid = paidByInvoice.get(inv.id) ?? 0;
+                return [
+                  inv.invoice_number,
+                  clientNameFor(inv),
+                  inv.status,
+                  inv.issue_date,
+                  inv.due_date,
+                  Number(inv.subtotal),
+                  Number(inv.vat_amount),
+                  Number(inv.total),
+                  paid,
+                  Math.round((Number(inv.total) - paid) * 100) / 100,
+                ];
+              })}
+            />
+          </div>
         </CardHeader>
         <CardContent>
           {loading ? (
@@ -514,11 +620,49 @@ function InvoicesPage() {
                     </div>
                     <div className="flex items-center gap-1">
                       {renderFlagButton(inv.quotation_id, inv.invoice_number, flag)}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        title="PDF / print"
+                        aria-label="PDF / print"
+                        onClick={() =>
+                          void printInvoice({
+                            ...inv,
+                            client_name: clientNameFor(inv),
+                          }).catch((e: unknown) =>
+                            toast.error(e instanceof Error ? e.message : String(e)),
+                          )
+                        }
+                      >
+                        <Printer className="h-4 w-4" />
+                      </Button>
+                      {isAdmin && flag.project_id && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          asChild
+                          title="Open project"
+                          aria-label="Open project"
+                        >
+                          <Link
+                            to="/project-viewer/$projectId"
+                            params={{ projectId: flag.project_id }}
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                          </Link>
+                        </Button>
+                      )}
+                      {(inv.status === "sent" || inv.status === "partially_paid") && (
+                        <Button variant="outline" onClick={() => setPaying(toPayable(inv))}>
+                          <Wallet className="mr-1 h-4 w-4" />
+                          Record payment
+                        </Button>
+                      )}
                       {inv.status === "draft" ? (
                         <Button
                           variant="outline"
-                          onClick={() => handleSendInvoice(inv.id)}
-                          disabled={flag.flagged}
+                          onClick={() => setSendTarget(inv)}
+                          disabled={flag.flagged || sending}
                         >
                           Send invoice
                         </Button>
@@ -535,6 +679,22 @@ function InvoicesPage() {
           )}
         </CardContent>
       </Card>
+
+      <RecordPaymentDialog
+        invoice={paying}
+        onClose={() => setPaying(null)}
+        onDone={() => loadData()}
+      />
+
+      <ConfirmDialog
+        open={sendTarget !== null}
+        title="Send invoice and post to the ledger?"
+        description={`${sendTarget?.invoice_number ?? ""} for ${Number(sendTarget?.total ?? 0).toFixed(2)} will be marked as sent and posted to the general ledger (Accounts Receivable and revenue).`}
+        confirmLabel="Send and post"
+        busy={sending}
+        onConfirm={() => void handleSendInvoice()}
+        onCancel={() => setSendTarget(null)}
+      />
 
       <Dialog
         open={flagTarget !== null}
