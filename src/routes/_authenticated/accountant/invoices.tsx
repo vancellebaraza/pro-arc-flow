@@ -14,8 +14,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { logAudit } from "@/lib/auditLog";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Flag } from "lucide-react";
 import { getUserCached } from "@/lib/auth-cache";
+import { useMyRoles } from "@/lib/auth";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export const Route = createFileRoute("/_authenticated/accountant/invoices")({
   component: InvoicesPage,
@@ -31,6 +35,14 @@ interface ApprovableQuotation {
   labour: number;
   vat_amount: number;
   grand_total: number;
+  do_not_invoice: boolean;
+  do_not_invoice_reason: string | null;
+  project_status: string | null;
+}
+
+interface FlagInfo {
+  flagged: boolean;
+  reason: string | null;
 }
 
 interface InvoiceRecord {
@@ -65,6 +77,14 @@ function InvoicesPage() {
   const [creating, setCreating] = useState<ApprovableQuotation | null>(null);
   const [dueDate, setDueDate] = useState("");
   const [saving, setSaving] = useState(false);
+  const { roles } = useMyRoles();
+  // Matches the task spec; the database policy decides what is actually allowed (see setFlag).
+  const canFlag = roles.includes("admin") || roles.includes("accountant");
+  const [showFlagged, setShowFlagged] = useState(false);
+  const [invoiceFlags, setInvoiceFlags] = useState<Map<string, FlagInfo>>(new Map());
+  const [flagTarget, setFlagTarget] = useState<{ id: string; label: string } | null>(null);
+  const [flagReason, setFlagReason] = useState("");
+  const [flagBusy, setFlagBusy] = useState(false);
 
   useEffect(() => {
     void loadData();
@@ -88,9 +108,28 @@ function InvoicesPage() {
 
     const invoicedQuotationIds = new Set((existingInvoices ?? []).map((inv) => inv.quotation_id));
 
+    if (invoicedQuotationIds.size > 0) {
+      const { data: flagRows } = await supabase
+        .from("quotations")
+        .select("id,do_not_invoice,do_not_invoice_reason")
+        .in("id", [...invoicedQuotationIds]);
+      setInvoiceFlags(
+        new Map(
+          (flagRows ?? []).map((f) => [
+            f.id,
+            { flagged: !!f.do_not_invoice, reason: f.do_not_invoice_reason ?? null },
+          ]),
+        ),
+      );
+    } else {
+      setInvoiceFlags(new Map());
+    }
+
     const { data: quotations, error: quotationsError } = await supabase
       .from("quotations")
-      .select("id,project_id,subtotal,labour,vat_amount,grand_total,projects(title,client_id,client_display_name)")
+      .select(
+        "id,project_id,subtotal,labour,vat_amount,grand_total,do_not_invoice,do_not_invoice_reason,projects(title,status,client_id,client_display_name)",
+      )
       .eq("status", "approved");
 
     if (quotationsError) {
@@ -104,6 +143,7 @@ function InvoicesPage() {
       .map((q) => {
         const project = q.projects as unknown as {
           title: string;
+          status: string | null;
           client_id: string;
           client_display_name: string | null;
         } | null;
@@ -117,6 +157,9 @@ function InvoicesPage() {
           labour: Number(q.labour) || 0,
           vat_amount: Number(q.vat_amount) || 0,
           grand_total: Number(q.grand_total) || 0,
+          do_not_invoice: !!q.do_not_invoice,
+          do_not_invoice_reason: q.do_not_invoice_reason ?? null,
+          project_status: project?.status ?? null,
         };
       });
 
@@ -132,7 +175,10 @@ function InvoicesPage() {
     if (!completedError && completedProjects) {
       const stuck: StuckProject[] = [];
       for (const p of completedProjects as any[]) {
-        const quotationRows = (p.quotations ?? []) as Array<{ status: string; grand_total: number }>;
+        const quotationRows = (p.quotations ?? []) as Array<{
+          status: string;
+          grand_total: number;
+        }>;
         const relevant = quotationRows.find((q) => q.status !== "approved");
         const hasApproved = quotationRows.some((q) => q.status === "approved");
         if (relevant && !hasApproved) {
@@ -164,9 +210,8 @@ function InvoicesPage() {
     try {
       const { data: userData } = await getUserCached();
 
-      const { data: generatedNumber, error: numberError } = await supabase.rpc(
-        "next_invoice_number",
-      );
+      const { data: generatedNumber, error: numberError } =
+        await supabase.rpc("next_invoice_number");
 
       if (numberError || !generatedNumber) {
         throw numberError ?? new Error("Could not generate invoice number.");
@@ -244,6 +289,71 @@ function InvoicesPage() {
     }
   }
 
+  async function setFlag(quotationId: string, flagged: boolean, reason: string) {
+    setFlagBusy(true);
+    try {
+      const patch = {
+        do_not_invoice: flagged,
+        do_not_invoice_reason: flagged ? reason.trim() || null : null,
+      };
+      // .select() so a policy-blocked update (0 rows, no error) is detected instead of looking like success.
+      const { data, error } = await supabase
+        .from("quotations")
+        .update(patch)
+        .eq("id", quotationId)
+        .select("id");
+      if (error) throw error;
+      if (!data || data.length === 0) {
+        throw new Error(
+          "Not saved: the database does not allow your role to edit quotations (row-level security).",
+        );
+      }
+      await logAudit("quotations", quotationId, "update", { do_not_invoice: !flagged }, patch);
+      toast.success(flagged ? "Marked as test data - will not be invoiced." : "Flag removed.");
+      setFlagTarget(null);
+      await loadData();
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : String(error));
+    } finally {
+      setFlagBusy(false);
+    }
+  }
+
+  function renderFlagButton(id: string, label: string, info: FlagInfo) {
+    if (!canFlag) return null;
+    return (
+      <TooltipProvider delayDuration={100}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              disabled={flagBusy}
+              aria-label={info.flagged ? "Unflag" : "Mark as test data - do not invoice"}
+              className={
+                info.flagged ? "text-red-600/60 hover:text-red-600" : "text-muted-foreground"
+              }
+              onClick={() => {
+                if (info.flagged) void setFlag(id, false, "");
+                else {
+                  setFlagReason("");
+                  setFlagTarget({ id, label });
+                }
+              }}
+            >
+              <Flag className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            {info.flagged
+              ? `Flagged as test data${info.reason ? `: ${info.reason}` : ""} - click to unflag`
+              : "Mark as test data - do not invoice"}
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  }
+
   async function handleSendInvoice(invoiceId: string) {
     const { error } = await supabase
       .from("invoices")
@@ -261,14 +371,32 @@ function InvoicesPage() {
     await loadData();
   }
 
+  const visibleQuotations = availableQuotations.filter((q) => showFlagged || !q.do_not_invoice);
+  const visibleInvoices = invoices.filter(
+    (inv) => showFlagged || !invoiceFlags.get(inv.quotation_id)?.flagged,
+  );
+  const flaggedCount =
+    availableQuotations.filter((q) => q.do_not_invoice).length +
+    invoices.filter((inv) => invoiceFlags.get(inv.quotation_id)?.flagged).length;
+
   return (
     <div className="fade-in flex flex-col gap-5">
-      <div>
-        <h1 className="font-display text-[1.75rem] font-bold leading-tight">Invoices</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Create invoices from approved quotations. A draft invoice does not affect the ledger —
-          only sending it does.
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="font-display text-[1.75rem] font-bold leading-tight">Invoices</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Create invoices from approved quotations. A draft invoice does not affect the ledger —
+            only sending it does.
+          </p>
+        </div>
+        <label className="flex shrink-0 cursor-pointer items-center gap-2 text-sm text-muted-foreground">
+          <input
+            type="checkbox"
+            checked={showFlagged}
+            onChange={(e) => setShowFlagged(e.target.checked)}
+          />
+          Show flagged{flaggedCount > 0 ? ` (${flaggedCount})` : ""}
+        </label>
       </div>
 
       {!loading && blockedProjects.length > 0 && (
@@ -279,9 +407,8 @@ function InvoicesPage() {
               Completed jobs blocked from invoicing ({blockedProjects.length})
             </CardTitle>
             <p className="text-sm text-muted-foreground">
-              These jobs are marked completed but their quotation was never approved, so they
-              can't be invoiced yet. This is not an accounts problem — chase whoever approves
-              quotations.
+              These jobs are marked completed but their quotation was never approved, so they can't
+              be invoiced yet. This is not an accounts problem — chase whoever approves quotations.
             </p>
           </CardHeader>
           <CardContent>
@@ -317,25 +444,42 @@ function InvoicesPage() {
         <CardContent>
           {loading ? (
             <div className="text-sm text-muted-foreground">Loading…</div>
-          ) : availableQuotations.length === 0 ? (
+          ) : visibleQuotations.length === 0 ? (
             <div className="text-sm text-muted-foreground">
               No approved quotations are waiting to be invoiced.
             </div>
           ) : (
             <div className="space-y-2">
-              {availableQuotations.map((q) => (
-                <div
-                  key={q.id}
-                  className="flex items-center justify-between rounded-lg border p-4"
-                >
+              {visibleQuotations.map((q) => (
+                <div key={q.id} className="flex items-center justify-between rounded-lg border p-4">
                   <div>
-                    <div className="font-medium">{q.project_title}</div>
+                    <div className="flex items-center gap-2 font-medium">
+                      {q.project_title}
+                      {q.project_status !== "completed" && (
+                        <Badge variant="outline" className="border-amber-500/50 text-amber-700">
+                          Approved but not yet completed
+                        </Badge>
+                      )}
+                      {q.do_not_invoice && (
+                        <Badge variant="outline" className="border-red-500/40 text-red-600/80">
+                          Test data
+                        </Badge>
+                      )}
+                    </div>
                     <div className="text-sm text-muted-foreground">
                       {q.client_display_name ? `${q.client_display_name} • ` : ""}
                       Total: {q.grand_total.toFixed(2)}
                     </div>
                   </div>
-                  <Button onClick={() => openCreateDialog(q)}>Create invoice</Button>
+                  <div className="flex items-center gap-1">
+                    {renderFlagButton(q.id, q.project_title, {
+                      flagged: q.do_not_invoice,
+                      reason: q.do_not_invoice_reason,
+                    })}
+                    <Button onClick={() => openCreateDialog(q)} disabled={q.do_not_invoice}>
+                      Create invoice
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -350,35 +494,80 @@ function InvoicesPage() {
         <CardContent>
           {loading ? (
             <div className="text-sm text-muted-foreground">Loading…</div>
-          ) : invoices.length === 0 ? (
+          ) : visibleInvoices.length === 0 ? (
             <div className="text-sm text-muted-foreground">No invoices yet.</div>
           ) : (
             <div className="space-y-2">
-              {invoices.map((inv) => (
-                <div
-                  key={inv.id}
-                  className="flex items-center justify-between rounded-lg border p-4"
-                >
-                  <div>
-                    <div className="font-medium">{inv.invoice_number}</div>
-                    <div className="text-sm text-muted-foreground">
-                      {inv.status} • Total: {Number(inv.total).toFixed(2)} • Issued{" "}
-                      {new Date(inv.issue_date).toLocaleDateString()}
+              {visibleInvoices.map((inv) => {
+                const flag = invoiceFlags.get(inv.quotation_id) ?? { flagged: false, reason: null };
+                return (
+                  <div
+                    key={inv.id}
+                    className="flex items-center justify-between rounded-lg border p-4"
+                  >
+                    <div>
+                      <div className="font-medium">{inv.invoice_number}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {inv.status} • Total: {Number(inv.total).toFixed(2)} • Issued{" "}
+                        {new Date(inv.issue_date).toLocaleDateString()}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      {renderFlagButton(inv.quotation_id, inv.invoice_number, flag)}
+                      {inv.status === "draft" ? (
+                        <Button
+                          variant="outline"
+                          onClick={() => handleSendInvoice(inv.id)}
+                          disabled={flag.flagged}
+                        >
+                          Send invoice
+                        </Button>
+                      ) : (
+                        <span className="text-sm text-muted-foreground capitalize">
+                          {inv.status}
+                        </span>
+                      )}
                     </div>
                   </div>
-                  {inv.status === "draft" ? (
-                    <Button variant="outline" onClick={() => handleSendInvoice(inv.id)}>
-                      Send invoice
-                    </Button>
-                  ) : (
-                    <span className="text-sm text-muted-foreground capitalize">{inv.status}</span>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </CardContent>
       </Card>
+
+      <Dialog
+        open={flagTarget !== null}
+        onOpenChange={(open) => !open && !flagBusy && setFlagTarget(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Mark as test data</DialogTitle>
+            <DialogDescription>
+              {flagTarget?.label} will be hidden from invoicing and cannot be invoiced or sent until
+              unflagged.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="flagReason">Reason (optional)</Label>
+              <Textarea
+                id="flagReason"
+                value={flagReason}
+                onChange={(e) => setFlagReason(e.target.value)}
+                placeholder="e.g. demo job used for training"
+              />
+            </div>
+            <Button
+              className="w-full"
+              disabled={flagBusy}
+              onClick={() => flagTarget && void setFlag(flagTarget.id, true, flagReason)}
+            >
+              {flagBusy ? "Saving…" : "Mark as test data"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={creating !== null} onOpenChange={(open) => !open && setCreating(null)}>
         <DialogContent>
