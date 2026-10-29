@@ -8,6 +8,8 @@ const IN_CHUNK = 100; // Keeps `.in()` URLs short.
 export const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
 
 export function formatKes(amount: number) {
+  // Negating a zero balance gives -0, which would print as "-0.00".
+  if (Math.abs(amount) < 0.005) amount = 0;
   return `KES ${amount.toLocaleString("en-KE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
