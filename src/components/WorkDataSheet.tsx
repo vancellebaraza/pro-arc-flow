@@ -523,7 +523,12 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
           </Button>
         </div>
       </div>
-      <div className="max-h-[calc(100vh-14rem)] min-h-[320px] overflow-auto rounded-2xl border bg-card">
+      <div
+        role="region"
+        aria-label="Work data sheet"
+        tabIndex={0}
+        className="sheet-scroll max-h-[calc(100vh-8rem)] min-h-[420px] rounded-2xl border bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      >
         <table className="w-full min-w-[3424px] table-fixed border-separate border-spacing-0 text-[15px]">
           <colgroup>
             <col style={{ width: 56 }} />
@@ -836,41 +841,47 @@ export default function WorkDataSheet({ onCommentChange }: Props) {
           {!loading && (
             <tfoot>
               <tr className="h-12 bg-[var(--surface)] font-semibold">
-                <td colSpan={6} className="border-t px-3 text-right align-middle">
+                <td
+                  colSpan={6}
+                  className="sticky bottom-0 z-20 border-t bg-[var(--surface)] px-3 text-right align-middle"
+                >
                   Totals
                 </td>
-                <td className="whitespace-nowrap border-t px-3 text-right align-middle tabular-nums">
+                <td className="whitespace-nowrap sticky bottom-0 z-20 border-t bg-[var(--surface)] px-3 text-right align-middle tabular-nums">
                   {fmt(totals.quotedAmt)}
                 </td>
-                <td className="whitespace-nowrap border-t px-3 text-right align-middle tabular-nums">
+                <td className="whitespace-nowrap sticky bottom-0 z-20 border-t bg-[var(--surface)] px-3 text-right align-middle tabular-nums">
                   {fmt(totals.paidByClient)}
                 </td>
-                <td className="whitespace-nowrap border-t px-3 text-right align-middle tabular-nums">
+                <td className="whitespace-nowrap sticky bottom-0 z-20 border-t bg-[var(--surface)] px-3 text-right align-middle tabular-nums">
                   {fmt(totals.amountDue)}
                 </td>
-                <td className="border-t px-3" />
-                <td className="whitespace-nowrap border-t px-3 text-right align-middle tabular-nums">
+                <td className="sticky bottom-0 z-20 border-t bg-[var(--surface)] px-3" />
+                <td className="whitespace-nowrap sticky bottom-0 z-20 border-t bg-[var(--surface)] px-3 text-right align-middle tabular-nums">
                   {fmt(totals.vendorQuoted)}
                 </td>
-                <td className="whitespace-nowrap border-t px-3 text-right align-middle tabular-nums">
+                <td className="whitespace-nowrap sticky bottom-0 z-20 border-t bg-[var(--surface)] px-3 text-right align-middle tabular-nums">
                   {fmt(totals.variance)}
                 </td>
-                <td className="whitespace-nowrap border-t px-3 text-right align-middle tabular-nums">
+                <td className="whitespace-nowrap sticky bottom-0 z-20 border-t bg-[var(--surface)] px-3 text-right align-middle tabular-nums">
                   {fmt(totals.amountPayable)}
                 </td>
-                <td className="whitespace-nowrap border-t px-3 text-right align-middle tabular-nums">
+                <td className="whitespace-nowrap sticky bottom-0 z-20 border-t bg-[var(--surface)] px-3 text-right align-middle tabular-nums">
                   {fmt(totals.paidToVendor)}
                 </td>
-                <td className="whitespace-nowrap border-t px-3 text-right align-middle tabular-nums">
+                <td className="whitespace-nowrap sticky bottom-0 z-20 border-t bg-[var(--surface)] px-3 text-right align-middle tabular-nums">
                   {fmt(totals.dueToVendor)}
                 </td>
-                <td className="whitespace-nowrap border-t px-3 text-right align-middle tabular-nums">
+                <td className="whitespace-nowrap sticky bottom-0 z-20 border-t bg-[var(--surface)] px-3 text-right align-middle tabular-nums">
                   {fmt(totals.margin)}
                 </td>
-                <td className="whitespace-nowrap border-t px-3 text-right align-middle tabular-nums">
+                <td className="whitespace-nowrap sticky bottom-0 z-20 border-t bg-[var(--surface)] px-3 text-right align-middle tabular-nums">
                   {totalMarginPercent != null ? `${totalMarginPercent.toFixed(1)}%` : "—"}
                 </td>
-                <td colSpan={5} className="border-t px-3" />
+                <td
+                  colSpan={5}
+                  className="sticky bottom-0 z-20 border-t bg-[var(--surface)] px-3"
+                />
               </tr>
             </tfoot>
           )}
