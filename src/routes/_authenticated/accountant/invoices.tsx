@@ -93,6 +93,7 @@ function InvoicesPage() {
   // Matches the task spec; the database policy decides what is actually allowed (see setFlag).
   const canFlag = roles.includes("admin") || roles.includes("accountant");
   const [showFlagged, setShowFlagged] = useState(false);
+  const [showVoided, setShowVoided] = useState(false);
   const [invoiceFlags, setInvoiceFlags] = useState<Map<string, FlagInfo>>(new Map());
   const [flagTarget, setFlagTarget] = useState<{ id: string; label: string } | null>(null);
   const [flagReason, setFlagReason] = useState("");
@@ -130,7 +131,8 @@ function InvoicesPage() {
 
     const { data: allocRows } = await supabase
       .from("payment_allocations")
-      .select("invoice_id,amount_applied");
+      .select("invoice_id,amount_applied,payments!inner(voided_at)")
+      .is("payments.voided_at", null);
     const paid = new Map<string, number>();
     for (const a of allocRows ?? []) {
       paid.set(a.invoice_id, (paid.get(a.invoice_id) ?? 0) + (Number(a.amount_applied) || 0));
@@ -148,13 +150,20 @@ function InvoicesPage() {
       setClientNames(new Map((profs ?? []).map((pr) => [pr.id, pr.full_name ?? ""])));
     }
 
-    const invoicedQuotationIds = new Set((existingInvoices ?? []).map((inv) => inv.quotation_id));
+    // Void invoices are treated as if they never existed: a quotation with only void invoices is invoiceable again.
+    const invoicedQuotationIds = new Set(
+      (existingInvoices ?? [])
+        .filter((inv) => inv.status !== "void")
+        .map((inv) => inv.quotation_id),
+    );
+    // Flags are still looked up for void invoices so their rows render when "Show voided" is on.
+    const listedQuotationIds = new Set((existingInvoices ?? []).map((inv) => inv.quotation_id));
 
-    if (invoicedQuotationIds.size > 0) {
+    if (listedQuotationIds.size > 0) {
       const { data: flagRows } = await supabase
         .from("quotations")
         .select("id,do_not_invoice,do_not_invoice_reason,project_id")
-        .in("id", [...invoicedQuotationIds]);
+        .in("id", [...listedQuotationIds]);
       setInvoiceFlags(
         new Map(
           (flagRows ?? []).map((f) => [
@@ -255,6 +264,18 @@ function InvoicesPage() {
     setSaving(true);
     try {
       const { data: userData } = await getUserCached();
+
+      // A quotation may carry several invoices over time (void ones are ignored), but never two live ones.
+      const { data: liveInvoices, error: liveError } = await supabase
+        .from("invoices")
+        .select("id")
+        .eq("quotation_id", creating.id)
+        .neq("status", "void")
+        .limit(1);
+      if (liveError) throw liveError;
+      if (liveInvoices && liveInvoices.length > 0) {
+        throw new Error("This quotation already has an invoice.");
+      }
 
       const { data: generatedNumber, error: numberError } =
         await supabase.rpc("next_invoice_number");
@@ -451,12 +472,16 @@ function InvoicesPage() {
   }
 
   const visibleQuotations = availableQuotations.filter((q) => showFlagged || !q.do_not_invoice);
+  const liveInvoices = invoices.filter((inv) => inv.status !== "void");
+  const voidCount = invoices.length - liveInvoices.length;
   const visibleInvoices = invoices.filter(
-    (inv) => showFlagged || !invoiceFlags.get(inv.quotation_id)?.flagged,
+    (inv) =>
+      (showFlagged || !invoiceFlags.get(inv.quotation_id)?.flagged) &&
+      (showVoided || inv.status !== "void"),
   );
   const flaggedCount =
     availableQuotations.filter((q) => q.do_not_invoice).length +
-    invoices.filter((inv) => invoiceFlags.get(inv.quotation_id)?.flagged).length;
+    liveInvoices.filter((inv) => invoiceFlags.get(inv.quotation_id)?.flagged).length;
 
   return (
     <div className="fade-in flex flex-col gap-5">
@@ -468,14 +493,24 @@ function InvoicesPage() {
             only sending it does.
           </p>
         </div>
-        <label className="flex shrink-0 cursor-pointer items-center gap-2 text-sm text-muted-foreground">
-          <input
-            type="checkbox"
-            checked={showFlagged}
-            onChange={(e) => setShowFlagged(e.target.checked)}
-          />
-          Show flagged{flaggedCount > 0 ? ` (${flaggedCount})` : ""}
-        </label>
+        <div className="flex shrink-0 flex-col items-end gap-1">
+          <label className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground">
+            <input
+              type="checkbox"
+              checked={showFlagged}
+              onChange={(e) => setShowFlagged(e.target.checked)}
+            />
+            Show flagged{flaggedCount > 0 ? ` (${flaggedCount})` : ""}
+          </label>
+          <label className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground">
+            <input
+              type="checkbox"
+              checked={showVoided}
+              onChange={(e) => setShowVoided(e.target.checked)}
+            />
+            Show voided{voidCount > 0 ? ` (${voidCount})` : ""}
+          </label>
+        </div>
       </div>
 
       {!loading && blockedProjects.length > 0 && (
@@ -584,21 +619,23 @@ function InvoicesPage() {
                 "Paid",
                 "Balance",
               ]}
-              rows={visibleInvoices.map((inv) => {
-                const paid = paidByInvoice.get(inv.id) ?? 0;
-                return [
-                  inv.invoice_number,
-                  clientNameFor(inv),
-                  inv.status,
-                  inv.issue_date,
-                  inv.due_date,
-                  Number(inv.subtotal),
-                  Number(inv.vat_amount),
-                  Number(inv.total),
-                  paid,
-                  Math.round((Number(inv.total) - paid) * 100) / 100,
-                ];
-              })}
+              rows={visibleInvoices
+                .filter((inv) => inv.status !== "void")
+                .map((inv) => {
+                  const paid = paidByInvoice.get(inv.id) ?? 0;
+                  return [
+                    inv.invoice_number,
+                    clientNameFor(inv),
+                    inv.status,
+                    inv.issue_date,
+                    inv.due_date,
+                    Number(inv.subtotal),
+                    Number(inv.vat_amount),
+                    Number(inv.total),
+                    paid,
+                    Math.round((Number(inv.total) - paid) * 100) / 100,
+                  ];
+                })}
             />
           </div>
         </CardHeader>
@@ -606,21 +643,29 @@ function InvoicesPage() {
           {loading ? (
             <div className="text-sm text-muted-foreground">Loading…</div>
           ) : visibleInvoices.length === 0 ? (
-            <div className="text-sm text-muted-foreground">No invoices yet.</div>
+            <div className="text-sm text-muted-foreground">No invoices to show.</div>
           ) : (
             <div className="space-y-2">
               {visibleInvoices.map((inv) => {
                 const flag = invoiceFlags.get(inv.quotation_id) ?? { flagged: false, reason: null };
+                const isVoid = inv.status === "void";
                 return (
                   <div
                     key={inv.id}
-                    className="flex items-center justify-between rounded-lg border p-4"
+                    className={`flex items-center justify-between rounded-lg border p-4 ${isVoid ? "opacity-60" : ""}`}
                   >
                     <div>
-                      <div className="font-medium">{inv.invoice_number}</div>
+                      <div className="flex items-center gap-2 font-medium">
+                        {inv.invoice_number}
+                        {isVoid && (
+                          <Badge variant="outline" className="text-muted-foreground">
+                            Void
+                          </Badge>
+                        )}
+                      </div>
                       <div className="text-sm text-muted-foreground">
-                        {inv.status} • Total: {Number(inv.total).toFixed(2)} • Issued{" "}
-                        {new Date(inv.issue_date).toLocaleDateString()}
+                        {isVoid ? "" : `${inv.status} • `}Total: {Number(inv.total).toFixed(2)} •
+                        Issued {new Date(inv.issue_date).toLocaleDateString()}
                       </div>
                     </div>
                     <div className="flex items-center gap-1">
@@ -657,13 +702,23 @@ function InvoicesPage() {
                           </Link>
                         </Button>
                       )}
+                      {isVoid && (
+                        <Button variant="outline" disabled>
+                          <Wallet className="mr-1 h-4 w-4" />
+                          Record payment
+                        </Button>
+                      )}
                       {(inv.status === "sent" || inv.status === "partially_paid") && (
                         <Button variant="outline" onClick={() => setPaying(toPayable(inv))}>
                           <Wallet className="mr-1 h-4 w-4" />
                           Record payment
                         </Button>
                       )}
-                      {inv.status === "draft" ? (
+                      {isVoid ? (
+                        <Button variant="outline" disabled>
+                          Send invoice
+                        </Button>
+                      ) : inv.status === "draft" ? (
                         <Button
                           variant="outline"
                           onClick={() => setSendTarget(inv)}
