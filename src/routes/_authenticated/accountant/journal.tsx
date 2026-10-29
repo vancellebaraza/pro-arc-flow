@@ -222,7 +222,16 @@ function JournalPage() {
         p_reference: ref,
         p_lines: payload,
       });
-      if (error) throw error;
+      if (error) {
+        // The unique index on REV: references catches a concurrent reversal the pre-check missed.
+        if (
+          error.code === "23505" &&
+          String(error.message).includes("journal_entries_reversal_ref_uniq")
+        ) {
+          throw new Error("This entry has already been reversed.");
+        }
+        throw new Error(error.message);
+      }
 
       await logAudit("journal_entries", entryId as string, "insert", null, {
         entry_date: todayISO(),

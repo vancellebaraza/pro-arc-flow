@@ -338,23 +338,28 @@ function InvoicesPage() {
   async function setFlag(quotationId: string, flagged: boolean, reason: string) {
     setFlagBusy(true);
     try {
-      const patch = {
-        do_not_invoice: flagged,
-        do_not_invoice_reason: flagged ? reason.trim() || null : null,
-      };
-      // .select() so a policy-blocked update (0 rows, no error) is detected instead of looking like success.
-      const { data, error } = await supabase
-        .from("quotations")
-        .update(patch)
-        .eq("id", quotationId)
-        .select("id");
-      if (error) throw error;
-      if (!data || data.length === 0) {
-        throw new Error(
-          "Not saved: the database does not allow your role to edit quotations (row-level security).",
-        );
-      }
-      await logAudit("quotations", quotationId, "update", { do_not_invoice: !flagged }, patch);
+      const reasonValue = flagged ? reason.trim() || null : null;
+      // Narrow cast: the generated Supabase types are empty on this branch, so the RPC is untyped.
+      const { error } = await (
+        supabase as unknown as {
+          rpc: (
+            fn: "set_quotation_do_not_invoice",
+            args: { _quotation_id: string; _flag: boolean; _reason: string | null },
+          ) => PromiseLike<{ error: { message: string } | null }>;
+        }
+      ).rpc("set_quotation_do_not_invoice", {
+        _quotation_id: quotationId,
+        _flag: flagged,
+        _reason: reasonValue,
+      });
+      if (error) throw new Error(error.message);
+      await logAudit(
+        "quotations",
+        quotationId,
+        "update",
+        { do_not_invoice: !flagged },
+        { do_not_invoice: flagged, do_not_invoice_reason: reasonValue },
+      );
       toast.success(flagged ? "Marked as test data - will not be invoiced." : "Flag removed.");
       setFlagTarget(null);
       await loadData();
