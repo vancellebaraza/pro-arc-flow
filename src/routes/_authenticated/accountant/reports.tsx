@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -29,6 +31,7 @@ interface AccountBalance {
   code: string;
   name: string;
   type: string;
+  isActive: boolean;
   debit: number;
   credit: number;
   balance: number;
@@ -293,6 +296,7 @@ function ReportsPage() {
   const navigate = useNavigate();
   const { tab = "trial-balance" } = Route.useSearch();
   const [balances, setBalances] = useState<AccountBalance[]>([]);
+  const [showZero, setShowZero] = useState(true);
   const [arAging, setArAging] = useState<AgingRow[]>([]);
   const [apAging, setApAging] = useState<AgingRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -335,6 +339,7 @@ function ReportsPage() {
           code: acc.code,
           name: acc.name,
           type: acc.type,
+          isActive: acc.is_active !== false,
           debit: s.debit,
           credit: s.credit,
           balance,
@@ -348,8 +353,9 @@ function ReportsPage() {
     }
   }
 
-  // Trial Balance: net per account. Debit minus credit, positive goes in Debit, otherwise
-  // the absolute value goes in Credit. Everything is rounded to cents before it is summed.
+  // Trial Balance: net per account. Debit minus credit, positive goes in Debit, negative in Credit,
+  // and an exact zero is shown in Debit. Everything is rounded to cents before it is summed.
+  // Inactive accounts only appear while they still carry a balance.
   const trialBalanceRows = useMemo(
     () =>
       balances
@@ -360,12 +366,13 @@ function ReportsPage() {
             code: b.code,
             name: b.name,
             debit: net > 0 ? net : 0,
-            credit: net > 0 ? 0 : Math.abs(net),
+            credit: net < 0 ? Math.abs(net) : 0,
             net,
+            isActive: b.isActive,
           };
         })
-        .filter((r) => r.net !== 0),
-    [balances],
+        .filter((r) => (r.isActive || r.net !== 0) && (showZero || r.net !== 0)),
+    [balances, showZero],
   );
   const trialBalanceTotals = useMemo(
     () =>
@@ -462,8 +469,8 @@ function ReportsPage() {
                       ...trialBalanceRows.map((r) => [
                         r.code,
                         r.name,
-                        r.debit || "",
-                        r.credit || "",
+                        r.net < 0 ? "" : r.debit,
+                        r.net < 0 ? r.credit : "",
                       ]),
                       ["", "Total", trialBalanceTotals.debit, trialBalanceTotals.credit],
                     ]}
@@ -471,6 +478,12 @@ function ReportsPage() {
                 </div>
               </CardHeader>
               <CardContent>
+                <div className="mb-3 flex items-center gap-2">
+                  <Switch id="tb-show-zero" checked={showZero} onCheckedChange={setShowZero} />
+                  <Label htmlFor="tb-show-zero" className="text-sm">
+                    Show zero-balance accounts
+                  </Label>
+                </div>
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b text-left text-muted-foreground">
@@ -505,10 +518,10 @@ function ReportsPage() {
                         <td className="py-2">{row.code}</td>
                         <td className="py-2">{row.name}</td>
                         <td className="py-2 text-right">
-                          {row.debit > 0 ? row.debit.toFixed(2) : ""}
+                          {row.net < 0 ? "" : row.debit.toFixed(2)}
                         </td>
                         <td className="py-2 text-right">
-                          {row.credit > 0 ? row.credit.toFixed(2) : ""}
+                          {row.net < 0 ? row.credit.toFixed(2) : ""}
                         </td>
                       </tr>
                     ))}
