@@ -47,6 +47,7 @@ export interface LedgerAccount {
   code: string;
   name: string;
   type: string;
+  is_active: boolean;
 }
 
 export interface LedgerSums {
@@ -59,7 +60,7 @@ export interface LedgerSums {
 
 export async function loadLedgerSums(): Promise<LedgerSums> {
   const [{ data: accounts, error }, lines] = await Promise.all([
-    supabase.from("accounts").select("id,code,name,type").order("code"),
+    supabase.from("accounts").select("id,code,name,type,is_active").order("code"),
     fetchAllRows<{ account_id: string; debit: number | string; credit: number | string }>(
       (from, to) =>
         supabase
